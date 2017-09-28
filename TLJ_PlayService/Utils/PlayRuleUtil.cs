@@ -32,7 +32,7 @@ public class PlayRuleUtil
                 for (int i = 0; i < playerOutPokerList.Count - 2; i += 2)
                 {
                     LogUtil.getInstance().writeLogToLocalNow("第一张牌的权重："+ playerOutPokerList[i + 2].m_weight+ "第三张牌的权重："+ playerOutPokerList[i].m_weight);
-                    if (playerOutPokerList[i + 2].m_weight - playerOutPokerList[i].m_weight != 1)
+                    if (Math.Abs(playerOutPokerList[i + 2].m_weight - playerOutPokerList[i].m_weight) != 1)
                     {
                         return false;
                     }
