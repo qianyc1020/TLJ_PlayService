@@ -1228,7 +1228,7 @@ class PlayLogic_Relax
     }
 }
 
-class RoomData
+ class RoomData
 {
     int m_roomId;
     public bool m_isStartGame = false;
@@ -1243,8 +1243,8 @@ class RoomData
     List<TLJCommon.PokerInfo> m_DiPokerList = new List<TLJCommon.PokerInfo>();
 
     // 默认为-1，代表没有被赋值过
-    public int m_levelPokerNum = -1;            // 级牌
-    public int m_masterPokerType = -1;          // 主牌花色
+    public static int m_levelPokerNum = -1;            // 级牌
+    public static int m_masterPokerType = -1;          // 主牌花色
 
     public int m_getAllScore = 0;                  // 庄家对家抓到的分数
 
