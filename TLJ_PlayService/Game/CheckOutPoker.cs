@@ -15,7 +15,7 @@ public class CheckOutPoker
     }
 
     // 检测出牌合理性
-    public static bool checkOutPoker(bool isFreeOutPoker, List<TLJCommon.PokerInfo> myOutPokerList, List<TLJCommon.PokerInfo> beforeOutPokerList, List<TLJCommon.PokerInfo> myRestPokerList)
+    public static bool checkOutPoker(bool isFreeOutPoker, List<TLJCommon.PokerInfo> myOutPokerList, List<TLJCommon.PokerInfo> beforeOutPokerList, List<TLJCommon.PokerInfo> myRestPokerList, int mLevelPokerNum, int masterPokerType)
     {
         // 自由出牌
         if (isFreeOutPoker)
@@ -32,7 +32,7 @@ public class CheckOutPoker
             }
 
             // 检查出牌的类型是否正确：单排、对子、拖拉机、甩牌
-            if (checkOutPokerType(myOutPokerList) == OutPokerType.OutPokerType_Error)
+            if (checkOutPokerType(myOutPokerList, mLevelPokerNum, masterPokerType) == OutPokerType.OutPokerType_Error)
             {
                 return false;
             }
@@ -48,7 +48,7 @@ public class CheckOutPoker
                 }
             }
 
-            switch (CheckOutPoker.checkOutPokerType(beforeOutPokerList))
+            switch (CheckOutPoker.checkOutPokerType(beforeOutPokerList, mLevelPokerNum, masterPokerType))
             {
                 case CheckOutPoker.OutPokerType.OutPokerType_Single:
                     {
@@ -122,7 +122,7 @@ public class CheckOutPoker
                         {
                             // 是拖拉机
                             {
-                                if (checkOutPokerType(myOutPokerList) == OutPokerType.OutPokerType_TuoLaJi)
+                                if (checkOutPokerType(myOutPokerList, mLevelPokerNum, masterPokerType) == OutPokerType.OutPokerType_TuoLaJi)
                                 {
                                     return true;
                                 }
@@ -141,7 +141,7 @@ public class CheckOutPoker
                                                 }
 
                                                 // 找到拖拉机了
-                                                if (CheckOutPoker.checkOutPokerType(tempList) == CheckOutPoker.OutPokerType.OutPokerType_TuoLaJi)
+                                                if (CheckOutPoker.checkOutPokerType(tempList, mLevelPokerNum, masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_TuoLaJi)
                                                 {
                                                     return false;
                                                 }
@@ -252,7 +252,7 @@ public class CheckOutPoker
         return true;
     }
 
-    public static OutPokerType checkOutPokerType(List<TLJCommon.PokerInfo> outPokerList)
+    public static OutPokerType checkOutPokerType(List<TLJCommon.PokerInfo> outPokerList, int mLevelPokerNum, int masterPokerType)
     {
         int count = outPokerList.Count;
 
@@ -276,7 +276,7 @@ public class CheckOutPoker
 
         else if (count % 2 == 0 && count >= 4)
         {
-            if (CompareWhoMax.CheckTuoLaJi(outPokerList))
+            if (PlayRuleUtil.CheckTuoLaJi(outPokerList, mLevelPokerNum, masterPokerType))
             {
                 LogUtil.getInstance().writeLogToLocalNow("出的是拖拉机");
                 return OutPokerType.OutPokerType_TuoLaJi;

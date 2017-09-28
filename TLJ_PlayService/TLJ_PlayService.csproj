@@ -79,6 +79,7 @@
     <Compile Include="Utils\HPServerUtil.cs" />
     <Compile Include="Utils\LogUtil.cs" />
     <Compile Include="Utils\MySqlServerUtil.cs" />
+    <Compile Include="Utils\PlayRuleUtil.cs" />
     <Compile Include="Utils\RandomUtil.cs" />
   </ItemGroup>
   <ItemGroup>

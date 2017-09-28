@@ -8,12 +8,12 @@ using TLJCommon;
 public class PlayRuleUtil
 {
     //检查是否是拖拉机
-    public static bool CheckTuoLaJi(List<PokerInfo> playerOutPokerList)
+    public static bool CheckTuoLaJi(List<PokerInfo> playerOutPokerList, int mLevelPokerNum, int masterPokerType)
     {
         if (playerOutPokerList.Count % 2 == 0 && playerOutPokerList.Count >= 4)
         {
             //都是主牌或者都是同一花色的副牌
-            if (IsAllMasterPoker(playerOutPokerList) || IsAllFuPoker(playerOutPokerList))
+            if (IsAllMasterPoker(playerOutPokerList,mLevelPokerNum, masterPokerType) || IsAllFuPoker(playerOutPokerList))
             {
                 //先判断是否为对子
                 for (int i = 0; i < playerOutPokerList.Count; i += 2)
@@ -39,9 +39,11 @@ public class PlayRuleUtil
     }
 
     //单牌是否为主牌
-    static bool IsMasterPoker(PokerInfo pokerInfo)
+    public static bool IsMasterPoker(PokerInfo pokerInfo, int mLevelPokerNum, int masterPokerType)
     {
-        if (pokerInfo.m_num ==RoomData.m_levelPokerNum || (int)pokerInfo.m_pokerType == RoomData.m_masterPokerType
+        LogUtil.getInstance()
+            .addDebugLog("级牌：" +mLevelPokerNum + "主花色:" + masterPokerType);
+        if (pokerInfo.m_num == mLevelPokerNum || pokerInfo.m_pokerType == (Consts.PokerType)masterPokerType
             || pokerInfo.m_pokerType == Consts.PokerType.PokerType_Wang)
         {
             return true;
@@ -53,11 +55,11 @@ public class PlayRuleUtil
     }
 
     //是否都是主牌
-    public static bool IsAllMasterPoker(List<PokerInfo> list)
+    public static bool IsAllMasterPoker(List<PokerInfo> list, int mLevelPokerNum, int masterPokerType)
     {
         for (int i = 0; i < list.Count; i++)
         {
-            if (!IsMasterPoker(list[i]))
+            if (!IsMasterPoker(list[i],mLevelPokerNum,masterPokerType))
             {
                 return false;
             }

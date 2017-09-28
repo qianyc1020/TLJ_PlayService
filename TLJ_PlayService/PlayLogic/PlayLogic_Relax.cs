@@ -714,7 +714,7 @@ class PlayLogic_Relax
                             }
 
                             // 此人出的牌不是单牌、对子、拖拉机，如果是此回合第一个人出牌则当做甩牌处理
-                            if(CheckOutPoker.checkOutPokerType(outPokerList) == CheckOutPoker.OutPokerType.OutPokerType_Error)
+                            if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_Error)
                             {
                                 if (uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                                 {
@@ -1079,49 +1079,49 @@ class PlayLogic_Relax
     }
 
     // 比较这一轮出牌的大小
-    PlayerData compareWhoMax(List<PlayerData> listPlayerData, PlayerData firstOutPokerPlayer)
-    {
-        /*
-         * listPlayerData是按玩家进入房间顺序排的
-         * 这里要改成按这一轮出牌顺序排
-         */
-
-        List<PlayerData> tempList = new List<PlayerData>();
-
-        // 重新排序
-        {
-            int index = listPlayerData.IndexOf(firstOutPokerPlayer);
-
-            for (int i = index; i < listPlayerData.Count; i++)
-            {
-                tempList.Add(listPlayerData[i]);
-            }
-
-            for (int i = 0; i < index; i++)
-            {
-                tempList.Add(listPlayerData[i]);
-            }
-        }
-
-        PlayerData max = tempList[0];
-
-        if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) != CheckOutPoker.OutPokerType.OutPokerType_Error)
-        {
-            for (int i = 1; i < tempList.Count; i++)
-            {
-                // 出牌类型必须一样才可以继续比较大小，否则视为小
-                if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) == CheckOutPoker.checkOutPokerType(tempList[i].m_curOutPokerList))
-                {
-                    if (tempList[i].m_curOutPokerList[0].m_num > max.m_curOutPokerList[0].m_num)
-                    {
-                        max = tempList[i];
-                    }
-                }
-            }
-        }
-
-        return max;
-    }
+//    PlayerData compareWhoMax(List<PlayerData> listPlayerData, PlayerData firstOutPokerPlayer)
+//    {
+//        /*
+//         * listPlayerData是按玩家进入房间顺序排的
+//         * 这里要改成按这一轮出牌顺序排
+//         */
+//
+//        List<PlayerData> tempList = new List<PlayerData>();
+//
+//        // 重新排序
+//        {
+//            int index = listPlayerData.IndexOf(firstOutPokerPlayer);
+//
+//            for (int i = index; i < listPlayerData.Count; i++)
+//            {
+//                tempList.Add(listPlayerData[i]);
+//            }
+//
+//            for (int i = 0; i < index; i++)
+//            {
+//                tempList.Add(listPlayerData[i]);
+//            }
+//        }
+//
+//        PlayerData max = tempList[0];
+//
+//        if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) != CheckOutPoker.OutPokerType.OutPokerType_Error)
+//        {
+//            for (int i = 1; i < tempList.Count; i++)
+//            {
+//                // 出牌类型必须一样才可以继续比较大小，否则视为小
+//                if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) == CheckOutPoker.checkOutPokerType(tempList[i].m_curOutPokerList))
+//                {
+//                    if (tempList[i].m_curOutPokerList[0].m_num > max.m_curOutPokerList[0].m_num)
+//                    {
+//                        max = tempList[i];
+//                    }
+//                }
+//            }
+//        }
+//
+//        return max;
+//    }
 
     // 托管逻辑
     void trusteeshipLogic(string jsonData, PlayerData playerData)
@@ -1243,12 +1243,13 @@ class PlayLogic_Relax
     List<TLJCommon.PokerInfo> m_DiPokerList = new List<TLJCommon.PokerInfo>();
 
     // 默认为-1，代表没有被赋值过
-    public static int m_levelPokerNum = -1;            // 级牌
-    public static int m_masterPokerType = -1;          // 主牌花色
+    public  int m_levelPokerNum = -1;            // 级牌
+    public  int m_masterPokerType = -1;          // 主牌花色
 
     public int m_getAllScore = 0;                  // 庄家对家抓到的分数
 
     public PlayerData m_zhuangjiaPlayerData = null;
+
 
     public RoomData(int roomId)
     {
