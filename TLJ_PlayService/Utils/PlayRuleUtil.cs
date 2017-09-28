@@ -12,9 +12,11 @@ public class PlayRuleUtil
     {
         if (playerOutPokerList.Count % 2 == 0 && playerOutPokerList.Count >= 4)
         {
+
             //都是主牌或者都是同一花色的副牌
             if (IsAllMasterPoker(playerOutPokerList,mLevelPokerNum, masterPokerType) || IsAllFuPoker(playerOutPokerList))
             {
+                LogUtil.getInstance().writeLogToLocalNow("1");
                 //先判断是否为对子
                 for (int i = 0; i < playerOutPokerList.Count; i += 2)
                 {
@@ -24,6 +26,8 @@ public class PlayRuleUtil
                         return false;
                     }
                 }
+
+                LogUtil.getInstance().writeLogToLocalNow("2");
                 //判断权重
                 for (int i = 0; i < playerOutPokerList.Count - 2; i += 2)
                 {
@@ -32,6 +36,7 @@ public class PlayRuleUtil
                         return false;
                     }
                 }
+                LogUtil.getInstance().writeLogToLocalNow("3");
                 return true;
             }
         }
