@@ -273,44 +273,51 @@ public class CheckOutPoker
                 return OutPokerType.OutPokerType_Double;
             }
         }
-        // 检查是否是拖拉机
-        else if (((count % 2) == 0) && (count >= 4))
+
+        else if (count % 2 == 0 && count >= 4)
         {
-            bool isSampleType = true;
-
-            for (int i = 1; i < outPokerList.Count; i++)
+            if (CompareWhoMax.CheckTuoLaJi(outPokerList))
             {
-                if (outPokerList[i].m_pokerType != outPokerList[0].m_pokerType)
-                {
-                    isSampleType = false;
-                    break;
-                }
-            }
-
-            if (isSampleType)
-            {
-                bool isTuoLaJi = true;
-                int beforeNum = outPokerList[0].m_num + 1;
-                for (int i = 0; i < outPokerList.Count - 1; i += 2)
-                {
-                    if ((outPokerList[i].m_num == outPokerList[i + 1].m_num) && ((outPokerList[i].m_num - beforeNum) == -1))
-                    {
-                        beforeNum = outPokerList[i].m_num;
-                    }
-                    else
-                    {
-                        isTuoLaJi = false;
-                        break;
-                    }
-                }
-
-                if (isTuoLaJi)
-                {
-                    return OutPokerType.OutPokerType_TuoLaJi;
-                }
+                return OutPokerType.OutPokerType_TuoLaJi;
             }
         }
-
         return OutPokerType.OutPokerType_Error;
+        // 检查是否是拖拉机
+        //        else if (((count % 2) == 0) && (count >= 4))
+        //        {
+        //            bool isSampleType = true;
+        //
+        //            for (int i = 1; i < outPokerList.Count; i++)
+        //            {
+        //                if (outPokerList[i].m_pokerType != outPokerList[0].m_pokerType)
+        //                {
+        //                    isSampleType = false;
+        //                    break;
+        //                }
+        //            }
+        //
+        //            if (isSampleType)
+        //            {
+        //                bool isTuoLaJi = true;
+        //                int beforeNum = outPokerList[0].m_num + 1;
+        //                for (int i = 0; i < outPokerList.Count - 1; i += 2)
+        //                {
+        //                    if ((outPokerList[i].m_num == outPokerList[i + 1].m_num) && ((outPokerList[i].m_num - beforeNum) == -1))
+        //                    {
+        //                        beforeNum = outPokerList[i].m_num;
+        //                    }
+        //                    else
+        //                    {
+        //                        isTuoLaJi = false;
+        //                        break;
+        //                    }
+        //                }
+        //
+        //                if (isTuoLaJi)
+        //                {
+        //                    return OutPokerType.OutPokerType_TuoLaJi;
+        //                }
+        //            }
+        //    }
     }
 }

@@ -54,107 +54,31 @@ class CompareWhoMax
     /// <returns>牌最大的玩家数据</returns>
     static PlayerData CompareBoth(PlayerData player1, PlayerData player2)
     {
-        List<PokerInfo> playerOutPokerList1 = player1.m_curOutPokerList;
-        List<PokerInfo> playerOutPokerList2 = player2.m_curOutPokerList;
-        List<List<PokerInfo>> temp = new List<List<PokerInfo>>();
-        temp.Add(playerOutPokerList1);
-        temp.Add(playerOutPokerList2);
-        if (playerOutPokerList2.Count == 0)
+        List<PokerInfo> playerOutPokerList1 =
+            SetPokerWeight(player1.m_curOutPokerList, mLevelPokerNum, (Consts.PokerType) mMasterPokerType);
+        List<PokerInfo> playerOutPokerList2 =
+            SetPokerWeight(player2.m_curOutPokerList, mLevelPokerNum, (Consts.PokerType) mMasterPokerType);
+
+        if (playerOutPokerList1 == null || playerOutPokerList2 == null)
         {
             return player1;
         }
-        if (playerOutPokerList1.Count != playerOutPokerList2.Count) return player1;
-        //给weight重新赋值，从2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
-        //17为大王，16为小王，15为主级牌,14为副级牌
-        for (int i = 0; i < temp.Count; i++)
+
+        if (playerOutPokerList2.Count == 0 || playerOutPokerList1.Count == 0)
         {
-            List<PokerInfo> pokerInfos = temp[i];
-            for (int j = 0; j < pokerInfos.Count; j++)
-            {
-                PokerInfo pokerInfo = pokerInfos[j];
-                //是级牌
-                if (pokerInfo.m_num == mLevelPokerNum)
-                {
-                    if (pokerInfo.m_pokerType == (Consts.PokerType)mMasterPokerType)
-                    {
-                        pokerInfo.m_weight = 15;
-                    }
-                    else
-                    {
-                        pokerInfo.m_weight = 14;
-                    }
-                }
-                //大王
-                else if (pokerInfo.m_num == 16)
-                {
-                    pokerInfo.m_weight = 17;
-                }
-                //小王
-                else if (pokerInfo.m_num == 15)
-                {
-                    pokerInfo.m_weight = 16;
-                }
-                else if (pokerInfo.m_num < mLevelPokerNum)
-                {
-                    pokerInfo.m_weight = pokerInfo.m_num;
-                }
-                else
-                {
-                    pokerInfo.m_weight = pokerInfo.m_num - 1;
-                }
-            }
+            return player1;
         }
+
+        if (playerOutPokerList1.Count != playerOutPokerList2.Count) return player1;
+
         LogUtil.getInstance().writeLogToLocalNow("玩家一：" + playerOutPokerList1[0].m_num + " " +
-                                          playerOutPokerList1[0].m_pokerType + " " + playerOutPokerList1[0].m_weight
-                                          + "---玩家二" + playerOutPokerList2[0].m_num + " " +
-                                          playerOutPokerList2[0].m_pokerType + " " + playerOutPokerList2[0].m_weight);
+                                                 playerOutPokerList1[0].m_pokerType + " " +
+                                                 playerOutPokerList1[0].m_weight
+                                                 + "---玩家二" + playerOutPokerList2[0].m_num + " " +
+                                                 playerOutPokerList2[0].m_pokerType + " " +
+                                                 playerOutPokerList2[0].m_weight);
         CheckOutPoker.OutPokerType outPokerType = CheckOutPoker.checkOutPokerType(playerOutPokerList1);
         CheckOutPoker.OutPokerType outPokerType2 = CheckOutPoker.checkOutPokerType(playerOutPokerList2);
-        bool IsTljPlay1 = CheckTuoLaJi(playerOutPokerList1);
-        bool IsTljPlay2 = CheckTuoLaJi(playerOutPokerList2);
-
-        //拖拉机
-        if (IsTljPlay1)
-        {
-            if (IsTljPlay2)
-            {
-                if (IsMasterPoker(playerOutPokerList1[0]))
-                {
-                    if (IsMasterPoker(playerOutPokerList2[0]))
-                    {
-                        return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
-                    }
-                    else
-                    {
-                        return player1;
-                    }
-                }
-                //玩家1不是主牌
-                else
-                {
-                    //毙了
-                    if (IsMasterPoker(playerOutPokerList2[0]))
-                    {
-                        return player2;
-                    }
-                    else
-                    {
-                        if (playerOutPokerList1[0].m_pokerType != playerOutPokerList2[0].m_pokerType)
-                        {
-                            return player1;
-                        }
-                        else
-                        {
-                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return player1;
-            }
-        }
 
         //单牌
         if (outPokerType.Equals(CheckOutPoker.OutPokerType.OutPokerType_Single))
@@ -222,7 +146,9 @@ class CompareWhoMax
                         }
                         else
                         {
-                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
+                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight
+                                ? player1
+                                : player2;
                         }
                     }
                 }
@@ -232,11 +158,50 @@ class CompareWhoMax
                 return player1;
             }
         }
+        //拖拉机
+        else if (outPokerType.Equals(CheckOutPoker.OutPokerType.OutPokerType_TuoLaJi))
+        {
+            if (outPokerType2.Equals(CheckOutPoker.OutPokerType.OutPokerType_TuoLaJi))
+            {
+                if (IsMasterPoker(playerOutPokerList1[0]))
+                {
+                    if (IsMasterPoker(playerOutPokerList2[0]))
+                    {
+                        return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
+                    }
+                    else
+                    {
+                        return player1;
+                    }
+                }
+                //玩家1不是主牌
+                else
+                {
+                    //毙了
+                    if (IsMasterPoker(playerOutPokerList2[0]))
+                    {
+                        return player2;
+                    }
+                    else
+                    {
+                        if (playerOutPokerList1[0].m_pokerType != playerOutPokerList2[0].m_pokerType)
+                        {
+                            return player1;
+                        }
+                        else
+                        {
+                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
+                        }
+                    }
+                }
+            }
+        }
         return player1;
     }
 
+
     //检查是否是拖拉机
-    private static bool CheckTuoLaJi(List<PokerInfo> playerOutPokerList)
+    public static bool CheckTuoLaJi(List<PokerInfo> playerOutPokerList)
     {
         if (playerOutPokerList.Count % 2 == 0 && playerOutPokerList.Count >= 4)
         {
@@ -269,7 +234,7 @@ class CompareWhoMax
     //单牌是否为主牌
     static bool IsMasterPoker(PokerInfo pokerInfo)
     {
-        if (pokerInfo.m_num == mLevelPokerNum || (int)pokerInfo.m_pokerType == mMasterPokerType
+        if (pokerInfo.m_num == mLevelPokerNum || (int) pokerInfo.m_pokerType == mMasterPokerType
             || pokerInfo.m_pokerType == Consts.PokerType.PokerType_Wang)
         {
             return true;
@@ -281,7 +246,7 @@ class CompareWhoMax
     }
 
     //是否都是主牌
-    static bool IsAllMasterPoker(List<PokerInfo> list)
+    public static bool IsAllMasterPoker(List<PokerInfo> list)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -294,7 +259,7 @@ class CompareWhoMax
     }
 
     //是否都是同一花色
-    static bool IsAllFuPoker(List<PokerInfo> list)
+    public static bool IsAllFuPoker(List<PokerInfo> list)
     {
         for (int i = 0; i < list.Count - 1; i++)
         {
@@ -305,5 +270,53 @@ class CompareWhoMax
         }
 
         return true;
+    }
+
+    /// <summary>
+    ///  给weight重新赋值，从2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    ///  17为大王，16为小王，15为主级牌,14为副级牌
+    /// </summary>
+    /// <param name="list">牌</param>
+    /// <param name="levelPokerNum">级牌</param>
+    /// <param name="masterPokerType">主牌花色</param>
+    /// <returns></returns>
+    public static List<PokerInfo> SetPokerWeight(List<PokerInfo> list, int levelPokerNum,
+        Consts.PokerType masterPokerType)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            PokerInfo pokerInfo = list[i];
+            //是级牌
+            if (pokerInfo.m_num == levelPokerNum)
+            {
+                if (pokerInfo.m_pokerType == masterPokerType)
+                {
+                    pokerInfo.m_weight = 15;
+                }
+                else
+                {
+                    pokerInfo.m_weight = 14;
+                }
+            }
+            //大王
+            else if (pokerInfo.m_num == 16)
+            {
+                pokerInfo.m_weight = 17;
+            }
+            //小王
+            else if (pokerInfo.m_num == 15)
+            {
+                pokerInfo.m_weight = 16;
+            }
+            else if (pokerInfo.m_num < levelPokerNum)
+            {
+                pokerInfo.m_weight = pokerInfo.m_num;
+            }
+            else
+            {
+                pokerInfo.m_weight = pokerInfo.m_num - 1;
+            }
+        }
+        return list;
     }
 }
