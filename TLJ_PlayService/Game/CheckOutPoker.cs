@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TLJCommon;
 
 public class CheckOutPoker
 {
@@ -254,6 +255,8 @@ public class CheckOutPoker
 
     public static OutPokerType checkOutPokerType(List<TLJCommon.PokerInfo> outPokerList, int mLevelPokerNum, int masterPokerType)
     {
+        PlayRuleUtil.SetPokerWeight(outPokerList, mLevelPokerNum, (Consts.PokerType) masterPokerType);
+
         int count = outPokerList.Count;
 
         if (count == 0)
@@ -273,9 +276,10 @@ public class CheckOutPoker
                 return OutPokerType.OutPokerType_Double;
             }
         }
-
         else if (count % 2 == 0 && count >= 4)
         {
+            LogUtil.getInstance().writeLogToLocalNow("检测是否拖拉机");
+
             if (PlayRuleUtil.CheckTuoLaJi(outPokerList, mLevelPokerNum, masterPokerType))
             {
                 LogUtil.getInstance().writeLogToLocalNow("出的是拖拉机");

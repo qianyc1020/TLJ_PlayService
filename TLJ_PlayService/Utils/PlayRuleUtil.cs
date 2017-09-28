@@ -41,8 +41,6 @@ public class PlayRuleUtil
     //单牌是否为主牌
     public static bool IsMasterPoker(PokerInfo pokerInfo, int mLevelPokerNum, int masterPokerType)
     {
-        LogUtil.getInstance()
-            .addDebugLog("级牌：" +mLevelPokerNum + "主花色:" + masterPokerType);
         if (pokerInfo.m_num == mLevelPokerNum || pokerInfo.m_pokerType == (Consts.PokerType)masterPokerType
             || pokerInfo.m_pokerType == Consts.PokerType.PokerType_Wang)
         {
