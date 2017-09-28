@@ -1,0 +1,18 @@
+{
+  "LoginService": {
+    "ip": "10.224.5.110",
+    "port": 60001
+  },
+  "LogicService": {
+    "ip": "10.224.5.110",
+    "port": 60002
+  },
+  "PlayService": {
+    "ip": "10.224.5.110",
+    "port": 60003
+  },
+  "MySqlService": {
+    "ip": "10.224.5.82",
+    "port": 60005
+  }
+}
