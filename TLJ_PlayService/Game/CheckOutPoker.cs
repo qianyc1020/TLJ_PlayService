@@ -278,6 +278,7 @@ public class CheckOutPoker
         {
             if (CompareWhoMax.CheckTuoLaJi(outPokerList))
             {
+                LogUtil.getInstance().writeLogToLocalNow("出的是拖拉机");
                 return OutPokerType.OutPokerType_TuoLaJi;
             }
         }

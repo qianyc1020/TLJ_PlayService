@@ -275,6 +275,7 @@ class CompareWhoMax
     /// <summary>
     ///  给weight重新赋值，从2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
     ///  17为大王，16为小王，15为主级牌,14为副级牌
+    ///  无主情况下,16为大王,15为小王，14为级牌
     /// </summary>
     /// <param name="list">牌</param>
     /// <param name="levelPokerNum">级牌</param>
@@ -301,12 +302,12 @@ class CompareWhoMax
             //大王
             else if (pokerInfo.m_num == 16)
             {
-                pokerInfo.m_weight = 17;
+                pokerInfo.m_weight = (int)masterPokerType != (-1) ? 17 : 16;
             }
             //小王
             else if (pokerInfo.m_num == 15)
             {
-                pokerInfo.m_weight = 16;
+                pokerInfo.m_weight = (int)masterPokerType != (-1) ? 16 : 15;
             }
             else if (pokerInfo.m_num < levelPokerNum)
             {
@@ -318,5 +319,14 @@ class CompareWhoMax
             }
         }
         return list;
+    }
+
+    public static List<PokerInfo> GetTljFromPoker(List<PokerInfo> list, List<PokerInfo> firstOutPoker)
+    {
+
+
+
+
+        return null;
     }
 }
