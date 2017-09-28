@@ -897,10 +897,6 @@ class PlayLogic_Relax
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    LogUtil.getInstance().addDebugLog("此人出牌错误：" + uid);
-                                }
                             }
                             // 此人出的牌是单牌、对子、拖拉机,类型没问题，从此人牌堆里删除他出的牌
                             {
