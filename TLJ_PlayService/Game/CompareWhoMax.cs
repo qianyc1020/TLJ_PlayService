@@ -30,7 +30,7 @@ class CompareWhoMax
                 tempList.Add(room.getPlayerDataList()[i]);
             }
         }
-
+        //设权重
         for (int i = 0; i < tempList.Count; i++)
         {
             PlayerData playerData = tempList[i];

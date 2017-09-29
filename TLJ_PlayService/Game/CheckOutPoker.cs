@@ -278,9 +278,8 @@ public class CheckOutPoker
         }
         else if (count % 2 == 0 && count >= 4)
         {
-            LogUtil.getInstance().writeLogToLocalNow("检测是否拖拉机");
 
-            if (PlayRuleUtil.CheckTuoLaJi(outPokerList, mLevelPokerNum, masterPokerType))
+            if (PlayRuleUtil.IsTuoLaJi(outPokerList, mLevelPokerNum, masterPokerType))
             {
                 LogUtil.getInstance().writeLogToLocalNow("出的是拖拉机");
                 return OutPokerType.OutPokerType_TuoLaJi;
