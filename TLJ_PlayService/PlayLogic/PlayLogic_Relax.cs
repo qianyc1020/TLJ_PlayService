@@ -41,7 +41,6 @@ class PlayLogic_Relax
                 }
             }
         }
-
         return count;
     }
 
@@ -937,7 +936,6 @@ class PlayLogic_Relax
                                 m_roomList.RemoveAt(i);
                             }
                         }
-
                         return true;
                     }
                 }
