@@ -93,6 +93,12 @@ class PlayLogic_Relax
                     doTask_ReceivePlayerOutPoker(connId, data);
                 }
                     break;
+
+                case (int)TLJCommon.Consts.PlayAction.PlayAction_Chat:
+                    {
+                        doTask_Chat(connId, data);
+                    }
+                    break;
             }
         }
         catch (Exception ex)
@@ -730,8 +736,13 @@ class PlayLogic_Relax
                                 outPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType) pokerType));
                             }
                             // 此人出的牌不是单牌、对子、拖拉机，如果是此回合第一个人出牌则当做甩牌处理
+<<<<<<< .mine
                             if (CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,
                                     room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_Error)
+=======
+                            LogUtil.getInstance().addDebugLog("出牌类型:"+CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum, room.m_masterPokerType).ToString());
+                            if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_Error)
+>>>>>>> .theirs
                             {
                                 if (uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                                 {
@@ -760,27 +771,43 @@ class PlayLogic_Relax
                                                 GameUtil.choiceDoublePoker(room.getPlayerDataList()[k].getPokerList(),
                                                     outPokerList[0].m_pokerType);
 
-                                            for (int m = 0; m < pokerList_single.Count; m++)
+                                            if (firstOutPokerList_single.Count > 0)
                                             {
+<<<<<<< .mine
                                                 if (pokerList_single[m].m_num >
                                                     firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_num)
-                                                {
-                                                    isSingleBigger = false;
-                                                    isSuccess = false;
+=======
+                                                for (int m = 0; m < pokerList_single.Count; m++)
 
-                                                    break;
+>>>>>>> .theirs
+                                                {
+                                                    if (pokerList_single[m].m_num > firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_num)
+                                                    {
+                                                        isSingleBigger = false;
+                                                        isSuccess = false;
+
+                                                        break;
+                                                    }
                                                 }
                                             }
 
-                                            for (int m = 0; m < pokerList_double.Count; m++)
+                                            if (firstOutPokerList_double.Count > 0)
                                             {
+<<<<<<< .mine
                                                 if (pokerList_double[m].m_num >
                                                     firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_num)
-                                                {
-                                                    isDoubleBigger = false;
-                                                    isSuccess = false;
+=======
+                                                for (int m = 0; m < pokerList_double.Count; m++)
 
-                                                    break;
+>>>>>>> .theirs
+                                                {
+                                                    if (pokerList_double[m].m_num > firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_num)
+                                                    {
+                                                        isDoubleBigger = false;
+                                                        isSuccess = false;
+
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -847,106 +874,288 @@ class PlayLogic_Relax
                                         Thread.Sleep(5000);
 
                                         {
+<<<<<<< .mine
                                             // 单牌和对子都比别人小、单牌比别人小对子比别人大，则优先出单牌
                                             if (((!isSingleBigger) && (!isDoubleBigger)) ||
                                                 ((!isSingleBigger) && isDoubleBigger))
-                                            {
-                                                {
-                                                    JArray ja_outPoker = new JArray();
-                                                    JObject jo_outPoker = new JObject();
+=======
+                                            // 单牌、对子都有
+                                            if ((firstOutPokerList_single.Count > 0) && (firstOutPokerList_double.Count > 0))
 
+>>>>>>> .theirs
+                                            {
+                                                // 单牌和对子都比别人小、单牌比别人小对子比别人大，则优先出单牌
+                                                if (((!isSingleBigger) && (!isDoubleBigger)) || ((!isSingleBigger) && isDoubleBigger))
+                                                {
+                                                    {
+                                                        JArray ja_outPoker = new JArray();
+                                                        JObject jo_outPoker = new JObject();
+
+<<<<<<< .mine
                                                     int num = firstOutPokerList_single[
                                                         firstOutPokerList_single.Count - 1].m_num;
                                                     int pokerType =
                                                         (int) firstOutPokerList_single[
                                                             firstOutPokerList_single.Count - 1].m_pokerType;
+=======
+                                                        int num = firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_num;
+                                                        int pokerType = (int)firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_pokerType;
 
-                                                    jo_outPoker.Add("num", num);
-                                                    jo_outPoker.Add("pokerType", pokerType);
 
-                                                    ja_outPoker.Add(jo_outPoker);
 
+>>>>>>> .theirs
+
+                                                        jo_outPoker.Add("num", num);
+                                                        jo_outPoker.Add("pokerType", pokerType);
+
+                                                        ja_outPoker.Add(jo_outPoker);
+
+<<<<<<< .mine
                                                     for (int n = playerDataList[j].getPokerList().Count - 1;
                                                         n >= 0;
                                                         n--)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=======
+                                                        for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                                        {
+                                                            if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
+                                                            {
+                                                                // 加到当前这一轮出牌的牌堆里面
+                                                                playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+
+                                                                // 出的牌从自己的牌堆里删除
+                                                                {
+                                                                    playerDataList[j].getPokerList().RemoveAt(n);
+                                                                }
+
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        jo["pokerList"] = ja_outPoker;
+                                                    }
+                                                }
+                                                // 单牌比别人大，对子比别人小，则优先出对子
+                                                else if (isSingleBigger && (!isDoubleBigger))
+                                                {
+>>>>>>> .theirs
                                                     {
+<<<<<<< .mine
                                                         if ((playerDataList[j].getPokerList()[n].m_num == num) &&
                                                             ((int) playerDataList[j].getPokerList()[n].m_pokerType ==
                                                              pokerType))
+
+
+=======
+                                                        JArray ja_outPoker = new JArray();
+
+                                                        int num = firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_num;
+                                                        int pokerType = (int)firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_pokerType;
+
+>>>>>>> .theirs
                                                         {
+<<<<<<< .mine
                                                             // 加到当前这一轮出牌的牌堆里面
                                                             playerDataList[j].m_curOutPokerList
                                                                 .Add(new TLJCommon.PokerInfo(num,
                                                                     (TLJCommon.Consts.PokerType) pokerType));
+=======
+                                                            JObject jo_outPoker = new JObject();
+                                                            jo_outPoker.Add("num", num);
+                                                            jo_outPoker.Add("pokerType", pokerType);
 
-                                                            // 出的牌从自己的牌堆里删除
-                                                            {
-                                                                playerDataList[j].getPokerList().RemoveAt(n);
-                                                            }
+>>>>>>> .theirs
 
-                                                            break;
+                                                            ja_outPoker.Add(jo_outPoker);
                                                         }
-                                                    }
 
-                                                    jo["pokerList"] = ja_outPoker;
+                                                        {
+                                                            JObject jo_outPoker = new JObject();
+                                                            jo_outPoker.Add("num", num);
+                                                            jo_outPoker.Add("pokerType", pokerType);
+
+                                                            ja_outPoker.Add(jo_outPoker);
+                                                        }
+
+                                                        int findNum = 0;
+                                                        for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                                        {
+                                                            if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
+                                                            {
+                                                                // 加到当前这一轮出牌的牌堆里面
+                                                                playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+
+                                                                // 出的牌从自己的牌堆里删除
+                                                                {
+                                                                    playerDataList[j].getPokerList().RemoveAt(n);
+                                                                }
+
+                                                                if ((++findNum) == 2)
+                                                                {
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        jo["pokerList"] = ja_outPoker;
+                                                    }
                                                 }
                                             }
-                                            // 单牌比别人大，对子比别人小，则优先出对子
-                                            else if (isSingleBigger && (!isDoubleBigger))
+                                            // 只有单牌
+                                            else if (firstOutPokerList_single.Count > 0)
                                             {
-                                                {
-                                                    JArray ja_outPoker = new JArray();
+                                                JArray ja_outPoker = new JArray();
+                                                JObject jo_outPoker = new JObject();
 
+<<<<<<< .mine
                                                     int num = firstOutPokerList_double[
                                                         firstOutPokerList_double.Count - 1].m_num;
                                                     int pokerType =
                                                         (int) firstOutPokerList_double[
                                                             firstOutPokerList_double.Count - 1].m_pokerType;
+=======
+                                                int num = firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_num;
+                                                int pokerType = (int)firstOutPokerList_single[firstOutPokerList_single.Count - 1].m_pokerType;
 
+
+
+>>>>>>> .theirs
+
+                                                jo_outPoker.Add("num", num);
+                                                jo_outPoker.Add("pokerType", pokerType);
+
+                                                ja_outPoker.Add(jo_outPoker);
+
+                                                for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                                {
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
                                                     {
-                                                        JObject jo_outPoker = new JObject();
-                                                        jo_outPoker.Add("num", num);
-                                                        jo_outPoker.Add("pokerType", pokerType);
+                                                        // 加到当前这一轮出牌的牌堆里面
+                                                        playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
 
-                                                        ja_outPoker.Add(jo_outPoker);
+                                                        // 出的牌从自己的牌堆里删除
+                                                        {
+                                                            playerDataList[j].getPokerList().RemoveAt(n);
+                                                        }
+
+                                                        break;
                                                     }
+                                                }
 
-                                                    {
-                                                        JObject jo_outPoker = new JObject();
-                                                        jo_outPoker.Add("num", num);
-                                                        jo_outPoker.Add("pokerType", pokerType);
-
-                                                        ja_outPoker.Add(jo_outPoker);
-                                                    }
-
+<<<<<<< .mine
                                                     int findNum = 0;
                                                     for (int n = playerDataList[j].getPokerList().Count - 1;
                                                         n >= 0;
                                                         n--)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=======
+                                                jo["pokerList"] = ja_outPoker;
+                                            }
+                                            // 只有对子
+                                            if (firstOutPokerList_double.Count > 0)
+                                            {
+                                                JArray ja_outPoker = new JArray();
+
+                                                int num = firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_num;
+                                                int pokerType = (int)firstOutPokerList_double[firstOutPokerList_double.Count - 1].m_pokerType;
+
+                                                {
+                                                    JObject jo_outPoker = new JObject();
+                                                    jo_outPoker.Add("num", num);
+                                                    jo_outPoker.Add("pokerType", pokerType);
+
+                                                    ja_outPoker.Add(jo_outPoker);
+                                                }
+
+                                                {
+                                                    JObject jo_outPoker = new JObject();
+                                                    jo_outPoker.Add("num", num);
+                                                    jo_outPoker.Add("pokerType", pokerType);
+
+                                                    ja_outPoker.Add(jo_outPoker);
+                                                }
+
+                                                int findNum = 0;
+                                                for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                                {
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
+>>>>>>> .theirs
                                                     {
+<<<<<<< .mine
                                                         if ((playerDataList[j].getPokerList()[n].m_num == num) &&
                                                             ((int) playerDataList[j].getPokerList()[n].m_pokerType ==
                                                              pokerType))
+
+=======
+                                                        // 加到当前这一轮出牌的牌堆里面
+                                                        playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+
+                                                        // 出的牌从自己的牌堆里删除
+>>>>>>> .theirs
                                                         {
+<<<<<<< .mine
                                                             // 加到当前这一轮出牌的牌堆里面
                                                             playerDataList[j].m_curOutPokerList
                                                                 .Add(new TLJCommon.PokerInfo(num,
                                                                     (TLJCommon.Consts.PokerType) pokerType));
+=======
+                                                            playerDataList[j].getPokerList().RemoveAt(n);
+                                                        }
 
-                                                            // 出的牌从自己的牌堆里删除
-                                                            {
-                                                                playerDataList[j].getPokerList().RemoveAt(n);
-                                                            }
 
-                                                            if ((++findNum) == 2)
-                                                            {
-                                                                break;
-                                                            }
+>>>>>>> .theirs
+
+                                                        if ((++findNum) == 2)
+                                                        {
+                                                            break;
                                                         }
                                                     }
-
-                                                    jo["pokerList"] = ja_outPoker;
                                                 }
+
+                                                jo["pokerList"] = ja_outPoker;
                                             }
                                         }
                                     }
@@ -997,6 +1206,61 @@ class PlayLogic_Relax
         catch (Exception ex)
         {
             LogUtil.getInstance().addErrorLog("doTask_ReceivePlayerOutPoker异常：" + ex.Message);
+        }
+    }
+
+    public void doTask_Chat(IntPtr connId, string data)
+    {
+        try
+        {
+            JObject jo = JObject.Parse(data);
+            string tag = jo.GetValue("tag").ToString();
+            string uid = jo.GetValue("uid").ToString();
+            int content_id = Convert.ToInt32(jo.GetValue("content_id"));
+
+            RoomData room = getRoomByPlayerUid(uid);
+
+            if (room != null)
+            {
+                JObject respondJO;
+                {
+                    respondJO = new JObject();
+
+                    respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_Chat);
+                    respondJO.Add("uid", uid);
+                }
+
+                string content_text = "";
+                switch (content_id)
+                {
+                    case 1:
+                        {
+                            content_text = "快点吧，我等的花儿都谢了";
+                        }
+                        break;
+                }
+
+                respondJO.Add("content_text", content_text);
+
+                // 给在线的人推送
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    // 推送给客户端
+                    if (!room.getPlayerDataList()[i].m_isOffLine)
+                    {
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
+                    }
+                }
+            }
+            else
+            {
+                LogUtil.getInstance().addDebugLog("未找到此人所在房间：" + uid);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogUtil.getInstance().addErrorLog("doTask_Chat异常：" + ex.Message);
         }
     }
 
@@ -1137,50 +1401,73 @@ class PlayLogic_Relax
         }
     }
 
+    RoomData getRoomByPlayerUid(string uid)
+    {
+        RoomData room = null;
+
+        // 找到玩家所在的房间
+        for (int i = 0; i < m_roomList.Count; i++)
+        {
+            List<PlayerData> playerDataList = m_roomList[i].getPlayerDataList();
+
+            for (int j = 0; j < playerDataList.Count; j++)
+            {
+                if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                {
+                    room = m_roomList[i];
+
+                    return room;
+                }
+            }
+        }
+
+        return room;
+    }
+
     // 比较这一轮出牌的大小
-//    PlayerData compareWhoMax(List<PlayerData> listPlayerData, PlayerData firstOutPokerPlayer)
-//    {
-//        /*
-//         * listPlayerData是按玩家进入房间顺序排的
-//         * 这里要改成按这一轮出牌顺序排
-//         */
-//
-//        List<PlayerData> tempList = new List<PlayerData>();
-//
-//        // 重新排序
-//        {
-//            int index = listPlayerData.IndexOf(firstOutPokerPlayer);
-//
-//            for (int i = index; i < listPlayerData.Count; i++)
-//            {
-//                tempList.Add(listPlayerData[i]);
-//            }
-//
-//            for (int i = 0; i < index; i++)
-//            {
-//                tempList.Add(listPlayerData[i]);
-//            }
-//        }
-//
-//        PlayerData max = tempList[0];
-//
-//        if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) != CheckOutPoker.OutPokerType.OutPokerType_Error)
-//        {
-//            for (int i = 1; i < tempList.Count; i++)
-//            {
-//                // 出牌类型必须一样才可以继续比较大小，否则视为小
-//                if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) == CheckOutPoker.checkOutPokerType(tempList[i].m_curOutPokerList))
-//                {
-//                    if (tempList[i].m_curOutPokerList[0].m_num > max.m_curOutPokerList[0].m_num)
-//                    {
-//                        max = tempList[i];
-//                    }
-//                }
-//            }
-//        }
-//
-//        return max;
-//    }
+    //    PlayerData compareWhoMax(List<PlayerData> listPlayerData, PlayerData firstOutPokerPlayer)
+    //    {
+    //        /*
+    //         * listPlayerData是按玩家进入房间顺序排的
+    //         * 这里要改成按这一轮出牌顺序排
+    //         */
+    //
+    //        List<PlayerData> tempList = new List<PlayerData>();
+    //
+    //        // 重新排序
+    //        {
+    //            int index = listPlayerData.IndexOf(firstOutPokerPlayer);
+    //
+    //            for (int i = index; i < listPlayerData.Count; i++)
+    //            {
+    //                tempList.Add(listPlayerData[i]);
+    //            }
+    //
+    //            for (int i = 0; i < index; i++)
+    //            {
+    //                tempList.Add(listPlayerData[i]);
+    //            }
+    //        }
+    //
+    //        PlayerData max = tempList[0];
+    //
+    //        if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) != CheckOutPoker.OutPokerType.OutPokerType_Error)
+    //        {
+    //            for (int i = 1; i < tempList.Count; i++)
+    //            {
+    //                // 出牌类型必须一样才可以继续比较大小，否则视为小
+    //                if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) == CheckOutPoker.checkOutPokerType(tempList[i].m_curOutPokerList))
+    //                {
+    //                    if (tempList[i].m_curOutPokerList[0].m_num > max.m_curOutPokerList[0].m_num)
+    //                    {
+    //                        max = tempList[i];
+    //                    }
+    //                }
+    //            }
+    //        }
+    //
+    //        return max;
+    //    }
 
     // 托管逻辑
     void trusteeshipLogic(string jsonData, PlayerData playerData)
