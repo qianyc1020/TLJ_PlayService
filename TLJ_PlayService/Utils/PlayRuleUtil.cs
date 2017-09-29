@@ -58,8 +58,14 @@ public class PlayRuleUtil
             return false;
         }
     }
+    /// <summary>
+    /// 是否都是主牌
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="mLevelPokerNum"></param>
+    /// <param name="masterPokerType"></param>
+    /// <returns></returns>
 
-    //是否都是主牌
     public static bool IsAllMasterPoker(List<PokerInfo> list, int mLevelPokerNum, int masterPokerType)
     {
         for (int i = 0; i < list.Count; i++)
@@ -496,5 +502,70 @@ public class PlayRuleUtil
             }
         }
         return pokers.OrderBy(a => a.m_weight).ToList(); 
+    }
+
+    /// <summary>
+    /// 判断手牌中是否有主牌
+    /// </summary>
+    /// <param name="myRestPokerList"></param>
+    /// <param name="mLevelPokerNum"></param>
+    /// <param name="masterPokerType"></param>
+    /// <returns></returns>
+    public static bool IsContainMasterPoker(List<PokerInfo> myRestPokerList, int mLevelPokerNum, int masterPokerType)
+    {
+        for (int i = 0; i < myRestPokerList.Count; i++)
+        {
+            PokerInfo myRestPoker = myRestPokerList[i];
+            if (IsMasterPoker(myRestPoker, mLevelPokerNum, masterPokerType))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }  /// <summary>
+    /// 判断手牌中是否有对子
+    /// </summary>
+    /// <param name="myRestPokerList"></param>
+    /// <param name="mLevelPokerNum"></param>
+    /// <param name="masterPokerType"></param>
+    /// <returns></returns>
+    public static bool IsContainDoublePoker(List<PokerInfo> myRestPokerList)
+    {
+        if (myRestPokerList.Count < 2) return false;
+        for (int i = 0; i < myRestPokerList.Count -1; i++)
+        {
+            if (myRestPokerList[i].m_num == myRestPokerList[i + 1].m_num 
+                && myRestPokerList[i].m_pokerType == myRestPokerList[i + 1].m_pokerType)
+            {
+                return true;
+            }
+          
+        }
+
+        return false;
+    }
+
+
+
+    /// <summary>
+    /// 判断手牌中是否有该花色的牌
+    /// </summary>
+    /// <param name="mPokerType"></param>
+    /// <returns></returns>
+    public static bool IsContainTypePoke(List<PokerInfo> myRestPokerList, Consts.PokerType mPokerType,out List<PokerInfo> typeList)
+    {
+        for (int i = 0; i < myRestPokerList.Count; i++)
+        {
+            PokerInfo myRestPoker = myRestPokerList[i];
+            if (myRestPoker.m_pokerType == mPokerType)
+            {
+                typeList = null;
+                typeList.Add(myRestPokerList[i]);
+                return true;
+            }
+        }
+        typeList = null;
+        return false;
     }
 }

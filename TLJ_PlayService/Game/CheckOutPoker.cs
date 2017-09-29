@@ -16,24 +16,24 @@ public class CheckOutPoker
     }
 
     // 检测出牌合理性
-    public static bool checkOutPoker(bool isFreeOutPoker, List<TLJCommon.PokerInfo> myOutPokerList, List<TLJCommon.PokerInfo> beforeOutPokerList, List<TLJCommon.PokerInfo> myRestPokerList, int mLevelPokerNum, int masterPokerType)
+    public static bool checkOutPoker(bool isFreeOutPoker, List<TLJCommon.PokerInfo> myOutPokerList,
+        List<TLJCommon.PokerInfo> beforeOutPokerList, List<TLJCommon.PokerInfo> myRestPokerList,
+        int mLevelPokerNum, int masterPokerType)
     {
         // 自由出牌
         if (isFreeOutPoker)
         {
-            // 先检查花色是否一致
+            //判断是否是主牌
+            if (PlayRuleUtil.IsAllMasterPoker(myOutPokerList,mLevelPokerNum, masterPokerType))
             {
-                for (int i = 1; i < myOutPokerList.Count; i++)
-                {
-                    if (myOutPokerList[i].m_pokerType != myOutPokerList[0].m_pokerType)
-                    {
-                        return false;
-                    }
-                }
+                return true;
             }
-
-            // 检查出牌的类型是否正确：单排、对子、拖拉机、甩牌
-            if (checkOutPokerType(myOutPokerList, mLevelPokerNum, masterPokerType) == OutPokerType.OutPokerType_Error)
+            //判断是否为同花色副牌
+            else if (PlayRuleUtil.IsAllFuPoker(myOutPokerList))
+            {
+                return true;
+            }
+            else
             {
                 return false;
             }
@@ -52,68 +52,149 @@ public class CheckOutPoker
             switch (CheckOutPoker.checkOutPokerType(beforeOutPokerList, mLevelPokerNum, masterPokerType))
             {
                 case CheckOutPoker.OutPokerType.OutPokerType_Single:
+                {
+                    //第一个人出的是主牌
+                    if (PlayRuleUtil.IsMasterPoker(beforeOutPokerList[0], mLevelPokerNum, masterPokerType))
                     {
-                        if (myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                        if (PlayRuleUtil.IsContainMasterPoker(myRestPokerList, mLevelPokerNum, masterPokerType))
                         {
-                            return true;
-                        }
-
-                        for (int i = 0; i < myRestPokerList.Count; i++)
-                        {
-                            if (myRestPokerList[i].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                            if (PlayRuleUtil.IsMasterPoker(myOutPokerList[0], mLevelPokerNum, masterPokerType))
+                            {
+                                return true;
+                            }
+                            else
                             {
                                 return false;
                             }
                         }
-
-                        return true;
-                    }
-                    break;
-
-                case CheckOutPoker.OutPokerType.OutPokerType_Double:
-                    {
-                        // 跟上家一样的同花色的对子
-                        if ((myOutPokerList[0].m_pokerType == myOutPokerList[1].m_pokerType) && (myOutPokerList[0].m_num == myOutPokerList[1].m_num) && (myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType))
+                        else
                         {
                             return true;
                         }
+                    }
+                    //出的是副牌
+                    else
+                    {
+                        //如果有该花色必须出该花色
+                        List<PokerInfo> typeInfo;
+                        if (PlayRuleUtil.IsContainTypePoke(myRestPokerList, beforeOutPokerList[0].m_pokerType,out typeInfo))
+                        {
+                            if (myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
                         else
                         {
-                            for (int i = myRestPokerList.Count - 1; i >= 1; i--)
+                            return true;
+                        }
+                    }
+
+                }
+                break;
+
+                case CheckOutPoker.OutPokerType.OutPokerType_Double:
+                    {
+                        //第一个人出的是主牌对子
+                        if (PlayRuleUtil.IsMasterPoker(beforeOutPokerList[0], mLevelPokerNum, masterPokerType))
+                        {
+                            List<PokerInfo> masterPoker =
+                                PlayRuleUtil.GetMasterPoker(myRestPokerList, mLevelPokerNum, masterPokerType);
+                            //手中有主牌
+                            if (masterPoker.Count > 0)
                             {
-                                if (myRestPokerList[i].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                if (masterPoker.Count == 1)
                                 {
-                                    if (myRestPokerList[i - 1].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                    if (PlayRuleUtil.IsContainMasterPoker(myOutPokerList, mLevelPokerNum,
+                                        masterPokerType))
                                     {
-                                        if (myRestPokerList[i].m_num == myRestPokerList[i - 1].m_num)
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                }
+                                //主牌中包含对子
+                                if (PlayRuleUtil.IsContainDoublePoker(masterPoker))
+                                {
+                                    //出的牌都要是主牌
+                                    if (PlayRuleUtil.IsAllMasterPoker(myOutPokerList, mLevelPokerNum, masterPokerType))
+                                    {
+                                        if (myOutPokerList[0].m_num == myOutPokerList[1].m_num
+                                            && myOutPokerList[0].m_pokerType == myOutPokerList[1].m_pokerType)
+                                        {
+                                            return true;
+                                        }
+                                        else
                                         {
                                             return false;
                                         }
                                     }
+                                    else
+                                    {
+                                        return false;
+                                    }
                                 }
-                            }
-                        }
-
-                        // 跟上家一样的同花色
-                        if ((myOutPokerList[0].m_pokerType == myOutPokerList[1].m_pokerType) && (myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            for (int i = myRestPokerList.Count - 1; i >= 1; i--)
-                            {
-                                if (myRestPokerList[i].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                //主牌中没有对子，且大于两张
+                                else
                                 {
-                                    if (myRestPokerList[i - 1].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                    if (PlayRuleUtil.IsAllMasterPoker(myOutPokerList, mLevelPokerNum, masterPokerType))
+                                    {
+                                        return true;
+                                    }
+                                    else
                                     {
                                         return false;
                                     }
                                 }
                             }
-                        }
+                            //手中没有主牌
+                            else
+                            {
+                                return true;
+                            }
 
-                        return true;
+                        }
+                        //出的是副牌
+                        else
+                        {
+                            List<PokerInfo> typeInfo;
+                            if (PlayRuleUtil.IsContainTypePoke(myRestPokerList, beforeOutPokerList[0].m_pokerType, out typeInfo))
+                            {
+                                if (typeInfo.Count == 1)
+                                {
+                                    if (myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType ||
+                                        myOutPokerList[1].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    if(myOutPokerList[0].m_pokerType == beforeOutPokerList[0].m_pokerType &&
+                                        myOutPokerList[1].m_pokerType == beforeOutPokerList[0].m_pokerType)
+                                    {
+                                        return true;
+                                    }else
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
                     }
                     break;
 
