@@ -881,34 +881,13 @@ class PlayLogic_Relax
 
             if (room != null)
             {
-                JObject respondJO;
-                {
-                    respondJO = new JObject();
-
-                    respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
-                    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_Chat);
-                    respondJO.Add("uid", uid);
-                }
-
-                string content_text = "";
-                switch (content_id)
-                {
-                    case 1:
-                        {
-                            content_text = "快点吧，我等的花儿都谢了";
-                        }
-                        break;
-                }
-
-                respondJO.Add("content_text", content_text);
-
                 // 给在线的人推送
                 for (int i = 0; i < room.getPlayerDataList().Count; i++)
                 {
                     // 推送给客户端
                     if (!room.getPlayerDataList()[i].m_isOffLine)
                     {
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, data);
                     }
                 }
             }
