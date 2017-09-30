@@ -735,10 +735,8 @@ class PlayLogic_Relax
                                 outPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType) pokerType));
                             }
                             // 此人出的牌不是单牌、对子、拖拉机，如果是此回合第一个人出牌则当做甩牌处理
-                            if (CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,
-                                    room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_Error)
                             LogUtil.getInstance().addDebugLog("出牌类型:"+CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum, room.m_masterPokerType).ToString());
-                            if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_Error)
+                            if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_ShuaiPai)
                             {
                                 if (uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                                 {
