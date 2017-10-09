@@ -20,6 +20,9 @@ public class CheckOutPoker
         List<TLJCommon.PokerInfo> beforeOutPokerList, List<TLJCommon.PokerInfo> myRestPokerList,
         int mLevelPokerNum, int masterPokerType)
     {
+        PlayRuleUtil.SetPokerWeight(beforeOutPokerList, mLevelPokerNum, (Consts.PokerType)masterPokerType);
+        PlayRuleUtil.SetPokerWeight(myOutPokerList, mLevelPokerNum, (Consts.PokerType)masterPokerType);
+        PlayRuleUtil.SetPokerWeight(myRestPokerList, mLevelPokerNum, (Consts.PokerType)masterPokerType);
         // 自由出牌
         if (isFreeOutPoker)
         {
@@ -48,10 +51,6 @@ public class CheckOutPoker
                     return false;
                 }
             }
-
-            PlayRuleUtil.SetPokerWeight(beforeOutPokerList, mLevelPokerNum, (Consts.PokerType) masterPokerType);
-            PlayRuleUtil.SetPokerWeight(myOutPokerList, mLevelPokerNum, (Consts.PokerType) masterPokerType);
-            PlayRuleUtil.SetPokerWeight(myRestPokerList, mLevelPokerNum, (Consts.PokerType) masterPokerType);
             switch (CheckOutPoker.checkOutPokerType(beforeOutPokerList, mLevelPokerNum, masterPokerType))
             {
                 //第一个人是单牌
