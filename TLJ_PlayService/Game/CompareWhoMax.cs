@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using TLJCommon;
 
-class CompareWhoMax
+public class CompareWhoMax
 {
-
     // 比较这一轮出牌的大小
     public static PlayerData compareWhoMax(RoomData room)
     {
@@ -37,10 +36,12 @@ class CompareWhoMax
             List<PokerInfo> outPokerList = playerData.m_curOutPokerList;
             PlayRuleUtil.SetPokerWeight(outPokerList, room.m_levelPokerNum, (Consts.PokerType) room.m_masterPokerType);
         }
-        PlayerData maxPlayer1 = CompareBoth(tempList[0], tempList[1], room.m_levelPokerNum, room.m_masterPokerType);
-        PlayerData maxPlayer2 = CompareBoth(maxPlayer1, tempList[2], room.m_levelPokerNum, room.m_masterPokerType);
-        PlayerData maxPlayer3 = CompareBoth(maxPlayer2, tempList[3], room.m_levelPokerNum, room.m_masterPokerType);
-        return maxPlayer3;
+       
+        PlayerData maxPlayer = CompareBoth(tempList[0], tempList[1], room.m_levelPokerNum, room.m_masterPokerType);
+        maxPlayer = CompareBoth(maxPlayer, tempList[2], room.m_levelPokerNum, room.m_masterPokerType);
+        maxPlayer = CompareBoth(maxPlayer, tempList[3], room.m_levelPokerNum, room.m_masterPokerType);
+        LogUtil.getInstance().writeLogToLocalNow("我是最大的:"+maxPlayer.m_curOutPokerList[0].m_pokerType+ maxPlayer.m_curOutPokerList[0].m_num);
+        return maxPlayer;
     }
 
 
@@ -50,7 +51,8 @@ class CompareWhoMax
     /// <param name="player1"></param>
     /// <param name="player2"></param>
     /// <returns>牌最大的玩家数据</returns>
-    static PlayerData CompareBoth(PlayerData player1, PlayerData player2, int roomMLevelPokerNum, int roomMMasterPokerType)
+    public static PlayerData CompareBoth(PlayerData player1, PlayerData player2, int roomMLevelPokerNum,
+        int roomMMasterPokerType)
     {
         List<PokerInfo> playerOutPokerList1 = player1.m_curOutPokerList;
         List<PokerInfo> playerOutPokerList2 = player2.m_curOutPokerList;
@@ -73,8 +75,10 @@ class CompareWhoMax
                                                  + "---玩家二" + playerOutPokerList2[0].m_num + " " +
                                                  playerOutPokerList2[0].m_pokerType + " " +
                                                  playerOutPokerList2[0].m_weight);
-        CheckOutPoker.OutPokerType outPokerType = CheckOutPoker.checkOutPokerType(playerOutPokerList1, roomMLevelPokerNum, roomMMasterPokerType);
-        CheckOutPoker.OutPokerType outPokerType2 = CheckOutPoker.checkOutPokerType(playerOutPokerList2, roomMLevelPokerNum, roomMMasterPokerType);
+        CheckOutPoker.OutPokerType outPokerType =
+            CheckOutPoker.checkOutPokerType(playerOutPokerList1, roomMLevelPokerNum, roomMMasterPokerType);
+        CheckOutPoker.OutPokerType outPokerType2 =
+            CheckOutPoker.checkOutPokerType(playerOutPokerList2, roomMLevelPokerNum, roomMMasterPokerType);
 
         //单牌
         if (outPokerType.Equals(CheckOutPoker.OutPokerType.OutPokerType_Single))
@@ -93,7 +97,7 @@ class CompareWhoMax
             else
             {
                 //毙了
-                if (PlayRuleUtil.IsMasterPoker(playerOutPokerList1[0], roomMLevelPokerNum, roomMMasterPokerType))
+                if (PlayRuleUtil.IsMasterPoker(playerOutPokerList2[0], roomMLevelPokerNum, roomMMasterPokerType))
                 {
                     return player2;
                 }
@@ -130,7 +134,7 @@ class CompareWhoMax
                 else
                 {
                     //毙了
-                    if (PlayRuleUtil.IsMasterPoker(playerOutPokerList1[0], roomMLevelPokerNum, roomMMasterPokerType))
+                    if (PlayRuleUtil.IsMasterPoker(playerOutPokerList2[0], roomMLevelPokerNum, roomMMasterPokerType))
                     {
                         return player2;
                     }
@@ -174,7 +178,7 @@ class CompareWhoMax
                 else
                 {
                     //毙了
-                    if (PlayRuleUtil.IsMasterPoker(playerOutPokerList1[0], roomMLevelPokerNum, roomMMasterPokerType))
+                    if (PlayRuleUtil.IsMasterPoker(playerOutPokerList2[0], roomMLevelPokerNum, roomMMasterPokerType))
                     {
                         return player2;
                     }
@@ -186,7 +190,9 @@ class CompareWhoMax
                         }
                         else
                         {
-                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight ? player1 : player2;
+                            return playerOutPokerList1[0].m_weight >= playerOutPokerList2[0].m_weight
+                                ? player1
+                                : player2;
                         }
                     }
                 }

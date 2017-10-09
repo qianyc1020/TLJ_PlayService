@@ -181,6 +181,10 @@ public class PlayRuleUtil
 
         List<PlayerData> playerDatas = room.getPlayerDataList();
 
+        foreach (var playerData in playerDatas)
+        {
+            SetPokerWeight(playerData.m_curOutPokerList,room.m_levelPokerNum,(Consts.PokerType) room.m_masterPokerType) ;
+        }
         //得到甩牌的对子
         List<PokerInfo> firestDoubleList = GetDoublePoker(outPokerList);
         //得到甩牌的单牌
@@ -210,15 +214,13 @@ public class PlayRuleUtil
                     if (firestSingleList.Count == 0)
                     {
                         List<List<PokerInfo>> OtherTlj;
-                        return CompareDoublePoker(firestDoubleList, OtherDoubleleList, room.m_levelPokerNum,
-                            room.m_masterPokerType, out OtherTlj);
+                        return CompareDoublePoker(firestDoubleList, OtherDoubleleList, room.m_levelPokerNum,room.m_masterPokerType, out OtherTlj);
                     }
                     //最小的单牌牌都比其他玩家手牌中的最大主牌大
                     else if (minSingle.m_weight >= masterPoker[masterPoker.Count - 1].m_weight)
                     {
                         List<List<PokerInfo>> OtherTlj;
-                        return CompareDoublePoker(firestDoubleList, OtherDoubleleList, room.m_levelPokerNum,
-                            room.m_masterPokerType, out OtherTlj);
+                        return CompareDoublePoker(firestDoubleList, OtherDoubleleList, room.m_levelPokerNum, room.m_masterPokerType, out OtherTlj);
                     }
                     //甩牌失败,单牌比别人小
                     else
@@ -243,7 +245,7 @@ public class PlayRuleUtil
                 //得到其余玩家的手牌
                 List<PokerInfo> pokerList = playerDatas[i].getPokerList();
                 //得到指定花色的牌
-                List<PokerInfo> pokerByType = GetPokerByType(pokerList, mPokerType);
+                List<PokerInfo> pokerByType = GetPokerByType(pokerList, room.m_levelPokerNum, mPokerType);
 
                 if (pokerByType.Count > 0)
                 {
@@ -339,10 +341,9 @@ public class PlayRuleUtil
                 //甩牌为多个不连续对子
                 else
                 {
-                    if (OtherAllTlj.Count > 0)
+                    if (OtherDoubleleList.Count > 0)
                     {
-                        List<PokerInfo> pokerInfos = OtherAllTlj[OtherAllTlj.Count - 1];
-                        if (firestDoubleList[0].m_weight >= pokerInfos[pokerInfos.Count - 1].m_weight)
+                        if (firestDoubleList[0].m_weight >= OtherDoubleleList[OtherDoubleleList.Count - 1].m_weight)
                         {
                             //该玩家牌大，不作处理
                         }
@@ -354,21 +355,42 @@ public class PlayRuleUtil
                             return list;
                         }
                     }
+                    //没有对子
                     else
                     {
-                        //最小的牌都比其他玩家手牌中的最大主牌大
-                        if (firestDoubleList[0].m_weight >= OtherDoubleleList[OtherDoubleleList.Count - 1].m_weight)
-                        {
-                            //该玩家牌大，不作处理
-                        }
-                        //甩牌失败,单牌大，但是对子比别人小
-                        else
-                        {
-                            list.Add(firestDoubleList[0]);
-                            list.Add(firestDoubleList[1]);
-                            return list;
-                        }
+
                     }
+
+//                    if (OtherAllTlj.Count > 0)
+//                    {
+//                        List<PokerInfo> pokerInfos = OtherAllTlj[OtherAllTlj.Count - 1];
+//                        if (firestDoubleList[0].m_weight >= pokerInfos[pokerInfos.Count - 1].m_weight)
+//                        {
+//                            //该玩家牌大，不作处理
+//                        }
+//                        else
+//                        {
+//                            //甩牌失败,单牌大，但是对子比别人小
+//                            list.Add(firestDoubleList[0]);
+//                            list.Add(firestDoubleList[1]);
+//                            return list;
+//                        }
+//                    }
+//                    else
+//                    {
+//                        //最小的牌都比其他玩家手牌中的最大主牌大
+//                        if (firestDoubleList[0].m_weight >= OtherDoubleleList[OtherDoubleleList.Count - 1].m_weight)
+//                        {
+//                            //该玩家牌大，不作处理
+//                        }
+//                        //甩牌失败,单牌大，但是对子比别人小
+//                        else
+//                        {
+//                            list.Add(firestDoubleList[0]);
+//                            list.Add(firestDoubleList[1]);
+//                            return list;
+//                        }
+//                    }
                 }
             }
             //其他玩家没有对子，甩牌成功
@@ -385,13 +407,14 @@ public class PlayRuleUtil
     /// </summary>
     /// <param name="pokerList"></param>
     /// <param name="mPokerType"></param>
-    public static List<PokerInfo> GetPokerByType(List<PokerInfo> pokerList, Consts.PokerType mPokerType)
+    public static List<PokerInfo> GetPokerByType(List<PokerInfo> pokerList, int mLevelPokerNum,
+        Consts.PokerType mPokerType)
     {
         List<PokerInfo> list = new List<PokerInfo>();
         for (int i = 0; i < pokerList.Count; i++)
         {
             var poker = pokerList[i];
-            if (poker.m_pokerType == mPokerType)
+            if (poker.m_pokerType == mPokerType && poker.m_num != mLevelPokerNum)
             {
                 list.Add(poker);
             }
@@ -579,18 +602,19 @@ public class PlayRuleUtil
 
 
     /// <summary>
-    /// 判断手牌中是否有该花色的牌
+    /// 判断手牌中是否有该花色的副牌
     /// </summary>
     /// <param name="mPokerType"></param>
     /// <returns></returns>
-    public static bool IsContainTypePoke(List<PokerInfo> myRestPokerList, Consts.PokerType mPokerType,
+    public static bool IsContainTypePoke(List<PokerInfo> myRestPokerList, int mLevelPokerNum,
+        Consts.PokerType mPokerType,
         out List<PokerInfo> typeList)
     {
         typeList = new List<PokerInfo>();
         for (int i = 0; i < myRestPokerList.Count; i++)
         {
             PokerInfo myRestPoker = myRestPokerList[i];
-            if (myRestPoker.m_pokerType == mPokerType)
+            if (myRestPoker.m_pokerType == mPokerType && myRestPoker.m_num != mLevelPokerNum)
             {
                 typeList.Add(myRestPokerList[i]);
             }
@@ -610,8 +634,7 @@ public class PlayRuleUtil
     /// <param name="masterPokerType"></param>
     /// <returns></returns>
     public static bool IsSendByTuoLaJi(List<PokerInfo> myOutPokerList, List<PokerInfo> myPokerByType,
-        List<PokerInfo> OutPokerType, int mLevelPokerNum,
-        int masterPokerType)
+        List<PokerInfo> OutPokerType, int mLevelPokerNum, int masterPokerType)
     {
         int count = myOutPokerList.Count;
         if (myPokerByType.Count <= count) return OutPokerType.Count == myPokerByType.Count;
@@ -621,11 +644,11 @@ public class PlayRuleUtil
         if (myDoublePoker.Count <= count) return outDoublePoker.Count == myDoublePoker.Count;
 
         //很多对子+
-        List<List<PokerInfo>> allTljFromDouble =
-            PlayRuleUtil.GetAllTljFromDouble(myDoublePoker, mLevelPokerNum, masterPokerType);
+        List<List<PokerInfo>> allTljFromDouble =  PlayRuleUtil.GetAllTljFromDouble(myDoublePoker, mLevelPokerNum, masterPokerType);
+        List<List<PokerInfo>> allTljFromoutDouble = PlayRuleUtil.GetAllTljFromDouble(outDoublePoker, mLevelPokerNum, masterPokerType);
         if (allTljFromDouble.Count > 0)
         {
-            return PlayRuleUtil.IsTuolaji(myOutPokerList, mLevelPokerNum, masterPokerType);
+            return allTljFromoutDouble.Count > 0;
         }
         else
         {

@@ -55,7 +55,7 @@
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
     <Compile Include="Game\AllotPoker.cs" />
-    <Compile Include="Game\CheckOutPoker.cs" />
+    <Compile Include="Utils\CheckOutPoker.cs" />
     <Compile Include="Game\CompareWhoMax.cs" />
     <Compile Include="NetResponds\NetRespond_Login.cs" />
     <Compile Include="NetResponds\NetRespond_OnlineInfo.cs" />
