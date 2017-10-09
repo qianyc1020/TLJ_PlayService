@@ -26,6 +26,7 @@ namespace TLJ_PlayService
             LogUtil.getInstance().start("C:\\Users\\Administrator\\Desktop\\TLJ_PlayServiceLog");
             log4net.Config.XmlConfigurator.Configure();
             log = LogManager.GetLogger(TAG);
+            log.Info("日志开启");
             if (!NetConfig.init())
             {
                 return;

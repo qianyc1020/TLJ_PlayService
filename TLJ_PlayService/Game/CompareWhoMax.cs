@@ -69,7 +69,7 @@ public class CompareWhoMax
 
         if (playerOutPokerList1.Count != playerOutPokerList2.Count) return player1;
 
-        LogUtil.getInstance().writeLogToLocalNow("玩家一：" + playerOutPokerList1[0].m_num + " " +
+        TLJ_PlayService.PlayService.log.Info("玩家一：" + playerOutPokerList1[0].m_num + " " +
                                                  playerOutPokerList1[0].m_pokerType + " " +
                                                  playerOutPokerList1[0].m_weight
                                                  + "---玩家二" + playerOutPokerList2[0].m_num + " " +

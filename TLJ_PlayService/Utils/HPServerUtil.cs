@@ -60,6 +60,7 @@ public class HPServerUtil
             if (m_tcpServer.Start())
             {
                 LogUtil.getInstance().addDebugLog("TCP服务启动成功");
+
             }
             else
             {
