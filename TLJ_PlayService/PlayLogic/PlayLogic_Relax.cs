@@ -734,6 +734,7 @@ class PlayLogic_Relax
 
                                 outPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType) pokerType));
                             }
+
                             // 此人出的牌不是单牌、对子、拖拉机，如果是此回合第一个人出牌则当做甩牌处理
                             LogUtil.getInstance().addDebugLog("出牌类型:"+CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum, room.m_masterPokerType).ToString());
                             if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_ShuaiPai)
@@ -743,14 +744,13 @@ class PlayLogic_Relax
                                     //检测是否甩牌成功
                                     List<PokerInfo> shuaiPaiPoker = PlayRuleUtil.GetShuaiPaiPoker(room, outPokerList);
                                     
-                                    bool isSuccess = (shuaiPaiPoker.Count == 0?true:false);
-//
+                                    bool isSuccess = (shuaiPaiPoker.Count == 0 ? true:false);
+
                                     //   甩牌成功
                                     if (isSuccess)
                                     {
                                         // 从此人牌堆里删除他出的牌
                                         {
-                                            //JArray ja = (JArray)JsonConvert.DeserializeObject(jo.GetValue("pokerList").ToString());
                                             for (int m = 0; m < ja.Count; m++)
                                             {
                                                 int num = Convert.ToInt32(ja[m]["num"]);
@@ -758,9 +758,7 @@ class PlayLogic_Relax
 
                                                 for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
                                                 {
-                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) &&
-                                                        ((int) playerDataList[j].getPokerList()[n].m_pokerType ==
-                                                         pokerType))
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int) playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
                                                     {
                                                         // 加到当前这一轮出牌的牌堆里面
                                                         playerDataList[j].m_curOutPokerList
@@ -803,6 +801,31 @@ class PlayLogic_Relax
                                         }
 
                                         Thread.Sleep(5000);
+
+                                        // 从此人牌堆里删除他出的牌
+                                        {
+                                            for (int m = 0; m < ja.Count; m++)
+                                            {
+                                                int num = Convert.ToInt32(ja[m]["num"]);
+                                                int pokerType = Convert.ToInt32(ja[m]["pokerType"]);
+
+                                                for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                                {
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
+                                                    {
+                                                        // 加到当前这一轮出牌的牌堆里面
+                                                        playerDataList[j].m_curOutPokerList .Add(new TLJCommon.PokerInfo(num,(TLJCommon.Consts.PokerType)pokerType));
+
+                                                        // 出的牌从自己的牌堆里删除
+                                                        {
+                                                            playerDataList[j].getPokerList().RemoveAt(n);
+                                                        }
+
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
 
                                         {
                                             JArray ja_outPoker = new JArray();
