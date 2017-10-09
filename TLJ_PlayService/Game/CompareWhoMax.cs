@@ -40,7 +40,7 @@ public class CompareWhoMax
         PlayerData maxPlayer = CompareBoth(tempList[0], tempList[1], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[2], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[3], room.m_levelPokerNum, room.m_masterPokerType);
-        LogUtil.getInstance().writeLogToLocalNow("我是最大的:"+maxPlayer.m_curOutPokerList[0].m_pokerType+ maxPlayer.m_curOutPokerList[0].m_num);
+        TLJ_PlayService.PlayService.log.Info("我是最大的:"+maxPlayer.m_curOutPokerList[0].m_pokerType+ maxPlayer.m_curOutPokerList[0].m_num);
         return maxPlayer;
     }
 
@@ -69,7 +69,7 @@ public class CompareWhoMax
 
         if (playerOutPokerList1.Count != playerOutPokerList2.Count) return player1;
 
-        LogUtil.getInstance().writeLogToLocalNow("玩家一：" + playerOutPokerList1[0].m_num + " " +
+        TLJ_PlayService.PlayService.log.Info("玩家一：" + playerOutPokerList1[0].m_num + " " +
                                                  playerOutPokerList1[0].m_pokerType + " " +
                                                  playerOutPokerList1[0].m_weight
                                                  + "---玩家二" + playerOutPokerList2[0].m_num + " " +

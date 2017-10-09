@@ -34,6 +34,9 @@
     <Reference Include="HPSocketCS">
       <HintPath>Libs\HPSocketCS.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>Libs\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -47,11 +50,13 @@
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
-    <Reference Include="TLJCommon">
+    <Reference Include="TLJCommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\TLJCommon.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
     <Compile Include="Game\AllotPoker.cs" />

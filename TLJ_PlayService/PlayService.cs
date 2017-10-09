@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using log4net;
 
 namespace TLJ_PlayService
 {
@@ -13,7 +14,8 @@ namespace TLJ_PlayService
     {
         public static HPServerUtil m_serverUtil;
         public static MySqlServerUtil m_mySqlServerUtil;
-
+        public static string TAG = "PlayService";
+        public static ILog log;
         public PlayService()
         {
             InitializeComponent();
@@ -22,7 +24,9 @@ namespace TLJ_PlayService
         protected override void OnStart(string[] args)
         {
             LogUtil.getInstance().start("C:\\Users\\Administrator\\Desktop\\TLJ_PlayServiceLog");
-
+            log4net.Config.XmlConfigurator.Configure();
+            log = LogManager.GetLogger(TAG);
+            log.Info("日志开启");
             if (!NetConfig.init())
             {
                 return;
