@@ -804,10 +804,10 @@ class PlayLogic_Relax
 
                                         // 从此人牌堆里删除他出的牌
                                         {
-                                            for (int m = 0; m < ja.Count; m++)
+                                            for (int m = 0; m < shuaiPaiPoker.Count; m++)
                                             {
-                                                int num = Convert.ToInt32(ja[m]["num"]);
-                                                int pokerType = Convert.ToInt32(ja[m]["pokerType"]);
+                                                int num = shuaiPaiPoker[m].m_num;
+                                                int pokerType = (int)shuaiPaiPoker[m].m_pokerType;
 
                                                 for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
                                                 {
