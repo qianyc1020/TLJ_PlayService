@@ -795,8 +795,7 @@ class PlayLogic_Relax
                                             // 推送给客户端
                                             if (!room.getPlayerDataList()[n].m_isOffLine)
                                             {
-                                                PlayService.m_serverUtil.sendMessage(
-                                                    room.getPlayerDataList()[n].m_connId, respondJO.ToString());
+                                                PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[n].m_connId, respondJO.ToString());
                                             }
                                         }
 
@@ -844,6 +843,7 @@ class PlayLogic_Relax
                                 }
                             }
                             // 此人出的牌是单牌、对子、拖拉机,类型没问题，从此人牌堆里删除他出的牌
+                            else
                             {
                                 for (int m = 0; m < ja.Count; m++)
                                 {
