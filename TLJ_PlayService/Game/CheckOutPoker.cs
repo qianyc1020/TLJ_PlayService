@@ -236,10 +236,10 @@ public class CheckOutPoker
                     List<PokerInfo> firstSinglePoker = PlayRuleUtil.GetSinglePoker(beforeOutPokerList, firstDoublePoker);
                     if (PlayRuleUtil.IsAllMasterPoker(beforeOutPokerList, mLevelPokerNum, masterPokerType))
                     {
-                        List<PokerInfo> myMasterPoker = PlayRuleUtil.GetMasterPoker(myRestPokerList, mLevelPokerNum, mLevelPokerNum);
+                        List<PokerInfo> myMasterPoker = PlayRuleUtil.GetMasterPoker(myRestPokerList, mLevelPokerNum, masterPokerType);
                         List<PokerInfo> myMasterDoublePoker = PlayRuleUtil.GetDoublePoker(myMasterPoker);
 
-                        List<PokerInfo> myOutMasterPoker = PlayRuleUtil.GetMasterPoker(myOutPokerList, mLevelPokerNum, mLevelPokerNum);
+                        List<PokerInfo> myOutMasterPoker = PlayRuleUtil.GetMasterPoker(myOutPokerList, mLevelPokerNum, masterPokerType);
                         List<PokerInfo> myOutMasterDoublePoker = PlayRuleUtil.GetDoublePoker(myOutMasterPoker);
 
                         //甩的牌全是单牌
@@ -247,7 +247,7 @@ public class CheckOutPoker
                         {
                             if (myMasterPoker.Count <= beforeOutPokerList.Count)
                                 return myOutMasterPoker.Count == myMasterPoker.Count;
-                            return PlayRuleUtil.IsAllMasterPoker(myOutPokerList, mLevelPokerNum, mLevelPokerNum);
+                            return PlayRuleUtil.IsAllMasterPoker(myOutPokerList, mLevelPokerNum, masterPokerType);
                         }
                         //甩的牌中有对子
                         else
@@ -260,7 +260,7 @@ public class CheckOutPoker
                             List<List<PokerInfo>> allTljFromMyOut = PlayRuleUtil.GetAllTljFromDouble(myOutMasterDoublePoker, mLevelPokerNum, masterPokerType);
                             if (allTljFromFirst.Count == 0 || allTljFromMy.Count == 0)
                             {
-                                return myOutMasterDoublePoker.Count == firstDoublePoker.Count;
+                                return firstDoublePoker.Count == myOutMasterDoublePoker.Count;
                             }
                             if (allTljFromFirst.Count <= allTljFromMy.Count)
                             {
@@ -275,12 +275,10 @@ public class CheckOutPoker
                     //甩的牌是同花色的副牌
                     else
                     {
-                        List<PokerInfo> myFuPoker =
-                            PlayRuleUtil.GetPokerByType(myRestPokerList, beforeOutPokerList[0].m_pokerType);
+                        List<PokerInfo> myFuPoker = PlayRuleUtil.GetPokerByType(myRestPokerList, beforeOutPokerList[0].m_pokerType);
                         List<PokerInfo> myFuDoublePoker = PlayRuleUtil.GetDoublePoker(myFuPoker);
 
-                        List<PokerInfo> myOutFuPoker =
-                            PlayRuleUtil.GetPokerByType(myOutPokerList, beforeOutPokerList[0].m_pokerType);
+                        List<PokerInfo> myOutFuPoker = PlayRuleUtil.GetPokerByType(myOutPokerList, beforeOutPokerList[0].m_pokerType);
                         List<PokerInfo> myOutFuDoublePoker = PlayRuleUtil.GetDoublePoker(myOutFuPoker);
 
                         //甩的牌全是单牌
@@ -294,8 +292,7 @@ public class CheckOutPoker
                         else
                         {
                             //自己手中的对子不够
-                            if (myFuDoublePoker.Count <= firstDoublePoker.Count)
-                                return myOutFuDoublePoker.Count == myFuDoublePoker.Count;
+                            if (myFuDoublePoker.Count <= firstDoublePoker.Count) return myOutFuDoublePoker.Count == myFuDoublePoker.Count;
 
                             //对子够
                             List<List<PokerInfo>> allTljFromFirst = PlayRuleUtil.GetAllTljFromDouble(firstDoublePoker, mLevelPokerNum, masterPokerType);
