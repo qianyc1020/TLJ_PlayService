@@ -866,7 +866,7 @@ public class PlayRuleUtil
         {
             //得到主牌中的对子
             List<PokerInfo> myDoublePoker = GetDoublePoker(masterPoker);
-            List<PokerInfo> mySinglePoker = GetSinglePoker(firstPokerList, firstDoublePoker);
+            List<PokerInfo> mySinglePoker = GetSinglePoker(masterPoker, myDoublePoker);
             if (myDoublePoker.Count <= firstDoublePoker.Count)
             {
                 tempList.AddRange(myDoublePoker);
