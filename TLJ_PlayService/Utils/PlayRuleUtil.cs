@@ -180,8 +180,8 @@ public class PlayRuleUtil
         SetPokerWeight(outPokerList, room.m_levelPokerNum, (Consts.PokerType) room.m_masterPokerType);
 
         List<PlayerData> playerDatas = room.getPlayerDataList();
-        
 
+        //设置牌的权重
         foreach (var playerData in playerDatas)
         {
             SetPokerWeight(playerData.m_curOutPokerList,room.m_levelPokerNum,(Consts.PokerType) room.m_masterPokerType) ;
@@ -632,7 +632,12 @@ public class PlayRuleUtil
             }
         }
 
-        if (typeList.Count > 0) return true;
+        if (typeList.Count > 0)
+        {
+            typeList = typeList.OrderBy(a => a.m_weight).ToList();
+            return true;
+        }
+        
         return false;
     }
 
