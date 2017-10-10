@@ -1146,8 +1146,8 @@ class PlayLogic_Relax
                             JArray jarray = new JArray();
                             for (int i = 0; i < listPoker.Count; i++)
                             {
-                                int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                                int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+                                int num = listPoker[i].m_num;
+                                int pokerType = (int)listPoker[i].m_pokerType;
                                 
                                 {
                                     JObject temp = new JObject();
@@ -1212,8 +1212,8 @@ class PlayLogic_Relax
                             JArray jarray = new JArray();
                             for (int i = 0; i < listPoker.Count; i++)
                             {
-                                int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                                int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+                                int num = listPoker[i].m_num;
+                                int pokerType = (int)listPoker[i].m_pokerType;
 
                                 {
                                     JObject temp = new JObject();
