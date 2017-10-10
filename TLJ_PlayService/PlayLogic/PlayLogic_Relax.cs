@@ -93,10 +93,10 @@ class PlayLogic_Relax
                 }
                     break;
 
-                case (int) TLJCommon.Consts.PlayAction.PlayAction_Chat:
-                {
-                    doTask_Chat(connId, data);
-                }
+                case (int)TLJCommon.Consts.PlayAction.PlayAction_Chat:
+                    {
+                        doTask_Chat(connId, data);
+                    }
                     break;
             }
         }
@@ -736,12 +736,8 @@ class PlayLogic_Relax
                             }
 
                             // 此人出的牌不是单牌、对子、拖拉机，如果是此回合第一个人出牌则当做甩牌处理
-                            LogUtil.getInstance()
-                                .addDebugLog("出牌类型:" + CheckOutPoker
-                                                 .checkOutPokerType(outPokerList, room.m_levelPokerNum,
-                                                     room.m_masterPokerType).ToString());
-                            if (CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,
-                                    room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_ShuaiPai)
+                            LogUtil.getInstance().addDebugLog("出牌类型:"+CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum, room.m_masterPokerType).ToString());
+                            if(CheckOutPoker.checkOutPokerType(outPokerList, room.m_levelPokerNum,room.m_masterPokerType) == CheckOutPoker.OutPokerType.OutPokerType_ShuaiPai)
                             {
                                 if (uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                                 {
@@ -749,7 +745,7 @@ class PlayLogic_Relax
                                     List<PokerInfo> shuaiPaiPoker = PlayRuleUtil.GetShuaiPaiPoker(room, outPokerList);
 
                                     bool isSuccess = (shuaiPaiPoker.Count == 0 ? true : false);
-                                    TLJ_PlayService.PlayService.log.Info("甩牌是否成功："+ isSuccess);
+
                                     //   甩牌成功
                                     if (isSuccess)
                                     {
@@ -762,14 +758,10 @@ class PlayLogic_Relax
 
                                                 for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
                                                 {
-                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) &&
-                                                        ((int) playerDataList[j].getPokerList()[n].m_pokerType ==
-                                                         pokerType))
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
                                                     {
                                                         // 加到当前这一轮出牌的牌堆里面
-                                                        playerDataList[j].m_curOutPokerList
-                                                            .Add(new TLJCommon.PokerInfo(num,
-                                                                (TLJCommon.Consts.PokerType) pokerType));
+                                                        playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num,(TLJCommon.Consts.PokerType)pokerType));
 
                                                         // 出的牌从自己的牌堆里删除
                                                         {
@@ -790,8 +782,7 @@ class PlayLogic_Relax
                                             respondJO = new JObject();
 
                                             respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
-                                            respondJO.Add("playAction",
-                                                (int) TLJCommon.Consts.PlayAction.PlayAction_ShuaiPai);
+                                            respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_ShuaiPai);
                                             respondJO.Add("uid", room.m_curOutPokerPlayer.m_uid);
                                             respondJO.Add("pokerList", jo.GetValue("pokerList"));
                                         }
@@ -802,29 +793,25 @@ class PlayLogic_Relax
                                             // 推送给客户端
                                             if (!room.getPlayerDataList()[n].m_isOffLine)
                                             {
-                                                PlayService.m_serverUtil.sendMessage(
-                                                    room.getPlayerDataList()[n].m_connId, respondJO.ToString());
+                                                PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[n].m_connId, respondJO.ToString());
                                             }
                                         }
 
                                         Thread.Sleep(5000);
+
                                         // 从此人牌堆里删除他出的牌
                                         {
                                             for (int m = 0; m < shuaiPaiPoker.Count; m++)
                                             {
                                                 int num = shuaiPaiPoker[m].m_num;
-                                                int pokerType = (int) shuaiPaiPoker[m].m_pokerType;
+                                                int pokerType = (int)shuaiPaiPoker[m].m_pokerType;
 
                                                 for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
                                                 {
-                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) &&
-                                                        ((int) playerDataList[j].getPokerList()[n].m_pokerType ==
-                                                         pokerType))
+                                                    if ((playerDataList[j].getPokerList()[n].m_num == num) && ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
                                                     {
                                                         // 加到当前这一轮出牌的牌堆里面
-                                                        playerDataList[j].m_curOutPokerList
-                                                            .Add(new TLJCommon.PokerInfo(num,
-                                                                (TLJCommon.Consts.PokerType) pokerType));
+                                                        playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
 
                                                         // 出的牌从自己的牌堆里删除
                                                         {
@@ -836,18 +823,44 @@ class PlayLogic_Relax
                                                 }
                                             }
                                         }
+
                                         {
                                             JArray ja_outPoker = new JArray();
                                             for (int n = 0; n < shuaiPaiPoker.Count; n++)
                                             {
                                                 JObject jo_outPoker = new JObject();
                                                 jo_outPoker.Add("num", shuaiPaiPoker[n].m_num);
-                                                jo_outPoker.Add("pokerType", (int) shuaiPaiPoker[n].m_pokerType);
+                                                jo_outPoker.Add("pokerType", (int)shuaiPaiPoker[n].m_pokerType);
 
                                                 ja_outPoker.Add(jo_outPoker);
                                             }
 
                                             jo["pokerList"] = ja_outPoker;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for (int m = 0; m < ja.Count; m++)
+                                    {
+                                        int num = Convert.ToInt32(ja[m]["num"]);
+                                        int pokerType = Convert.ToInt32(ja[m]["pokerType"]);
+
+                                        for (int n = playerDataList[j].getPokerList().Count - 1; n >= 0; n--)
+                                        {
+                                            if ((playerDataList[j].getPokerList()[n].m_num == num) &&
+                                                ((int)playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
+                                            {
+                                                // 加到当前这一轮出牌的牌堆里面
+                                                playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num,(TLJCommon.Consts.PokerType)pokerType));
+
+                                                // 出的牌从自己的牌堆里删除
+                                                {
+                                                    playerDataList[j].getPokerList().RemoveAt(n);
+                                                }
+
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -866,9 +879,7 @@ class PlayLogic_Relax
                                             ((int) playerDataList[j].getPokerList()[n].m_pokerType == pokerType))
                                         {
                                             // 加到当前这一轮出牌的牌堆里面
-                                            playerDataList[j].m_curOutPokerList
-                                                .Add(new TLJCommon.PokerInfo(num,
-                                                    (TLJCommon.Consts.PokerType) pokerType));
+                                            playerDataList[j].m_curOutPokerList.Add(new TLJCommon.PokerInfo(num,(TLJCommon.Consts.PokerType) pokerType));
 
                                             // 出的牌从自己的牌堆里删除
                                             {
@@ -879,7 +890,6 @@ class PlayLogic_Relax
                                         }
                                     }
                                 }
-                                
                             }
                         }
 
@@ -892,6 +902,7 @@ class PlayLogic_Relax
                     break;
                 }
             }
+
             //doTask_CallPlayerOutPoker(room, data, false);
             doTask_CallPlayerOutPoker(room, jo.ToString(), false);
         }
