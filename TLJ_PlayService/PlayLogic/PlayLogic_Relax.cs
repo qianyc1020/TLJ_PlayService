@@ -743,9 +743,8 @@ class PlayLogic_Relax
                                 {
                                     //检测是否甩牌成功
                                     List<PokerInfo> shuaiPaiPoker = PlayRuleUtil.GetShuaiPaiPoker(room, outPokerList);
-
                                     bool isSuccess = (shuaiPaiPoker.Count == 0 ? true : false);
-
+                                    PlayService.log.Info("甩牌结果:" + isSuccess);
                                     //   甩牌成功
                                     if (isSuccess)
                                     {
