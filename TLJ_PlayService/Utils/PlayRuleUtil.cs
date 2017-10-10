@@ -882,7 +882,12 @@ public class PlayRuleUtil
                 for (int i = 0; i < firstDoublePoker.Count; i++)
                 {
                     tempList.Add(myDoublePoker[i]);
-                    myDoublePoker.Remove(myDoublePoker[i]);
+//                    myDoublePoker.Remove(myDoublePoker[i]);
+                }
+
+                foreach (var Poker in tempList)
+                {
+                    myDoublePoker.Remove(Poker);
                 }
 
                 for (int i = 0; i < firstSinglePoker.Count; i++)
