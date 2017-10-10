@@ -180,8 +180,8 @@ public class PlayRuleUtil
         SetPokerWeight(outPokerList, room.m_levelPokerNum, (Consts.PokerType) room.m_masterPokerType);
 
         List<PlayerData> playerDatas = room.getPlayerDataList();
-        
 
+        //设置牌的权重
         foreach (var playerData in playerDatas)
         {
             SetPokerWeight(playerData.m_curOutPokerList,room.m_levelPokerNum,(Consts.PokerType) room.m_masterPokerType) ;
