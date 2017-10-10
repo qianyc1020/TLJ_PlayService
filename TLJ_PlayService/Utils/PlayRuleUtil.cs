@@ -180,10 +180,12 @@ public class PlayRuleUtil
         SetPokerWeight(outPokerList, room.m_levelPokerNum, (Consts.PokerType) room.m_masterPokerType);
 
         List<PlayerData> playerDatas = room.getPlayerDataList();
+        
 
         foreach (var playerData in playerDatas)
         {
             SetPokerWeight(playerData.m_curOutPokerList,room.m_levelPokerNum,(Consts.PokerType) room.m_masterPokerType) ;
+            SetPokerWeight(playerData.getPokerList(),room.m_levelPokerNum,(Consts.PokerType) room.m_masterPokerType) ;
         }
         //得到甩牌的对子
         List<PokerInfo> firestDoubleList = GetDoublePoker(outPokerList);
@@ -225,6 +227,7 @@ public class PlayRuleUtil
                     //甩牌失败,单牌比别人小
                     else
                     {
+                        TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
                         resultList.Add(minSingle);
                         return resultList;
                     }
@@ -259,7 +262,7 @@ public class PlayRuleUtil
                         return CompareDoublePoker(firestDoubleList, OtherDoubleleList, room.m_levelPokerNum,
                             room.m_masterPokerType, out OtherTlj);
                     }
-                    //最小的单牌牌都比其他玩家手牌中的最大主牌大else
+                    //最小的单牌牌都比其他玩家手牌中的最大主牌大
                     else if (minSingle.m_weight >= pokerByType[pokerByType.Count - 1].m_weight)
                     {
                         List<List<PokerInfo>> OtherTlj;
@@ -269,6 +272,7 @@ public class PlayRuleUtil
                     //甩牌失败,单牌比别人小
                     else
                     {
+                        TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
                         resultList.Add(minSingle);
                         return resultList;
                     }
@@ -325,6 +329,7 @@ public class PlayRuleUtil
                                     }
                                     else
                                     {
+                                        TLJ_PlayService.PlayService.log.Info("拖拉机比别人小");
                                         list = TljPoker;
                                         return list;
                                     }
@@ -350,6 +355,7 @@ public class PlayRuleUtil
                         else
                         {
                             //甩牌失败,单牌大，但是对子比别人小
+                            TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌大，但是对子比别人小");
                             list.Add(firestDoubleList[0]);
                             list.Add(firestDoubleList[1]);
                             return list;

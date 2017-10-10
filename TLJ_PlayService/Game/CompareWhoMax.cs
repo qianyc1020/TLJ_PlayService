@@ -29,6 +29,8 @@ public class CompareWhoMax
                 tempList.Add(room.getPlayerDataList()[i]);
             }
         }
+        TLJ_PlayService.PlayService.log.Info("第一个人出牌数:"+ tempList[0].m_curOutPokerList.Count);
+
         //设权重
         for (int i = 0; i < tempList.Count; i++)
         {
@@ -40,7 +42,7 @@ public class CompareWhoMax
         PlayerData maxPlayer = CompareBoth(tempList[0], tempList[1], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[2], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[3], room.m_levelPokerNum, room.m_masterPokerType);
-        TLJ_PlayService.PlayService.log.Info("我是最大的:"+maxPlayer.m_curOutPokerList[0].m_pokerType+ maxPlayer.m_curOutPokerList[0].m_num);
+        TLJ_PlayService.PlayService.log.Info("我是最大的:"+maxPlayer.m_curOutPokerList[0].m_pokerType+ maxPlayer.m_curOutPokerList[0].m_num+"\n------------");
         return maxPlayer;
     }
 
@@ -59,15 +61,25 @@ public class CompareWhoMax
 
         if (playerOutPokerList1 == null || playerOutPokerList2 == null)
         {
+            TLJ_PlayService.PlayService.log.Info("有玩家出牌的数据为空");
             return player1;
         }
 
         if (playerOutPokerList2.Count == 0 || playerOutPokerList1.Count == 0)
         {
+            TLJ_PlayService.PlayService.log.Info("有玩家出牌的数据为0");
             return player1;
         }
 
-        if (playerOutPokerList1.Count != playerOutPokerList2.Count) return player1;
+        if (playerOutPokerList1.Count != playerOutPokerList2.Count)
+        {
+            TLJ_PlayService.PlayService.log.Info("有玩家出牌大小不一样:"+ playerOutPokerList1.Count+"-----"+ playerOutPokerList2.Count);
+            foreach (var VARIABLE in playerOutPokerList1)
+            {
+                TLJ_PlayService.PlayService.log.Info("第一个人的出牌:" + VARIABLE.m_pokerType + VARIABLE.m_num);
+            }
+            return player1;
+        }
 
         TLJ_PlayService.PlayService.log.Info("玩家一：" + playerOutPokerList1[0].m_num + " " +
                                                  playerOutPokerList1[0].m_pokerType + " " +

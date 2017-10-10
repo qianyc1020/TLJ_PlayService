@@ -376,10 +376,11 @@ public class CheckOutPoker
 
             if (PlayRuleUtil.IsTuolaji(outPokerList, mLevelPokerNum, masterPokerType))
             {
-                LogUtil.getInstance().writeLogToLocalNow("出的是拖拉机");
+                TLJ_PlayService.PlayService.log.Info("出的是拖拉机");
                 return OutPokerType.OutPokerType_TuoLaJi;
             }
         }
+        TLJ_PlayService.PlayService.log.Info("有人尝试甩牌");
         return OutPokerType.OutPokerType_ShuaiPai;
     }
 }
