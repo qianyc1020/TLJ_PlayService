@@ -688,7 +688,7 @@ class PlayLogic_Relax
                     {
                         if (room.getPlayerDataList()[i].m_uid.CompareTo(room.m_curOutPokerPlayer.m_uid) == 0)
                         {
-                            trusteeshipLogic(respondJO.ToString(), room.getPlayerDataList()[i]);
+                            trusteeshipLogic(room,respondJO.ToString(), room.getPlayerDataList()[i]);
 
                             break;
                         }
@@ -965,7 +965,7 @@ class PlayLogic_Relax
                             // 如果当前房间正好轮到此人出牌
                             if (m_roomList[i].m_curOutPokerPlayer.m_uid.CompareTo(playerDataList[j].m_uid) == 0)
                             {
-                                trusteeshipLogic(playerDataList[j]);
+                                trusteeshipLogic(m_roomList[i], playerDataList[j]);
                             }
                         }
                         // 如果此人所在的房间还没有开赛，则从房间删除此人
@@ -1104,53 +1104,8 @@ class PlayLogic_Relax
         return room;
     }
 
-    // 比较这一轮出牌的大小
-    //    PlayerData compareWhoMax(List<PlayerData> listPlayerData, PlayerData firstOutPokerPlayer)
-    //    {
-    //        /*
-    //         * listPlayerData是按玩家进入房间顺序排的
-    //         * 这里要改成按这一轮出牌顺序排
-    //         */
-    //
-    //        List<PlayerData> tempList = new List<PlayerData>();
-    //
-    //        // 重新排序
-    //        {
-    //            int index = listPlayerData.IndexOf(firstOutPokerPlayer);
-    //
-    //            for (int i = index; i < listPlayerData.Count; i++)
-    //            {
-    //                tempList.Add(listPlayerData[i]);
-    //            }
-    //
-    //            for (int i = 0; i < index; i++)
-    //            {
-    //                tempList.Add(listPlayerData[i]);
-    //            }
-    //        }
-    //
-    //        PlayerData max = tempList[0];
-    //
-    //        if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) != CheckOutPoker.OutPokerType.OutPokerType_Error)
-    //        {
-    //            for (int i = 1; i < tempList.Count; i++)
-    //            {
-    //                // 出牌类型必须一样才可以继续比较大小，否则视为小
-    //                if (CheckOutPoker.checkOutPokerType(max.m_curOutPokerList) == CheckOutPoker.checkOutPokerType(tempList[i].m_curOutPokerList))
-    //                {
-    //                    if (tempList[i].m_curOutPokerList[0].m_num > max.m_curOutPokerList[0].m_num)
-    //                    {
-    //                        max = tempList[i];
-    //                    }
-    //                }
-    //            }
-    //        }
-    //
-    //        return max;
-    //    }
-
     // 托管逻辑
-    void trusteeshipLogic(string jsonData, PlayerData playerData)
+    void trusteeshipLogic(RoomData room, string jsonData, PlayerData playerData)
     {
         try
         {
@@ -1169,26 +1124,40 @@ class PlayLogic_Relax
 
                     // 自己出的牌
                     {
-                        int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                        int pokerType = (int) playerData.getPokerList()[playerData.getPokerList().Count - 1]
-                            .m_pokerType;
-
-                        // 出的牌从自己的牌堆里删除
-                        //playerData.getPokerList().RemoveAt(playerData.getPokerList().Count - 1);
-
-                        JArray jarray = new JArray();
-                        //for (int i = 0; i < m_myPokerObjList.Count; i++)
-                        //{
-                        //    PokerScript pokerScript = m_myPokerObjList[i].GetComponent<PokerScript>();
-                        //    if (pokerScript.getIsSelect())
+                        // 任意出
+                        if (playerData.m_uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                         {
-                            JObject temp = new JObject();
-                            temp.Add("num", num);
-                            temp.Add("pokerType", pokerType);
-                            jarray.Add(temp);
+                            int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                            int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+
+                            JArray jarray = new JArray();
+                            {
+                                JObject temp = new JObject();
+                                temp.Add("num", num);
+                                temp.Add("pokerType", pokerType);
+                                jarray.Add(temp);
+                            }
+                            backData.Add("pokerList", jarray);
                         }
-                        //}
-                        backData.Add("pokerList", jarray);
+                        // 跟牌
+                        else
+                        {
+                            List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenTuoGuan(room.m_curRoundFirstPlayer.m_curOutPokerList, playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
+                            JArray jarray = new JArray();
+                            for (int i = 0; i < listPoker.Count; i++)
+                            {
+                                int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                                int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+                                
+                                {
+                                    JObject temp = new JObject();
+                                    temp.Add("num", num);
+                                    temp.Add("pokerType", pokerType);
+                                    jarray.Add(temp);
+                                }
+                            }
+                            backData.Add("pokerList", jarray);
+                        }
                     }
 
                     LogUtil.getInstance().addDebugLog("托管出牌：" + playerData.m_uid);
@@ -1203,7 +1172,7 @@ class PlayLogic_Relax
     }
 
     // 托管逻辑
-    void trusteeshipLogic(PlayerData playerData)
+    void trusteeshipLogic(RoomData room, PlayerData playerData)
     {
         try
         {
@@ -1221,27 +1190,40 @@ class PlayLogic_Relax
 
                     // 自己出的牌
                     {
-                        //List<>
-                        int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                        int pokerType = (int) playerData.getPokerList()[playerData.getPokerList().Count - 1]
-                            .m_pokerType;
-
-                        // 出的牌从自己的牌堆里删除
-                        //playerData.getPokerList().RemoveAt(playerData.getPokerList().Count - 1);
-
-                        JArray jarray = new JArray();
-                        //for (int i = 0; i < m_myPokerObjList.Count; i++)
-                        //{
-                        //    PokerScript pokerScript = m_myPokerObjList[i].GetComponent<PokerScript>();
-                        //    if (pokerScript.getIsSelect())
+                        // 任意出
+                        if (playerData.m_uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                         {
-                            JObject temp = new JObject();
-                            temp.Add("num", num);
-                            temp.Add("pokerType", pokerType);
-                            jarray.Add(temp);
+                            int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                            int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+
+                            JArray jarray = new JArray();
+                            {
+                                JObject temp = new JObject();
+                                temp.Add("num", num);
+                                temp.Add("pokerType", pokerType);
+                                jarray.Add(temp);
+                            }
+                            backData.Add("pokerList", jarray);
                         }
-                        //}
-                        backData.Add("pokerList", jarray);
+                        // 跟牌
+                        else
+                        {
+                            List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenTuoGuan(room.m_curRoundFirstPlayer.m_curOutPokerList, playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
+                            JArray jarray = new JArray();
+                            for (int i = 0; i < listPoker.Count; i++)
+                            {
+                                int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                                int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+
+                                {
+                                    JObject temp = new JObject();
+                                    temp.Add("num", num);
+                                    temp.Add("pokerType", pokerType);
+                                    jarray.Add(temp);
+                                }
+                            }
+                            backData.Add("pokerList", jarray);
+                        }
                     }
 
                     LogUtil.getInstance().addDebugLog("托管出牌：" + playerData.m_uid);
