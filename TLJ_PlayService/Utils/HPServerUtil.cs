@@ -13,7 +13,9 @@ public class HPServerUtil
     //TcpPackServer m_tcpServer = new TcpPackServer();
     TcpServer m_tcpServer = new TcpServer();
 
+    // 数据包尾部标识
     char m_packEndFlag = (char)1;
+    string m_endStr = "";
 
     int m_curPlayerCount = 0;
 
@@ -158,9 +160,45 @@ public class HPServerUtil
 
     HandleResult OnReceive(IntPtr connId, byte[] bytes)
     {
-        ReceiveObj obj = new ReceiveObj(connId, bytes);
-        Thread thread = new Thread(doAskCilentReq);
-        thread.Start(obj);
+        try
+        {
+            string text = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            LogUtil.getInstance().addDebugLog("收到客户端原始消息：" + text);
+            {
+                text = m_endStr + text;
+                text = text.Replace("\r\n", "");
+
+                List<string> list = new List<string>();
+                bool b = CommonUtil.splitStrIsPerfect(text, list, m_packEndFlag);
+
+                if (b)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        ReceiveObj obj = new ReceiveObj(connId, list[i]);
+                        Thread thread = new Thread(doAskCilentReq);
+                        thread.Start(obj);
+                    }
+
+                    text = "";
+                }
+                else
+                {
+                    for (int i = 0; i < list.Count - 1; i++)
+                    {
+                        ReceiveObj obj = new ReceiveObj(connId, list[i]);
+                        Thread thread = new Thread(doAskCilentReq);
+                        thread.Start(obj);
+                    }
+
+                    m_endStr = list[list.Count - 1];
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LogUtil.getInstance().addErrorLog("OnReceive:" + ex.Message);
+        }
 
         return HandleResult.Ok;
     }
@@ -193,7 +231,7 @@ public class HPServerUtil
         // Thread.Sleep(3000);
 
         ReceiveObj receiveObj = (ReceiveObj)obj;
-        string text = Encoding.UTF8.GetString(receiveObj.m_bytes, 0, receiveObj.m_bytes.Length);
+        string text = receiveObj.m_data;
 
         LogUtil.getInstance().addDebugLog("收到客户端消息：" + text);
 
@@ -248,11 +286,11 @@ public class HPServerUtil
 class ReceiveObj
 {
     public IntPtr m_connId;
-    public byte[] m_bytes;
+    public string m_data = "";
 
-    public ReceiveObj(IntPtr connId, byte[] bytes)
+    public ReceiveObj(IntPtr connId, string data)
     {
         m_connId = connId;
-        m_bytes = bytes;
+        m_data = data;
     }
 };

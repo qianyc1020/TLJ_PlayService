@@ -5175,3 +5175,10 @@ System.ComponentModel.Win32Exception: 指定的服务已标记为删除。
 >>>>>>> 91df4a0ef240d1f0b07dc2e711053965443ef075
 
 卸载完成。
+
+
+正在开始卸载。
+查看日志文件的内容以获得 E:\GitHub\TLJ_PlayService\TLJ_PlayService\bin\Debug\TLJ_PlayService.exe 程序集的进度。
+该文件位于 E:\GitHub\TLJ_PlayService\TLJ_PlayService\bin\Debug\TLJ_PlayService.InstallLog。
+
+卸载完成。
