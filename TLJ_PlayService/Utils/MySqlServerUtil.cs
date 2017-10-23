@@ -118,17 +118,11 @@ public class MySqlServerUtil
         string tag = jo.GetValue("tag").ToString();
         int connId = Convert.ToInt32(jo.GetValue("connId"));
 
-        // 请求登录接口
-        if (tag.CompareTo(TLJCommon.Consts.Tag_Login) == 0)
+        // 获取游戏内玩家信息
+        if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
         {
-            NetRespond_Login.onMySqlRespond(connId, str);
+            NetRespond_UserInfo_Game.onMySqlRespond(connId, str);
         }
-        // 请求快速注册接口
-        else if (tag.CompareTo(TLJCommon.Consts.Tag_QuickRegister) == 0)
-        {
-            NetRespond_QuickRegister.onMySqlRespond(connId,str);
-        }
-
 
         return HandleResult.Ok;
     }

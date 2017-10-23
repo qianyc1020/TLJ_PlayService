@@ -60,11 +60,10 @@
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
     <Compile Include="Game\AllotPoker.cs" />
+    <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="Utils\CheckOutPoker.cs" />
     <Compile Include="Game\CompareWhoMax.cs" />
-    <Compile Include="NetResponds\NetRespond_Login.cs" />
     <Compile Include="NetResponds\NetRespond_OnlineInfo.cs" />
-    <Compile Include="NetResponds\NetRespond_QuickRegister.cs" />
     <Compile Include="PlayLogic\PlayLogic_Relax.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
