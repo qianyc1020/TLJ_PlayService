@@ -256,6 +256,11 @@ public class HPServerUtil
             {
                 PlayLogic_Relax.getInstance().OnReceive(receiveObj.m_connId,text);
             }
+            // 比赛场相关
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_JingJiChang) == 0)
+            {
+                PlayLogic_PVP.getInstance().OnReceive(receiveObj.m_connId, text);
+            }
             // 请求服务器在线玩家信息接口
             else if (tag.CompareTo(TLJCommon.Consts.Tag_OnlineInfo) == 0)
             {

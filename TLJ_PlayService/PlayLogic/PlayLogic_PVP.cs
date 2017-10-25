@@ -8,22 +8,22 @@ using System.Threading;
 using TLJCommon;
 using TLJ_PlayService;
 
-class PlayLogic_Relax
+class PlayLogic_PVP
 {
-    static PlayLogic_Relax s_playLogic_Normal = null;
+    static PlayLogic_PVP s_playLogic_PVP = null;
 
     List<RoomData> m_roomList = new List<RoomData>();
 
     int m_tuoguanOutPokerDur = 100; // 托管出牌时间:毫秒
 
-    public static PlayLogic_Relax getInstance()
+    public static PlayLogic_PVP getInstance()
     {
-        if (s_playLogic_Normal == null)
+        if (s_playLogic_PVP == null)
         {
-            s_playLogic_Normal = new PlayLogic_Relax();
+            s_playLogic_PVP = new PlayLogic_PVP();
         }
 
-        return s_playLogic_Normal;
+        return s_playLogic_PVP;
     }
 
     public int getPlayerCount()
@@ -137,7 +137,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().writeLogToLocalNow("PlayLogic_Relax.OnReceive()异常：" + ex.Message);
+            LogUtil.getInstance().writeLogToLocalNow("PlayLogic_PVP.OnReceive()异常：" + ex.Message);
             // 客户端参数错误
             respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));
 
@@ -187,7 +187,7 @@ class PlayLogic_Relax
             // 在已有的房间寻找可以加入的房间
             for (int i = 0; i < m_roomList.Count; i++)
             {
-                if(gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
+                if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
                 {
                     if (m_roomList[i].joinPlayer(new PlayerData(connId, uid)))
                     {
@@ -357,7 +357,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_JoinGame异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_JoinGame异常：" + ex.Message);
         }
     }
 
@@ -411,7 +411,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_ExitGame异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_ExitGame异常：" + ex.Message);
         }
     }
 
@@ -505,7 +505,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_QiangZhu异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_QiangZhu异常：" + ex.Message);
         }
     }
 
@@ -583,7 +583,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_QiangZhu异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_QiangZhu异常：" + ex.Message);
         }
     }
 
@@ -682,7 +682,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_MaiDi异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_MaiDi异常：" + ex.Message);
         }
     }
     
@@ -770,7 +770,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_OtherMaiDi异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_OtherMaiDi异常：" + ex.Message);
         }
     }
 
@@ -785,7 +785,7 @@ class PlayLogic_Relax
                 {
                     respondJO = new JObject();
 
-                    respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                     respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_CallPlayerChaoDi);
                     respondJO.Add("uid", uid);
                 }
@@ -817,7 +817,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:callPlayerChaoDi异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:callPlayerChaoDi异常：" + ex.Message);
         }
     }
 
@@ -917,7 +917,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_PlayerChaoDi异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_PlayerChaoDi异常：" + ex.Message);
         }
     }
 
@@ -1037,7 +1037,7 @@ class PlayLogic_Relax
                 {
                     respondJO = new JObject();
 
-                    respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                     respondJO.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_CallPlayerOutPoker);
                     respondJO.Add("cur_uid", room.m_curOutPokerPlayer.m_uid);
                     respondJO.Add("isFreeOutPoker", isFreeOutPoker);
@@ -1084,7 +1084,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_CallPlayerOutPoker异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_CallPlayerOutPoker异常：" + ex.Message);
         }
     }
 
@@ -1166,7 +1166,7 @@ class PlayLogic_Relax
                                         {
                                             respondJO = new JObject();
 
-                                            respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                                            respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                                             respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_ShuaiPai);
                                             respondJO.Add("uid", room.m_curOutPokerPlayer.m_uid);
                                             respondJO.Add("pokerList", jo.GetValue("pokerList"));
@@ -1293,10 +1293,10 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_ReceivePlayerOutPoker异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_ReceivePlayerOutPoker异常：" + ex.Message);
         }
     }
-    
+
     public void doTask_ContinueGame(IntPtr connId, string data)
     {
         try
@@ -1315,7 +1315,7 @@ class PlayLogic_Relax
                     JObject respondJO = new JObject();
                     respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
                     respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_ContinueGame);
-                    
+
                     if (room.getPlayerDataList().Count == 4)
                     {
                         for (int i = 0; i < room.getPlayerDataList().Count; i++)
@@ -1359,7 +1359,7 @@ class PlayLogic_Relax
                 }
 
                 // 检查是否4个人都愿意继续游戏
-                if(isOK)
+                if (isOK)
                 {
                     bool canStartGame = true;
                     if (room.getPlayerDataList().Count == 4)
@@ -1540,7 +1540,7 @@ class PlayLogic_Relax
                         if (cur_room.getPlayerDataList()[i].m_isContinueGame)
                         {
                             JObject respondJO = new JObject();
-                            respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                            respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                             respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_ContinueGameFail);
                             respondJO.Add("uid", cur_room.getPlayerDataList()[i].m_uid);
 
@@ -1735,12 +1735,12 @@ class PlayLogic_Relax
             }
             else
             {
-                LogUtil.getInstance().addDebugLog("PlayLogic_Relax.doTask_ChangeRoom:未找到此人所在房间：" + uid);
+                LogUtil.getInstance().addDebugLog("PlayLogic_PVP.doTask_ChangeRoom:未找到此人所在房间：" + uid);
             }
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:ChangeRoom异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:ChangeRoom异常：" + ex.Message);
         }
     }
 
@@ -1769,12 +1769,12 @@ class PlayLogic_Relax
             }
             else
             {
-                LogUtil.getInstance().addDebugLog("PlayLogic_Relax.doTask_Chat:未找到此人所在房间：" + uid);
+                LogUtil.getInstance().addDebugLog("PlayLogic_PVP.doTask_Chat:未找到此人所在房间：" + uid);
             }
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTask_Chat异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTask_Chat异常：" + ex.Message);
         }
     }
 
@@ -1823,7 +1823,7 @@ class PlayLogic_Relax
                                     if (m_roomList[i].m_zhuangjiaPlayerData.m_uid.CompareTo(playerDataList[j].m_uid) == 0)
                                     {
                                         JObject data = new JObject();
-                                        data.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                                        data.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                                         data.Add("uid", m_roomList[i].m_zhuangjiaPlayerData.m_uid);
                                         data.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_MaiDi);
                                         
@@ -1899,7 +1899,7 @@ class PlayLogic_Relax
                                                 {
                                                     {
                                                         JObject respondJO = new JObject();
-                                                        respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                                                        respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                                                         respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_ContinueGameFail);
                                                         respondJO.Add("uid", playerDataList[k].m_uid);
 
@@ -1930,7 +1930,7 @@ class PlayLogic_Relax
                                     playerDataList.RemoveAt(j);
                                     if (playerDataList.Count == 0)
                                     {
-                                        LogUtil.getInstance().addDebugLog("PlayLogic_Relax:此房间人数为0，解散房间：" + m_roomList[i].getRoomId());
+                                        LogUtil.getInstance().addDebugLog("PlayLogic_PVP:此房间人数为0，解散房间：" + m_roomList[i].getRoomId());
                                         m_roomList.RemoveAt(i);
                                     }
                                 }
@@ -1944,7 +1944,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:doTaskPlayerCloseConn异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:doTaskPlayerCloseConn异常：" + ex.Message);
         }
 
         return false;
@@ -1956,7 +1956,7 @@ class PlayLogic_Relax
         try
         {
             JObject respondJO = new JObject();
-            respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+            respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
             respondJO.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_MaiDi);
             respondJO.Add("uid", room.m_zhuangjiaPlayerData.m_uid);
 
@@ -1994,7 +1994,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:callPlayerMaiDi异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:callPlayerMaiDi异常：" + ex.Message);
         }
     }
 
@@ -2004,7 +2004,7 @@ class PlayLogic_Relax
         try
         {
             //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
-            LogUtil.getInstance().addDebugLog("PlayLogic_Relax:比赛结束,roomid = :" + room.getRoomId());
+            LogUtil.getInstance().addDebugLog("PlayLogic_PVP:比赛结束,roomid = :" + room.getRoomId());
 
             // 逻辑处理
             {
@@ -2052,7 +2052,7 @@ class PlayLogic_Relax
                 {
                     respondJO = new JObject();
 
-                    respondJO.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    respondJO.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                     respondJO.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_GameOver);
                     respondJO.Add("getAllScore", room.m_getAllScore);
                     respondJO.Add("isBankerWin", room.m_getAllScore >= 80 ? 0 : 1);
@@ -2095,7 +2095,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:gameOver异常：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:gameOver异常：" + ex.Message);
         }
     }
 
@@ -2136,7 +2136,7 @@ class PlayLogic_Relax
                 {
                     JObject backData = new JObject();
 
-                    backData.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    backData.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                     backData.Add("uid", playerData.m_uid);
                     backData.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_PlayerOutPoker);
 
@@ -2185,7 +2185,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:trusteeshipLogic异常1：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:trusteeshipLogic异常1：" + ex.Message);
         }
     }
 
@@ -2202,7 +2202,7 @@ class PlayLogic_Relax
                 {
                     JObject backData = new JObject();
 
-                    backData.Add("tag", TLJCommon.Consts.Tag_XiuXianChang);
+                    backData.Add("tag", TLJCommon.Consts.Tag_JingJiChang);
                     backData.Add("uid", playerData.m_uid);
                     backData.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_PlayerOutPoker);
 
@@ -2251,7 +2251,7 @@ class PlayLogic_Relax
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("PlayLogic_Relax:trusteeshipLogic异常2：" + ex.Message);
+            LogUtil.getInstance().addErrorLog("PlayLogic_PVP:trusteeshipLogic异常2：" + ex.Message);
         }
     }
 }
