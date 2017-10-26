@@ -12,6 +12,8 @@ public class RoomData
         RoomState_zhuangjiamaidi,
         RoomState_fanzhu,
         RoomState_chaodi,
+        RoomState_othermaidi,
+        RoomState_koudi,
         RoomState_gaming,
         RoomState_end,
     }
@@ -24,6 +26,8 @@ public class RoomData
     public RoomState m_roomState = RoomState.RoomState_waiting;
 
     public PlayerData m_curOutPokerPlayer = null;
+    public PlayerData m_curMaiDiPlayer = null;
+    public PlayerData m_curChaoDiPlayer = null;
     public PlayerData m_curRoundFirstPlayer = null;
 
     // 本房间玩家信息

@@ -208,8 +208,9 @@ public class HPServerUtil
         --m_curPlayerCount;
 
         LogUtil.getInstance().addDebugLog("与客户端断开:" + connId);
-
-        hasPlayerExit(connId);
+        
+        Thread thread = new Thread(hasPlayerExit);
+        thread.Start(connId);
 
         return HandleResult.Ok;
     }
@@ -280,9 +281,14 @@ public class HPServerUtil
         }
     }
 
-    void hasPlayerExit(IntPtr connId)
+    void hasPlayerExit(object obj)
     {
+        IntPtr connId = (IntPtr)obj;
         if (PlayLogic_Relax.getInstance().doTaskPlayerCloseConn(connId))
+        {
+            LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+        }
+        else if (PlayLogic_PVP.getInstance().doTaskPlayerCloseConn(connId))
         {
             LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
         }
