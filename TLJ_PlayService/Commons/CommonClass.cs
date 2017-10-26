@@ -20,6 +20,7 @@ public class RoomData
 
     public int m_roomId;
     public string m_gameRoomType;
+    public int m_rounds_pvp = 1;
 
     public bool m_isStartGame = false;
     public bool m_canChaoDi = true;

@@ -190,7 +190,8 @@ class PlayLogic_Relax
             // 在已有的房间寻找可以加入的房间
             for (int i = 0; i < m_roomList.Count; i++)
             {
-                if(gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
+                //if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
+                if ((gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0) && (1 == m_roomList[i].m_rounds_pvp))
                 {
                     if (m_roomList[i].joinPlayer(new PlayerData(connId, uid, false)))
                     {
@@ -2074,8 +2075,7 @@ class PlayLogic_Relax
                     pokerList.Add(temp);
 
                     // 把底牌加到庄家牌里面去
-                    room.m_zhuangjiaPlayerData.getPokerList()
-                        .Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType) pokerType));
+                    room.m_zhuangjiaPlayerData.getPokerList() .Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType) pokerType));
                 }
 
                 respondJO.Add("diPokerList", pokerList);
@@ -2100,97 +2100,6 @@ class PlayLogic_Relax
         catch (Exception ex)
         {
             LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":callPlayerMaiDi异常：" + ex.Message);
-        }
-    }
-
-    // 游戏结束
-    void gameOver(RoomData room, string data)
-    {
-        try
-        {
-            //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
-            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
-
-            // 逻辑处理
-            {
-                // 闲家赢
-                if (room.m_getAllScore >= 80)
-                {
-                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
-                    {
-                        if (room.getPlayerDataList()[i].m_isBanker == 0)
-                        {
-                            ++room.getPlayerDataList()[i].m_myLevelPoker;
-                            if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
-                            {
-                                room.getPlayerDataList()[i].m_myLevelPoker = 2;
-                            }
-
-                            room.m_levelPokerNum = room.getPlayerDataList()[i].m_myLevelPoker;
-                        }
-                    }
-                }
-                // 庄家赢
-                else
-                {
-                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
-                    {
-                        if (room.getPlayerDataList()[i].m_isBanker == 1)
-                        {
-                            ++room.getPlayerDataList()[i].m_myLevelPoker;
-                            if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
-                            {
-                                room.getPlayerDataList()[i].m_myLevelPoker = 2;
-                            }
-
-                            room.m_levelPokerNum = room.getPlayerDataList()[i].m_myLevelPoker;
-                        }
-                    }
-                }
-            }
-
-            JObject jo = JObject.Parse(data);
-
-            // 通知
-            {
-                JObject respondJO;
-                {
-                    respondJO = new JObject();
-
-                    respondJO.Add("tag", m_tag);
-                    respondJO.Add("playAction", (int) TLJCommon.Consts.PlayAction.PlayAction_GameOver);
-                    respondJO.Add("getAllScore", room.m_getAllScore);
-                    respondJO.Add("isBankerWin", room.m_getAllScore >= 80 ? 0 : 1);
-                    respondJO.Add("pre_uid", jo.GetValue("uid"));
-                    respondJO.Add("pre_outPokerList", jo.GetValue("pokerList"));
-                }
-
-                // 给在线的人推送
-                for (int i = 0; i < room.getPlayerDataList().Count; i++)
-                {
-                    // 推送给客户端
-                    if (!room.getPlayerDataList()[i].m_isOffLine)
-                    {
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId,
-                            respondJO.ToString());
-                    }
-                }
-            }
-
-            room.m_roomState = RoomData.RoomState.RoomState_end;
-
-            // 检查是否删除该房间
-            {
-                if (GameUtil.checkRoomNonePlayer(room))
-                {
-                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":所有人都离线，解散该房间：" + room.getRoomId());
-                    m_roomList.Remove(room);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":gameOver异常：" + ex.Message);
         }
     }
 
@@ -2439,5 +2348,98 @@ class PlayLogic_Relax
         data["hasPoker"] = 0;
 
         doTask_PlayerChaoDi(playerData.m_connId, data.ToString());
+    }
+
+    //------------------------------------------------------------------以上内容休闲场和PVP逻辑一样--------------------------------------------------------------
+
+    // 游戏结束
+    void gameOver(RoomData room, string data)
+    {
+        try
+        {
+            //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
+            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
+
+            // 逻辑处理
+            {
+                // 闲家赢
+                if (room.m_getAllScore >= 80)
+                {
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        if (room.getPlayerDataList()[i].m_isBanker == 0)
+                        {
+                            ++room.getPlayerDataList()[i].m_myLevelPoker;
+                            if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
+                            {
+                                room.getPlayerDataList()[i].m_myLevelPoker = 2;
+                            }
+
+                            room.m_levelPokerNum = room.getPlayerDataList()[i].m_myLevelPoker;
+                        }
+                    }
+                }
+                // 庄家赢
+                else
+                {
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        if (room.getPlayerDataList()[i].m_isBanker == 1)
+                        {
+                            ++room.getPlayerDataList()[i].m_myLevelPoker;
+                            if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
+                            {
+                                room.getPlayerDataList()[i].m_myLevelPoker = 2;
+                            }
+
+                            room.m_levelPokerNum = room.getPlayerDataList()[i].m_myLevelPoker;
+                        }
+                    }
+                }
+            }
+
+            JObject jo = JObject.Parse(data);
+
+            // 通知
+            {
+                JObject respondJO;
+                {
+                    respondJO = new JObject();
+
+                    respondJO.Add("tag", m_tag);
+                    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_GameOver);
+                    respondJO.Add("getAllScore", room.m_getAllScore);
+                    respondJO.Add("isBankerWin", room.m_getAllScore >= 80 ? 0 : 1);
+                    respondJO.Add("pre_uid", jo.GetValue("uid"));
+                    respondJO.Add("pre_outPokerList", jo.GetValue("pokerList"));
+                }
+
+                // 给在线的人推送
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    // 推送给客户端
+                    if (!room.getPlayerDataList()[i].m_isOffLine)
+                    {
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId,
+                            respondJO.ToString());
+                    }
+                }
+            }
+
+            room.m_roomState = RoomData.RoomState.RoomState_end;
+
+            // 检查是否删除该房间
+            {
+                if (GameUtil.checkRoomNonePlayer(room))
+                {
+                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":所有人都离线，解散该房间：" + room.getRoomId());
+                    m_roomList.Remove(room);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":gameOver异常：" + ex.Message);
+        }
     }
 }
