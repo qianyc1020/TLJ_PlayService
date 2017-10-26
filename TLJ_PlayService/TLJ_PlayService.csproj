@@ -60,6 +60,7 @@
     <Compile Include="Commons\CommonClass.cs" />
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
+    <Compile Include="Game\AIDataManage.cs" />
     <Compile Include="Game\AllotPoker.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />

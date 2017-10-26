@@ -148,14 +148,16 @@ public class PlayerData
     public int m_myLevelPoker = 2;
     public bool m_isOffLine = false;
     public bool m_isContinueGame = false;
+    public bool m_isAI = false;
 
     List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();
     public List<TLJCommon.PokerInfo> m_curOutPokerList = new List<TLJCommon.PokerInfo>();
 
-    public PlayerData(IntPtr connId, string uid)
+    public PlayerData(IntPtr connId, string uid, bool isAI)
     {
         m_connId = connId;
         m_uid = uid;
+        m_isAI = isAI;
     }
 
     public void setPokerList(List<TLJCommon.PokerInfo> pokerList)

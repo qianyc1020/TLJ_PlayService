@@ -102,4 +102,20 @@ class GameUtil
 
         return doubleList;
     }
+
+    public static bool checkRoomNonePlayer(RoomData room)
+    {
+        bool isRemove = true;
+        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        {
+            // 推送给客户端
+            if (!room.getPlayerDataList()[i].m_isOffLine)
+            {
+                isRemove = false;
+                break;
+            }
+        }
+
+        return isRemove;
+    }
 }
