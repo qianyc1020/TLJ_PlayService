@@ -123,6 +123,11 @@ public class MySqlServerUtil
         {
             NetRespond_UserInfo_Game.onMySqlRespond(connId, str);
         }
+        // 获取pvp场次信息
+        else if (tag.CompareTo(TLJCommon.Consts.Tag_GetPVPGameRoom) == 0)
+        {
+            NetRespond_GetPVPGameRoom.onMySqlRespond(connId, str);
+        }
 
         return HandleResult.Ok;
     }

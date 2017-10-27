@@ -62,8 +62,10 @@
     <Compile Include="Commons\NetConfig.cs" />
     <Compile Include="Game\AIDataManage.cs" />
     <Compile Include="Game\AllotPoker.cs" />
+    <Compile Include="NetResponds\NetRespond_GetPVPGameRoom.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
+    <Compile Include="Request\Request_ProgressTask.cs" />
     <Compile Include="Utils\CheckOutPoker.cs" />
     <Compile Include="Game\CompareWhoMax.cs" />
     <Compile Include="NetResponds\NetRespond_OnlineInfo.cs" />
