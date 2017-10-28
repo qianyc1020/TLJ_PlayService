@@ -1945,14 +1945,53 @@ class PlayLogic_PVP
 
             string gameRoomType = now_room.m_gameRoomType;
             int rounds_pvp = now_room.m_rounds_pvp;
-
-            // 删除该房间
+            
+            // 检查是否打到最后一轮
+            bool isContiune = true;
             {
-                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":本局打完，强制解散该房间：" + now_room.getRoomId());
-                m_roomList.Remove(now_room);
+                List<string> listTemp = new List<string>();
+                CommonUtil.splitStr(now_room.m_gameRoomType, listTemp, '_');
+                int jirenchang = int.Parse(listTemp[2]);
+                switch (jirenchang)
+                {
+                    case 8:
+                    {
+                        if (rounds_pvp == 2)
+                        {
+                            isContiune = false;
+                        }
+                    }
+                    break;
+
+                    case 16:
+                    {
+                        if (rounds_pvp == 3)
+                        {
+                            isContiune = false;
+                        }
+                    }
+                    break;
+
+                    case 32:
+                    {
+                        if (rounds_pvp == 4)
+                        {
+                            isContiune = false;
+                        }
+                    }
+                    break;
+                }
             }
 
+            // 进入新房间，准备开始下一局
+            if (isContiune)
             {
+                // 删除该房间
+                {
+                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":本局打完，强制解散该房间：" + now_room.getRoomId());
+                    m_roomList.Remove(now_room);
+                }
+
                 for (int i = 0; i < winPlayerList.Count; i++)
                 {
                     if (!winPlayerList[i].m_isOffLine)
@@ -2012,6 +2051,40 @@ class PlayLogic_PVP
                             }
                         }
                     }
+                }
+            }
+            // 所有局数已经打完
+            else
+            {
+                JObject respondJO;
+                {
+                    respondJO = new JObject();
+
+                    respondJO.Add("tag", m_tag);
+                    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_PVPGameOver);
+                }
+
+                // 给在线的人推送
+                for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
+                {
+                    // 推送给客户端
+                    if (!now_room.getPlayerDataList()[i].m_isOffLine)
+                    {
+                        if (respondJO.GetValue("mingci") != null)
+                        {
+                            respondJO.Remove("mingci");
+                        }
+
+                        respondJO.Add("mingci",i + 1);
+
+                        PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId,respondJO.ToString());
+                    }
+                }
+
+                // 删除该房间
+                {
+                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":PVP所有局数已打完，强制解散该房间：" + now_room.getRoomId());
+                    m_roomList.Remove(now_room);
                 }
             }
         }
