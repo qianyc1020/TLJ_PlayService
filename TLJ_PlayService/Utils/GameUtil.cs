@@ -333,4 +333,97 @@ class GameUtil
             LogUtil.getInstance().addErrorLog("GameUtil.checkRoomStartGame()----" + ex.Message + "tag:" + tag + "  roomid:" + room.getRoomId() + "gameroomtype:" + room.m_gameRoomType);
         }
     }
+
+    public static void setPlayerScore(RoomData room)
+    {
+        try
+        {
+            float jichufenshu = 1000;
+            float changcixishu = 1;
+            float defenxishu = 1;
+            float xianjiadefen;
+
+            // 计算场次系数
+            {
+                List<string> tempList = new List<string>();
+                CommonUtil.splitStr(room.m_gameRoomType, tempList, '_');
+
+                switch (tempList[0])
+                {
+                    case "XiuXian":
+                        {
+                            if (tempList[2].CompareTo("ChuJi") == 0)
+                            {
+                                changcixishu = 1;
+                            }
+                            else if (tempList[2].CompareTo("ZhongJi") == 0)
+                            {
+                                changcixishu = 2;
+                            }
+                            else if (tempList[2].CompareTo("GaoJi") == 0)
+                            {
+                                changcixishu = 3;
+                            }
+                        }
+                        break;
+
+                    case "PVP":
+                        {
+                            changcixishu = 1;
+                        }
+                        break;
+                }
+            }
+
+            // 计算得分系数
+            {
+                if (room.m_getAllScore == 0)
+                {
+                    defenxishu = -3.8f;
+                }
+                else if ((room.m_getAllScore >= 5) && (room.m_getAllScore <= 40))
+                {
+                    defenxishu = -2.8f;
+                }
+                else if ((room.m_getAllScore >= 45) && (room.m_getAllScore <= 75))
+                {
+                    defenxishu = -1.8f;
+                }
+                else if (room.m_getAllScore == 80)
+                {
+                    defenxishu = 1.0f;
+                }
+                else if ((room.m_getAllScore >= 85) && (room.m_getAllScore <= 120))
+                {
+                    defenxishu = 1.8f;
+                }
+                else if ((room.m_getAllScore >= 125) && (room.m_getAllScore <= 195))
+                {
+                    defenxishu = 2.8f;
+                }
+                else if (room.m_getAllScore == 200)
+                {
+                    defenxishu = 3.8f;
+                }
+            }
+
+            xianjiadefen = jichufenshu * changcixishu * defenxishu;
+
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                if (room.getPlayerDataList()[i].m_isBanker == 1)
+                {
+                    room.getPlayerDataList()[i].m_score = -(int)xianjiadefen;
+                }
+                else
+                {
+                    room.getPlayerDataList()[i].m_score = (int)xianjiadefen;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LogUtil.getInstance().addErrorLog("GameUtil.setPlayerScore()----" + ex.Message + "gameRoomType:" + room.m_gameRoomType);
+        }
+    }
 }

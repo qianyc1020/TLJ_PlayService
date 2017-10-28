@@ -1841,6 +1841,9 @@ class PlayLogic_Relax
             //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
 
+            // 计算每个玩家的金币（积分）
+            GameUtil.setPlayerScore(room);
+
             // 逻辑处理
             {
                 // 闲家赢
@@ -1913,8 +1916,14 @@ class PlayLogic_Relax
                     // 推送给客户端
                     if (!room.getPlayerDataList()[i].m_isOffLine)
                     {
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId,
-                            respondJO.ToString());
+                        if (respondJO.GetValue("score") != null)
+                        {
+                            respondJO.Remove("score");
+                        }
+
+                        respondJO.Add("score", room.getPlayerDataList()[i].m_score);
+
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId,respondJO.ToString());
                     }
                 }
             }

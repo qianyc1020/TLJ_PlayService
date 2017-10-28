@@ -147,6 +147,7 @@ public class PlayerData
     public string m_teammateUID;    // 队友uid
     public int m_isBanker = 0;      // 是否是庄家
     public int m_myLevelPoker = 2;
+    public int m_score = 0;
     public bool m_isOffLine = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;

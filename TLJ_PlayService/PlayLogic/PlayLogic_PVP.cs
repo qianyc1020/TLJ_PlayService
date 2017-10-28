@@ -1841,6 +1841,9 @@ class PlayLogic_PVP
             //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + now_room.getRoomId());
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + now_room.getRoomId());
 
+            // 计算每个玩家的金币（积分）
+            GameUtil.setPlayerScore(now_room);
+
             List<PlayerData> winPlayerList = new List<PlayerData>();
 
             // 逻辑处理
