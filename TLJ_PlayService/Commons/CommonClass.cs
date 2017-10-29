@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+public class PVPRoomPlayerList
+{
+    public string m_gameRoomType = "";
+    public List<PlayerData> m_playerList = new List<PlayerData>();
+}
+
 public class RoomData
 {
     public enum RoomState
@@ -148,6 +154,7 @@ public class PlayerData
     public int m_isBanker = 0;      // 是否是庄家
     public int m_myLevelPoker = 2;
     public int m_score = 0;
+    public int m_rank = 0;
     public bool m_isOffLine = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;

@@ -62,6 +62,7 @@
     <Compile Include="Commons\NetConfig.cs" />
     <Compile Include="Game\AIDataManage.cs" />
     <Compile Include="Game\AllotPoker.cs" />
+    <Compile Include="Game\PVPChangCiUtil.cs" />
     <Compile Include="NetResponds\NetRespond_GetPVPGameRoom.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />

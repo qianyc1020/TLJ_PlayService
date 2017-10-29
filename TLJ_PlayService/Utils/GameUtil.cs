@@ -158,33 +158,33 @@ class GameUtil
                         if ((!room.getPlayerDataList()[i].m_isOffLine) && (!room.getPlayerDataList()[i].m_isAI))
                         {
                             List<string> tempList = new List<string>();
-                            CommonUtil.splitStr(room.m_gameRoomType,tempList,'_');
+                            CommonUtil.splitStr(room.m_gameRoomType, tempList, '_');
 
                             switch (tempList[1])
                             {
                                 case "JingDian":
                                     {
-                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid,201);
+                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 201);
                                         Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 205);
                                     }
                                     break;
 
                                 case "ChaoDi":
                                     {
-                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid,202);
+                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 202);
                                         Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 207);
                                     }
                                     break;
 
                                 case "JinBi":
                                     {
-                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid,206);
+                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 206);
                                     }
                                     break;
 
                                 case "HuaFei":
                                     {
-                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid,206);
+                                        Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 206);
                                     }
                                     break;
                             }
@@ -327,6 +327,10 @@ class GameUtil
                     }
                 }
             }
+            else
+            {
+                LogUtil.getInstance().addDebugLog("GameUtils----" + ":人数不够无法开赛：count = " + room.getPlayerDataList().Count);
+            }
         }
         catch (Exception ex)
         {
@@ -413,11 +417,11 @@ class GameUtil
             {
                 if (room.getPlayerDataList()[i].m_isBanker == 1)
                 {
-                    room.getPlayerDataList()[i].m_score = -(int)xianjiadefen;
+                    room.getPlayerDataList()[i].m_score += (-(int)xianjiadefen);
                 }
                 else
                 {
-                    room.getPlayerDataList()[i].m_score = (int)xianjiadefen;
+                    room.getPlayerDataList()[i].m_score += (int)xianjiadefen;
                 }
             }
         }

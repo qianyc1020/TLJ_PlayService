@@ -1385,26 +1385,44 @@ class PlayLogic_PVP
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room);
                                         m_roomList.Remove(room);
                                     }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
+                                    }
                                 }
                                 break;
 
                             case RoomData.RoomState.RoomState_qiangzhu:
                                 {
-                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抢主阶段退出：" + playerDataList[j].m_uid);
+                                    if (!playerDataList[j].m_isOffLine)
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抢主阶段退出：" + playerDataList[j].m_uid);
 
-                                    playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].m_isOffLine = true;
 
-                                    trusteeshipLogic_QiangZhu(room, playerDataList[j]);
+                                        trusteeshipLogic_QiangZhu(room, playerDataList[j]);
+                                    }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
+                                    }
                                 }
                                 break;
 
                             case RoomData.RoomState.RoomState_zhuangjiamaidi:
                                 {
-                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在庄家埋底阶段退出：" + playerDataList[j].m_uid);
+                                    if (!playerDataList[j].m_isOffLine)
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在庄家埋底阶段退出：" + playerDataList[j].m_uid);
 
-                                    playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].m_isOffLine = true;
 
-                                    trusteeshipLogic_MaiDi(room, playerDataList[j]);
+                                        trusteeshipLogic_MaiDi(room, playerDataList[j]);
+                                    }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
+                                    }
                                 }
                                 break;
 
@@ -1418,33 +1436,54 @@ class PlayLogic_PVP
 
                             case RoomData.RoomState.RoomState_chaodi:
                                 {
-                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抄底阶段退出：" + playerDataList[j].m_uid);
+                                    if (!playerDataList[j].m_isOffLine)
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抄底阶段退出：" + playerDataList[j].m_uid);
 
-                                    playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].m_isOffLine = true;
 
-                                    trusteeshipLogic_ChaoDi(playerDataList[j]);
+                                        trusteeshipLogic_ChaoDi(playerDataList[j]);
+                                    }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
+                                    }
                                 }
                                 break;
 
                             case RoomData.RoomState.RoomState_othermaidi:
                                 {
-                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在Other埋底阶段退出：" + playerDataList[j].m_uid);
+                                    if (!playerDataList[j].m_isOffLine)
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在Other埋底阶段退出：" + playerDataList[j].m_uid);
 
-                                    playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].m_isOffLine = true;
 
-                                    trusteeshipLogic_MaiDi(room, playerDataList[j]);
+                                        trusteeshipLogic_MaiDi(room, playerDataList[j]);
+                                    }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
+                                    }
                                 }
                                 break;
 
                             case RoomData.RoomState.RoomState_gaming:
-                                {m_logFlag:
-                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在游戏中退出：" + playerDataList[j].m_uid);
-                                    playerDataList[j].m_isOffLine = true;
-
-                                    // 如果当前房间正好轮到此人出牌
-                                    if (m_roomList[i].m_curOutPokerPlayer.m_uid.CompareTo(playerDataList[j].m_uid) == 0)
+                                {
+                                    if (!playerDataList[j].m_isOffLine)
                                     {
-                                        trusteeshipLogic_OutPoker(m_roomList[i], playerDataList[j]);
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在游戏中退出：" + playerDataList[j].m_uid);
+                                        playerDataList[j].m_isOffLine = true;
+
+                                        // 如果当前房间正好轮到此人出牌
+                                        if (m_roomList[i].m_curOutPokerPlayer.m_uid.CompareTo(playerDataList[j].m_uid) == 0)
+                                        {
+                                            trusteeshipLogic_OutPoker(m_roomList[i], playerDataList[j]);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此玩家连续退出/掉线：" + playerDataList[j].m_uid);
                                     }
                                 }
                                 break;
@@ -1871,6 +1910,11 @@ class PlayLogic_PVP
                                 Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
                             }
                         }
+                        // 加入淘汰人员列表里
+                        else
+                        {
+                            PVPChangCiUtil.getInstance().addPlayerToThere(now_room.m_gameRoomType, now_room.getPlayerDataList()[i]);
+                        }
                     }
                 }
                 // 庄家赢
@@ -1895,6 +1939,11 @@ class PlayLogic_PVP
                             {
                                 Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
                             }
+                        }
+                        // 加入淘汰人员列表里
+                        else
+                        {
+                            PVPChangCiUtil.getInstance().addPlayerToThere(now_room.m_gameRoomType, now_room.getPlayerDataList()[i]);
                         }
                     }
                 }
@@ -1959,27 +2008,48 @@ class PlayLogic_PVP
                 {
                     case 8:
                     {
-                        if (rounds_pvp == 2)
+                        if (rounds_pvp == 3)
                         {
                             isContiune = false;
+                        }
+                        // 决胜局
+                        else if (rounds_pvp == 2)
+                        {
+                            jueshengju(now_room);
+
+                            return;
                         }
                     }
                     break;
 
                     case 16:
                     {
-                        if (rounds_pvp == 3)
+                        if (rounds_pvp == 4)
                         {
                             isContiune = false;
+                        }
+                        // 决胜局
+                        else if (rounds_pvp == 3)
+                        {
+                            jueshengju(now_room);
+
+                            return;
                         }
                     }
                     break;
 
                     case 32:
                     {
-                        if (rounds_pvp == 4)
+                        if (rounds_pvp == 5)
                         {
                             isContiune = false;
+                        }
+                        // 决胜局
+                        else if (rounds_pvp == 4)
+                        {
+                            jueshengju(now_room);
+
+                            return;
                         }
                     }
                     break;
@@ -2059,28 +2129,53 @@ class PlayLogic_PVP
             // 所有局数已经打完
             else
             {
-                JObject respondJO;
                 {
-                    respondJO = new JObject();
-
-                    respondJO.Add("tag", m_tag);
-                    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_PVPGameOver);
+                    for (int i = 0; i < winPlayerList.Count; i++)
+                    {
+                        // 加入淘汰人员列表里
+                        PVPChangCiUtil.getInstance().addPlayerToThere(gameRoomType, winPlayerList[i]);
+                    }
                 }
 
-                // 给在线的人推送
-                for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
+                PVPRoomPlayerList curPVPRoomPlayerList = PVPChangCiUtil.getInstance().getPVPRoomPlayerListByUid(winPlayerList[0].m_uid);
+                if (curPVPRoomPlayerList != null)
                 {
-                    // 推送给客户端
-                    if (!now_room.getPlayerDataList()[i].m_isOffLine)
+                    PVPChangCiUtil.getInstance().sortPVPRoomPlayerList(curPVPRoomPlayerList);
+                    PVPChangCiUtil.getInstance().deletePVPRoomPlayerList(curPVPRoomPlayerList);
+
+                    for (int i = 0; i < curPVPRoomPlayerList.m_playerList.Count; i++)
                     {
-                        if (respondJO.GetValue("mingci") != null)
+                        LogUtil.getInstance().addDebugLog(m_tag + "----名次" + (i + 1) + "  id = " + curPVPRoomPlayerList.m_playerList[i].m_uid + " 分数为" + curPVPRoomPlayerList.m_playerList[i].m_score);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog(m_tag + "----curPVPRoomPlayerList == null");
+                }
+
+                {
+                    JObject respondJO;
+                    {
+                        respondJO = new JObject();
+
+                        respondJO.Add("tag", m_tag);
+                        respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_PVPGameOver);
+                    }
+
+                    // 给在线的人推送
+                    for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
+                    {
+                        if (!now_room.getPlayerDataList()[i].m_isOffLine)
                         {
-                            respondJO.Remove("mingci");
+                            if (respondJO.GetValue("mingci") != null)
+                            {
+                                respondJO.Remove("mingci");
+                            }
+
+                            respondJO.Add("mingci", now_room.getPlayerDataList()[i].m_rank);
+
+                            PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId, respondJO.ToString());
                         }
-
-                        respondJO.Add("mingci",i + 1);
-
-                        PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId,respondJO.ToString());
                     }
                 }
 
@@ -2094,6 +2189,61 @@ class PlayLogic_PVP
         catch (Exception ex)
         {
             LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":gameOver异常：" + ex.Message);
+        }
+    }
+
+    void jueshengju(RoomData room)
+    {
+        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":开始决胜局：roomid = " + room.getRoomId() + "  gameRoomType = " + room.m_gameRoomType);
+
+        // 通知客户端即将开始决胜局
+        {
+            JObject respondJO;
+            {
+                respondJO = new JObject();
+
+                respondJO.Add("tag", m_tag);
+                respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_JueShengJuTongZhi);
+            }
+
+            // 给在线的人推送
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                if (!room.getPlayerDataList()[i].m_isOffLine)
+                {
+                    PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
+                }
+            }
+        }
+
+        // 创建决胜局房间
+        {
+            RoomData new_room = new RoomData(m_roomList.Count + 1, room.m_gameRoomType);
+            new_room.m_rounds_pvp = room.m_rounds_pvp + 1;
+            m_roomList.Add(new_room);
+
+            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":创建新房间：" + new_room.getRoomId());
+
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                PlayerData playData = new PlayerData(room.getPlayerDataList()[i].m_connId, room.getPlayerDataList()[i].m_uid, room.getPlayerDataList()[i].m_isAI);
+                playData.m_score = room.getPlayerDataList()[i].m_score;
+                new_room.joinPlayer(playData);
+            }
+            
+            {
+                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "删除旧房间：" + room.getRoomId());
+                m_roomList.Remove(room);
+            }
+
+            // 开始决胜局
+            {
+                // 延迟3秒开赛
+                Thread.Sleep(3000);
+
+                // 检测房间人数是否可以开赛
+                GameUtil.checkRoomStartGame(new_room, m_tag, true);
+            }
         }
     }
 }

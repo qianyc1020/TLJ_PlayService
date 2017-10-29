@@ -85,4 +85,23 @@ class CommonUtil
     {
         return str.Substring(str.LastIndexOf(c) + 1);
     }
+
+    static public bool isStrContain(string sourceStr, string containStr)
+    {
+        for (int i = 0; i <= sourceStr.Length - containStr.Length; i++)
+        {
+            string temp = "";
+            for (int j = i; j < (i + containStr.Length); j++)
+            {
+                temp += sourceStr[j];
+            }
+
+            if (temp.CompareTo(containStr) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
