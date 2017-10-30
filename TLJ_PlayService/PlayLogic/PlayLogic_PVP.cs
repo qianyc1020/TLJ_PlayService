@@ -210,6 +210,17 @@ class PlayLogic_PVP
                 m_roomList.Add(room);
             }
 
+            // 扣除报名费
+            {
+                string baomingfei = PVPGameRoomDataScript.getInstance().getDataByRoomType(gameroomtype).baomingfei;
+                if (baomingfei.CompareTo("0") != 0)
+                {
+                    List<string> tempList = new List<string>();
+                    CommonUtil.splitStr(baomingfei, tempList,':');
+                    Request_ChangeUserWealth.doRequest(uid, int.Parse(tempList[0]), -int.Parse(tempList[1]));
+                }
+            }
+
             // 加入房间成功，给客户端回复
             {
                 JObject respondJO = new JObject();

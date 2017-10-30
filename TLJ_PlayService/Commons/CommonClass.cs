@@ -167,6 +167,11 @@ public class PlayerData
         m_connId = connId;
         m_uid = uid;
         m_isAI = isAI;
+
+        if (m_isAI)
+        {
+            m_isOffLine = true;
+        }
     }
 
     public void setPokerList(List<TLJCommon.PokerInfo> pokerList)

@@ -57,6 +57,9 @@ class NetRespond_GetPVPGameRoom
     {
         try
         {
+            // 初始化房间数据
+            PVPGameRoomDataScript.getInstance().initJson(respondData);
+
             // 发送给客户端
             {
                 //PlayService.m_serverUtil.sendMessage((IntPtr)connId, respondData);

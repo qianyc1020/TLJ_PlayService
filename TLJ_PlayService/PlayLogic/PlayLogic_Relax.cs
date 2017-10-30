@@ -1844,6 +1844,14 @@ class PlayLogic_Relax
             // 计算每个玩家的金币（积分）
             GameUtil.setPlayerScore(room);
 
+            // 加减金币
+            {
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    Request_ChangeUserWealth.doRequest(room.getPlayerDataList()[i].m_uid, 1, room.getPlayerDataList()[i].m_score);
+                }
+            }
+
             // 逻辑处理
             {
                 // 闲家赢

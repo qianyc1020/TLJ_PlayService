@@ -45,6 +45,11 @@ public class MySqlServerUtil
         m_isConnecting = true;
         LogUtil.getInstance().addDebugLog("连接数据库服务器成功");
 
+        // 数据清空
+        {
+            PVPGameRoomDataScript.clear();
+        }
+
         return;
     }
 

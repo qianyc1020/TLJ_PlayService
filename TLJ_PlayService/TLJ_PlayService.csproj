@@ -66,6 +66,8 @@
     <Compile Include="NetResponds\NetRespond_GetPVPGameRoom.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
+    <Compile Include="PVPGameRoomDataScript.cs" />
+    <Compile Include="Request\Request_ChangeUserWealth.cs" />
     <Compile Include="Request\Request_ProgressTask.cs" />
     <Compile Include="Utils\CheckOutPoker.cs" />
     <Compile Include="Game\CompareWhoMax.cs" />
@@ -97,5 +99,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
