@@ -298,12 +298,41 @@ class PlayLogic_PVP
                 {
                     if (playerDataList[j].m_uid.CompareTo(uid) == 0)
                     {
+                        // 还回报名费
+                        if(m_roomList[i].m_roomState == RoomData.RoomState.RoomState_waiting)
+                        {
+                            PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(m_roomList[i].m_gameRoomType);
+                            string baomingfei = pvpGameRoomData.baomingfei;
+
+                            if (baomingfei.CompareTo("0") != 0)
+                            {
+                                List<string> tempList = new List<string>();
+                                CommonUtil.splitStr(baomingfei, tempList, ':');
+
+                                int id = int.Parse(tempList[0]);
+                                int num = int.Parse(tempList[1]);
+
+                                string content = pvpGameRoomData.gameroomname + "报名费返还：";
+                                if (id == 1)
+                                {
+                                    content += ("金币x" + num);
+                                }
+                                else
+                                {
+                                    content += ("蓝钻石x" + num);
+                                }
+
+                                Request_SendMailToUser.doRequest(uid, "报名费返还", content, baomingfei);
+                            }
+                        }
+
                         // 给客户端回复
                         {
                             JObject respondJO = new JObject();
                             respondJO.Add("tag", tag);
                             respondJO.Add("playAction", playAction);
                             respondJO.Add("code", (int) TLJCommon.Consts.Code.Code_OK);
+                            respondJO.Add("gameroomtype", m_roomList[i].m_gameRoomType);
                             respondJO.Add("roomId", m_roomList[i].getRoomId());
 
                             // 发送给客户端

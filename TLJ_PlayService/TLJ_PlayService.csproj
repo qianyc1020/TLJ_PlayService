@@ -67,6 +67,7 @@
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
     <Compile Include="PVPGameRoomDataScript.cs" />
+    <Compile Include="Request\Request_SendMailToUser.cs" />
     <Compile Include="Request\Request_ChangeUserWealth.cs" />
     <Compile Include="Request\Request_ProgressTask.cs" />
     <Compile Include="Utils\CheckOutPoker.cs" />
