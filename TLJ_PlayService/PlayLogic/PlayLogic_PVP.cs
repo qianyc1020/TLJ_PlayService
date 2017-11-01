@@ -14,7 +14,7 @@ class PlayLogic_PVP
 
     List<RoomData> m_roomList = new List<RoomData>();
 
-    int m_tuoguanOutPokerDur = 100; // 托管出牌时间:毫秒
+    int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
 
     string m_tag = TLJCommon.Consts.Tag_JingJiChang;
     string m_logFlag = "PlayLogic_PVP";
@@ -261,12 +261,19 @@ class PlayLogic_PVP
                     int needAICount = 4 - room.getPlayerDataList().Count;
                     for (int i = 0; i < needAICount; i++)
                     {
-                        int AIIndex = AIDataManage.getOneAIIndex();
-                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "给room:" + room.getRoomId() + "创建机器人：" + "ai-" + AIIndex);
+                        string ai_uid = AIDataScript.getInstance().getOneAI();
+                        if (ai_uid.CompareTo("") != 0)
+                        {
+                            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "给room:" + room.getRoomId() + "创建机器人：" + ai_uid);
 
-                        PlayerData playerData = new PlayerData((IntPtr)(-AIIndex), "ai-" + AIIndex, true);
-                        playerData.m_isOffLine = true;
-                        room.joinPlayer(playerData);
+                            PlayerData playerData = new PlayerData((IntPtr)(-1), ai_uid, true);
+                            playerData.m_isOffLine = true;
+                            room.joinPlayer(playerData);
+                        }
+                        else
+                        {
+                            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "机器人不足");
+                        }
                     }
                 }
             }
@@ -1230,7 +1237,7 @@ class PlayLogic_PVP
                         if (GameUtil.checkRoomNonePlayer(room))
                         {
                             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room.getRoomId());
-                            m_roomList.Remove(room);
+                            removeRoom(room);
                         }
                     }
                 }
@@ -1311,7 +1318,7 @@ class PlayLogic_PVP
                     if (GameUtil.checkRoomNonePlayer(cur_room))
                     {
                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ".doTask_ChangeRoom:玩家换桌，该房间:" + cur_room.getRoomId() + "人数为空，解散该房间");
-                        m_roomList.Remove(cur_room);
+                        removeRoom(cur_room);
                     }
                 }
 
@@ -1423,7 +1430,7 @@ class PlayLogic_PVP
                                     if (GameUtil.checkRoomNonePlayer(room))
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room);
-                                        m_roomList.Remove(room);
+                                        removeRoom(room);
                                     }
                                     else
                                     {
@@ -1536,7 +1543,7 @@ class PlayLogic_PVP
                                     if (playerDataList.Count == 0)
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + m_roomList[i].getRoomId());
-                                        m_roomList.Remove(room);
+                                        removeRoom(room);
                                     }
                                     else
                                     {
@@ -1566,7 +1573,7 @@ class PlayLogic_PVP
                                             if (GameUtil.checkRoomNonePlayer(room))
                                             {
                                                 LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room.getRoomId());
-                                                m_roomList.Remove(room);
+                                                removeRoom(room);
                                             }
                                         }
                                     }
@@ -1582,7 +1589,7 @@ class PlayLogic_PVP
                                     if (GameUtil.checkRoomNonePlayer(room))
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room.getRoomId());
-                                        m_roomList.Remove(room);
+                                        removeRoom(room);
                                     }
                                 }
                                 break;
@@ -1910,6 +1917,20 @@ class PlayLogic_PVP
         doTask_PlayerChaoDi(playerData.m_connId, data.ToString());
     }
 
+    void removeRoom(RoomData room)
+    {
+        // 把机器人还回去
+        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        {
+            if (room.getPlayerDataList()[i].m_isAI)
+            {
+                AIDataScript.getInstance().backOneAI(room.getPlayerDataList()[i].m_uid);
+            }
+        }
+
+        m_roomList.Remove(room);
+    }
+
     //------------------------------------------------------------------以上内容休闲场和PVP逻辑一样--------------------------------------------------------------
 
     // 游戏结束
@@ -2019,6 +2040,11 @@ class PlayLogic_PVP
                         PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId,
                             respondJO.ToString());
                     }
+
+                    if (now_room.getPlayerDataList()[i].m_isAI)
+                    {
+                        AIDataScript.getInstance().backOneAI(now_room.getPlayerDataList()[i].m_uid);
+                    }
                 }
             }
 
@@ -2029,7 +2055,7 @@ class PlayLogic_PVP
             //    if (GameUtil.checkRoomNonePlayer(now_room))
             //    {
             //        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":所有人都离线，解散该房间：" + now_room.getRoomId());
-            //        m_roomList.Remove(now_room);
+            //        removeRoom(now_room);
 
             //        return;
             //    }
@@ -2102,7 +2128,7 @@ class PlayLogic_PVP
                 // 删除该房间
                 {
                     LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":本局打完，强制解散该房间：" + now_room.getRoomId());
-                    m_roomList.Remove(now_room);
+                    removeRoom(now_room);
                 }
 
                 for (int i = 0; i < winPlayerList.Count; i++)
@@ -2222,7 +2248,7 @@ class PlayLogic_PVP
                 // 删除该房间
                 {
                     LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":PVP所有局数已打完，强制解散该房间：" + now_room.getRoomId());
-                    m_roomList.Remove(now_room);
+                    removeRoom(now_room);
                 }
             }
         }
@@ -2273,7 +2299,7 @@ class PlayLogic_PVP
             
             {
                 LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "删除旧房间：" + room.getRoomId());
-                m_roomList.Remove(room);
+                removeRoom(room);
             }
 
             // 开始决胜局

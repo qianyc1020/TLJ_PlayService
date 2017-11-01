@@ -44,10 +44,15 @@ public class MySqlServerUtil
 
         m_isConnecting = true;
         LogUtil.getInstance().addDebugLog("连接数据库服务器成功");
-
+        
         // 数据清空
         {
             PVPGameRoomDataScript.clear();
+        }
+
+        {
+            // 拉取机器人列表
+            Request_GetAIList.doRequest();
         }
 
         return;
@@ -132,6 +137,11 @@ public class MySqlServerUtil
         else if (tag.CompareTo(TLJCommon.Consts.Tag_GetPVPGameRoom) == 0)
         {
             NetRespond_GetPVPGameRoom.onMySqlRespond(connId, str);
+        }
+        // 拉取机器人列表
+        else if (tag.CompareTo(TLJCommon.Consts.Tag_GetAIList) == 0)
+        {
+            Request_GetAIList.onMySqlRespond(str);
         }
 
         return HandleResult.Ok;

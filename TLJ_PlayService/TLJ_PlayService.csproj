@@ -60,13 +60,14 @@
     <Compile Include="Commons\CommonClass.cs" />
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
-    <Compile Include="Game\AIDataManage.cs" />
+    <Compile Include="Data\AIDataScript.cs" />
     <Compile Include="Game\AllotPoker.cs" />
     <Compile Include="Game\PVPChangCiUtil.cs" />
     <Compile Include="NetResponds\NetRespond_GetPVPGameRoom.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
-    <Compile Include="PVPGameRoomDataScript.cs" />
+    <Compile Include="Data\PVPGameRoomDataScript.cs" />
+    <Compile Include="Request\Request_GetAIList.cs" />
     <Compile Include="Request\Request_SendMailToUser.cs" />
     <Compile Include="Request\Request_ChangeUserWealth.cs" />
     <Compile Include="Request\Request_ProgressTask.cs" />
