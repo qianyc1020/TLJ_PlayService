@@ -1427,6 +1427,8 @@ class PlayLogic_PVP
 
                                     playerDataList.RemoveAt(j);
 
+                                    checkAllOffLine(room);
+
                                     if (GameUtil.checkRoomNonePlayer(room))
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room);
@@ -1447,6 +1449,8 @@ class PlayLogic_PVP
 
                                         playerDataList[j].m_isOffLine = true;
 
+                                        checkAllOffLine(room);
+
                                         trusteeshipLogic_QiangZhu(room, playerDataList[j]);
                                     }
                                     else
@@ -1463,6 +1467,8 @@ class PlayLogic_PVP
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在庄家埋底阶段退出：" + playerDataList[j].m_uid);
 
                                         playerDataList[j].m_isOffLine = true;
+
+                                        checkAllOffLine(room);
 
                                         trusteeshipLogic_MaiDi(room, playerDataList[j]);
                                     }
@@ -1489,6 +1495,8 @@ class PlayLogic_PVP
 
                                         playerDataList[j].m_isOffLine = true;
 
+                                        checkAllOffLine(room);
+
                                         trusteeshipLogic_ChaoDi(playerDataList[j]);
                                     }
                                     else
@@ -1506,6 +1514,8 @@ class PlayLogic_PVP
 
                                         playerDataList[j].m_isOffLine = true;
 
+                                        checkAllOffLine(room);
+
                                         trusteeshipLogic_MaiDi(room, playerDataList[j]);
                                     }
                                     else
@@ -1521,6 +1531,8 @@ class PlayLogic_PVP
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在游戏中退出：" + playerDataList[j].m_uid);
                                         playerDataList[j].m_isOffLine = true;
+
+                                        checkAllOffLine(room);
 
                                         // 如果当前房间正好轮到此人出牌
                                         if (m_roomList[i].m_curOutPokerPlayer.m_uid.CompareTo(playerDataList[j].m_uid) == 0)
@@ -1917,6 +1929,24 @@ class PlayLogic_PVP
         doTask_PlayerChaoDi(playerData.m_connId, data.ToString());
     }
 
+    void checkAllOffLine(RoomData room)
+    {
+        bool isAllOffLine = true;
+        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        {
+            if (!room.getPlayerDataList()[i].m_isOffLine)
+            {
+                isAllOffLine = false;
+                break;
+            }
+        }
+
+        if (isAllOffLine)
+        {
+            m_tuoguanOutPokerDur = 100;
+        }
+    }
+
     void removeRoom(RoomData room)
     {
         // 把机器人还回去
@@ -1942,7 +1972,7 @@ class PlayLogic_PVP
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + now_room.getRoomId());
 
             // 计算每个玩家的金币（积分）
-            GameUtil.setPlayerScore(now_room);
+            GameUtil.setPlayerScore(now_room,false);
 
             List<PlayerData> winPlayerList = new List<PlayerData>();
 

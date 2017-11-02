@@ -323,7 +323,7 @@ class GameUtil
                             }
                         }
 
-                        Thread.Sleep(200);
+                        Thread.Sleep(500);
                     }
                 }
             }
@@ -338,7 +338,12 @@ class GameUtil
         }
     }
 
-    public static void setPlayerScore(RoomData room)
+    /*
+     * canFuShu:是否可以为负数？
+     * 休闲场score代表金币，是要扣除的，所以可以为负数
+     * PVP场score代表积分，扣到0就不扣了，不能为负数
+     */
+    public static void setPlayerScore(RoomData room,bool canFuShu)
     {
         try
         {
@@ -422,6 +427,14 @@ class GameUtil
                 else
                 {
                     room.getPlayerDataList()[i].m_score += (int)xianjiadefen;
+                }
+
+                if (!canFuShu)
+                {
+                    if (room.getPlayerDataList()[i].m_score < 0)
+                    {
+                        room.getPlayerDataList()[i].m_score = 0;
+                    }
                 }
             }
         }

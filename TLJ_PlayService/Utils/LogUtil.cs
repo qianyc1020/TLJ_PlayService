@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 class LogUtil
 {
@@ -46,7 +47,10 @@ class LogUtil
                 }
             }
 
-            Thread t = new Thread(checkLogList);
+            //Thread t = new Thread(checkLogList);
+            //t.Start();
+
+            Task t = new Task(() => { checkLogList(); });
             t.Start();
 
             Debug.WriteLine("日志记录开启成功");
