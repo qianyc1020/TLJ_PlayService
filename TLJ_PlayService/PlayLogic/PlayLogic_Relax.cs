@@ -1652,15 +1652,31 @@ class PlayLogic_Relax
                         // 任意出
                         if (playerData.m_uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                         {
-                            int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                            int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+                            //int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                            //int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
 
+                            //JArray jarray = new JArray();
+                            //{
+                            //    JObject temp = new JObject();
+                            //    temp.Add("num", num);
+                            //    temp.Add("pokerType", pokerType);
+                            //    jarray.Add(temp);
+                            //}
+                            //backData.Add("pokerList", jarray);
+
+                            List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenFirst(playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
                             JArray jarray = new JArray();
+                            for (int i = 0; i < listPoker.Count; i++)
                             {
-                                JObject temp = new JObject();
-                                temp.Add("num", num);
-                                temp.Add("pokerType", pokerType);
-                                jarray.Add(temp);
+                                int num = listPoker[i].m_num;
+                                int pokerType = (int)listPoker[i].m_pokerType;
+
+                                {
+                                    JObject temp = new JObject();
+                                    temp.Add("num", num);
+                                    temp.Add("pokerType", pokerType);
+                                    jarray.Add(temp);
+                                }
                             }
                             backData.Add("pokerList", jarray);
                         }
@@ -1718,15 +1734,31 @@ class PlayLogic_Relax
                         // 任意出
                         if (playerData.m_uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                         {
-                            int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
-                            int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
+                            //int num = playerData.getPokerList()[playerData.getPokerList().Count - 1].m_num;
+                            //int pokerType = (int)playerData.getPokerList()[playerData.getPokerList().Count - 1].m_pokerType;
 
+                            //JArray jarray = new JArray();
+                            //{
+                            //    JObject temp = new JObject();
+                            //    temp.Add("num", num);
+                            //    temp.Add("pokerType", pokerType);
+                            //    jarray.Add(temp);
+                            //}
+                            //backData.Add("pokerList", jarray);
+
+                            List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenFirst(playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
                             JArray jarray = new JArray();
+                            for (int i = 0; i < listPoker.Count; i++)
                             {
-                                JObject temp = new JObject();
-                                temp.Add("num", num);
-                                temp.Add("pokerType", pokerType);
-                                jarray.Add(temp);
+                                int num = listPoker[i].m_num;
+                                int pokerType = (int)listPoker[i].m_pokerType;
+
+                                {
+                                    JObject temp = new JObject();
+                                    temp.Add("num", num);
+                                    temp.Add("pokerType", pokerType);
+                                    jarray.Add(temp);
+                                }
                             }
                             backData.Add("pokerList", jarray);
                         }

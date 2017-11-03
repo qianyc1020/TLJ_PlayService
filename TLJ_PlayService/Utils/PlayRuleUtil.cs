@@ -1116,15 +1116,65 @@ public class PlayRuleUtil
         }
     }
 
-    public static List<PokerInfo> ZhuDong(List<PokerInfo> handerPoker, int mLevelPokerNum, int masterPokerType)
+    public static List<PokerInfo> GetPokerWhenFirst(List<PokerInfo> handerPoker, int mLevelPokerNum, int masterPokerType)
     {
+        SetPokerWeight(handerPoker, mLevelPokerNum, (Consts.PokerType)masterPokerType);
+
         List<PokerInfo> result = new List<PokerInfo>();
+        List<PokerInfo> tempAll = new List<PokerInfo>();
+        foreach (var poker in handerPoker)
+        {
+            tempAll.Add(poker);
+        }
 
-        List<PokerInfo> pokerByFang = GetPokerByType(handerPoker, mLevelPokerNum, 0);
-        List<PokerInfo> pokerByMei = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)1);
-        List<PokerInfo> pokerByHong = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)2);
-        List<PokerInfo> pokerByHei = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)3);
+        List<PokerInfo> masterPoker = GetMasterPoker(tempAll, mLevelPokerNum, masterPokerType);
+        foreach (var poker in masterPoker)
+        {
+            tempAll.Remove(poker);
+        }
 
-        return null;
+        //得到副牌中的对子
+        List<PokerInfo> doublePoker = GetDoublePoker(tempAll);
+        foreach (var poker in doublePoker)
+        {
+            tempAll.Remove(poker);
+        }
+
+        foreach (var poker in tempAll)
+        {
+            if (poker.m_num == 14)
+            {
+                result.Add(poker);
+                return result;
+            }
+        }
+        if (doublePoker.Count > 0)
+        {
+
+            result.Add(doublePoker[doublePoker.Count - 1]);
+            result.Add(doublePoker[doublePoker.Count - 2]);
+        }
+        else
+        {
+            if (tempAll.Count > 0)
+            {
+                result.Add(tempAll[new Random().Next(0, tempAll.Count - 1)]);
+            }
+            else
+            {
+                List<PokerInfo> masterDoublePoker = GetDoublePoker(masterPoker);
+                if (masterDoublePoker.Count > 0)
+                {
+                    result.Add(masterDoublePoker[0]);
+                    result.Add(masterDoublePoker[1]);
+                }
+                else
+                {
+                    result.Add(masterPoker[0]);
+                }
+            }
+        }
+
+        return result;
     }
 }
