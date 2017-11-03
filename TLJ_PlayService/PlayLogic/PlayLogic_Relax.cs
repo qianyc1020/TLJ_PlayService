@@ -14,8 +14,6 @@ class PlayLogic_Relax
 
     List<RoomData> m_roomList = new List<RoomData>();
 
-    int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
-
     string m_tag = TLJCommon.Consts.Tag_XiuXianChang;
     string m_logFlag = "PlayLogic_Relax";
 
@@ -639,7 +637,7 @@ class PlayLogic_Relax
                     {
                         if (room.getPlayerDataList()[i].m_uid.CompareTo(playerData.m_uid) == 0)
                         {
-                            trusteeshipLogic_ChaoDi(room.getPlayerDataList()[i]);
+                            trusteeshipLogic_ChaoDi(room,room.getPlayerDataList()[i]);
 
                             break;
                         }
@@ -1441,7 +1439,7 @@ class PlayLogic_Relax
 
                                     checkAllOffLine(room);
 
-                                    trusteeshipLogic_ChaoDi(playerDataList[j]);
+                                    trusteeshipLogic_ChaoDi(room,playerDataList[j]);
                                 }
                                 break;
 
@@ -1636,7 +1634,7 @@ class PlayLogic_Relax
     {
         try
         {
-            Thread.Sleep(m_tuoguanOutPokerDur);
+            Thread.Sleep(room.m_tuoguanOutPokerDur);
 
             JObject jo = JObject.Parse(jsonData);
             // 轮到自己出牌
@@ -1703,7 +1701,7 @@ class PlayLogic_Relax
     {
         try
         {
-            Thread.Sleep(m_tuoguanOutPokerDur);
+            Thread.Sleep(room.m_tuoguanOutPokerDur);
 
             // 轮到自己出牌
             {
@@ -1767,7 +1765,7 @@ class PlayLogic_Relax
     // 托管:抢主
     void trusteeshipLogic_QiangZhu(RoomData room,PlayerData playerData)
     {
-        Thread.Sleep(m_tuoguanOutPokerDur);
+        Thread.Sleep(room.m_tuoguanOutPokerDur);
 
         bool isAllOffLine = true;
         for (int k = 0; k < room.getPlayerDataList().Count; k++)
@@ -1802,7 +1800,7 @@ class PlayLogic_Relax
     {
         try
         {
-            Thread.Sleep(m_tuoguanOutPokerDur);
+            Thread.Sleep(room.m_tuoguanOutPokerDur);
 
             if (room.m_curMaiDiPlayer.m_uid.CompareTo(playerData.m_uid) == 0)
             {
@@ -1845,9 +1843,9 @@ class PlayLogic_Relax
     }
 
     // 托管:抄底
-    void trusteeshipLogic_ChaoDi(PlayerData playerData)
+    void trusteeshipLogic_ChaoDi(RoomData room, PlayerData playerData)
     {
-        Thread.Sleep(m_tuoguanOutPokerDur);
+        Thread.Sleep(room.m_tuoguanOutPokerDur);
 
         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管：帮" + playerData.m_uid + "抄底");
 
@@ -1875,7 +1873,7 @@ class PlayLogic_Relax
 
         if (isAllOffLine)
         {
-            m_tuoguanOutPokerDur = 100;
+            room.m_tuoguanOutPokerDur = 100;
         }
     }
 

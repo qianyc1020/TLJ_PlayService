@@ -420,7 +420,7 @@ public class PlayRuleUtil
     }
 
     /// <summary>
-    /// 得到指定花色的牌,并排序
+    /// 得到指定花色的副牌,并排序
     /// </summary>
     /// <param name="pokerList"></param>
     /// <param name="mPokerType"></param>
@@ -882,7 +882,7 @@ public class PlayRuleUtil
             {
                 tempList.AddRange(myDoublePoker);
                 //对子不足会补牌
-                for (int j = 0; j < count - firstDoublePoker.Count; j++)
+                for (int j = 0; j < count - myDoublePoker.Count; j++)
                 {
                     tempList.Add(mySinglePoker[j]);
                 }
@@ -1114,5 +1114,17 @@ public class PlayRuleUtil
         {
             return pokerInfos;
         }
+    }
+
+    public static List<PokerInfo> ZhuDong(List<PokerInfo> handerPoker, int mLevelPokerNum, int masterPokerType)
+    {
+        List<PokerInfo> result = new List<PokerInfo>();
+
+        List<PokerInfo> pokerByFang = GetPokerByType(handerPoker, mLevelPokerNum, 0);
+        List<PokerInfo> pokerByMei = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)1);
+        List<PokerInfo> pokerByHong = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)2);
+        List<PokerInfo> pokerByHei = GetPokerByType(handerPoker, mLevelPokerNum, (Consts.PokerType)3);
+
+        return null;
     }
 }

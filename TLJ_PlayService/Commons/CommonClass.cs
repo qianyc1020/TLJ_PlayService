@@ -27,6 +27,7 @@ public class RoomData
     public int m_roomId;
     public string m_gameRoomType;
     public int m_rounds_pvp = 1;
+    public int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
 
     public bool m_isStartGame = false;
     public bool m_canChaoDi = true;
