@@ -2347,9 +2347,21 @@ class PlayLogic_PVP
                     PVPChangCiUtil.getInstance().sortPVPRoomPlayerList(curPVPRoomPlayerList);
                     PVPChangCiUtil.getInstance().deletePVPRoomPlayerList(curPVPRoomPlayerList);
 
+                    GameUtil.setPVPReward(curPVPRoomPlayerList);
+
+                    string gameroomname = PVPGameRoomDataScript.getInstance().getDataByRoomType(curPVPRoomPlayerList.m_gameRoomType).gameroomname;
+
+                    // 用邮件给他们发奖励
                     for (int i = 0; i < curPVPRoomPlayerList.m_playerList.Count; i++)
                     {
-                        LogUtil.getInstance().addDebugLog(m_tag + "----名次" + (i + 1) + "  id = " + curPVPRoomPlayerList.m_playerList[i].m_uid + " 分数为" + curPVPRoomPlayerList.m_playerList[i].m_score);
+                        LogUtil.getInstance().addDebugLog(m_tag + "----名次" + (i + 1) + "  id = " + curPVPRoomPlayerList.m_playerList[i].m_uid + " 分数为" + curPVPRoomPlayerList.m_playerList[i].m_score + "  奖励为:" + curPVPRoomPlayerList.m_playerList[i].m_pvpReward);
+
+                        if (curPVPRoomPlayerList.m_playerList[i].m_pvpReward.CompareTo("") != 0)
+                        {
+                            string title = curPVPRoomPlayerList + "奖励";
+                            string content = "恭喜您在" + gameroomname + "获得第" + curPVPRoomPlayerList.m_playerList[i].m_rank + "名，为您送上专属奖励";
+                            Request_SendMailToUser.doRequest(curPVPRoomPlayerList.m_playerList[i].m_uid, title, content, curPVPRoomPlayerList.m_playerList[i].m_pvpReward);
+                        }
                     }
                 }
                 else
@@ -2376,7 +2388,13 @@ class PlayLogic_PVP
                                 respondJO.Remove("mingci");
                             }
 
+                            if (respondJO.GetValue("pvpreward") != null)
+                            {
+                                respondJO.Remove("pvpreward");
+                            }
+
                             respondJO.Add("mingci", now_room.getPlayerDataList()[i].m_rank);
+                            respondJO.Add("pvpreward", now_room.getPlayerDataList()[i].m_pvpReward);
 
                             PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId, respondJO.ToString());
                         }

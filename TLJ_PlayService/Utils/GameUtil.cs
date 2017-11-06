@@ -451,4 +451,28 @@ class GameUtil
             LogUtil.getInstance().addErrorLog("GameUtil.setPlayerScore()----" + ex.Message + "gameRoomType:" + room.m_gameRoomType);
         }
     }
+
+    public static void setPVPReward(PVPRoomPlayerList curPVPRoomPlayerList)
+    {
+        if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_8) == 0)
+        {
+            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:10000;110:2";
+            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:7000;110:1";
+        }
+        else if(curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_16) == 0)
+        {
+            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:20000;110:2";
+            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:15000;110:1";
+        }
+        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_8) == 0)
+        {
+            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "111:1;110:1";
+            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000;110:1";
+        }
+        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_16) == 0)
+        {
+            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "112:1;110:3";
+            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:10000;110:2";
+        }
+    }
 }

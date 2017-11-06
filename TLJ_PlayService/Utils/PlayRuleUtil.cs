@@ -1039,11 +1039,13 @@ public class PlayRuleUtil
 
         if (masterPoker.Count == 0)
         {
-            tempList.Add(myPokerList[myPokerList.Count - 1]);
+            int random = new Random().Next(0, myPokerList.Count - 1);
+            tempList.Add(myPokerList[random]);
         }
         else
         {
-            tempList.Add(masterPoker[0]);
+            int random = new Random().Next(0, masterPoker.Count - 1);
+            tempList.Add(masterPoker[random]);
         }
     }
 

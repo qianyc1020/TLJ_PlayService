@@ -159,6 +159,7 @@ public class PlayerData
     public bool m_isOffLine = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;
+    public string m_pvpReward = "";
 
     List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();
     public List<TLJCommon.PokerInfo> m_curOutPokerList = new List<TLJCommon.PokerInfo>();
