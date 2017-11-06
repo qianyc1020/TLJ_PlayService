@@ -68,6 +68,7 @@
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
     <Compile Include="Data\PVPGameRoomDataScript.cs" />
     <Compile Include="Request\Request_GetAIList.cs" />
+    <Compile Include="Request\Request_RecordUserGameData.cs" />
     <Compile Include="Request\Request_SendMailToUser.cs" />
     <Compile Include="Request\Request_ChangeUserWealth.cs" />
     <Compile Include="Request\Request_ProgressTask.cs" />

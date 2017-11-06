@@ -1377,6 +1377,13 @@ class PlayLogic_Relax
                 {
                     if (playerDataList[j].m_connId == connId)
                     {
+                        // 记录逃跑数据
+                        if ((m_roomList[i].m_roomState != RoomData.RoomState.RoomState_waiting) &&
+                            (m_roomList[i].m_roomState != RoomData.RoomState.RoomState_end))
+                        {
+                            Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        }
+
                         switch (m_roomList[i].m_roomState)
                         {
                             case RoomData.RoomState.RoomState_waiting:
@@ -1966,6 +1973,11 @@ class PlayLogic_Relax
                             {
                                 Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 203);
                             }
+
+                            // 记录胜利次数数据
+                            {
+                                Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Win);
+                            }
                         }
                     }
                 }
@@ -1988,6 +2000,11 @@ class PlayLogic_Relax
                             if (!room.getPlayerDataList()[i].m_isAI)
                             {
                                 Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 203);
+                            }
+
+                            // 记录胜利次数数据
+                            {
+                                Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Win);
                             }
                         }
                     }

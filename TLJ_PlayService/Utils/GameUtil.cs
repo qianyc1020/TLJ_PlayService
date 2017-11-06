@@ -192,6 +192,14 @@ class GameUtil
                     }
                 }
 
+                // 记录总局数数据
+                {
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_StartGame);
+                    }
+                }
+
                 room.m_isStartGame = true;
                 room.m_roomState = RoomData.RoomState.RoomState_qiangzhu;
 

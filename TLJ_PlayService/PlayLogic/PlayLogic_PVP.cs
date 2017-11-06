@@ -81,7 +81,13 @@ class PlayLogic_PVP
                 }
                 break;
 
-                case (int) TLJCommon.Consts.PlayAction.PlayAction_ExitGame:
+                case (int) TLJCommon.Consts.PlayAction.PlayAction_ExitPVP:
+                {
+                    doTask_ExitPVP(connId, data);
+                }
+                break;
+
+                case (int)TLJCommon.Consts.PlayAction.PlayAction_ExitGame:
                 {
                     doTask_ExitGame(connId, data);
                 }
@@ -285,7 +291,7 @@ class PlayLogic_PVP
         }
     }
 
-    void doTask_ExitGame(IntPtr connId, string data)
+    void doTask_ExitPVP(IntPtr connId, string data)
     {
         try
         {
@@ -304,7 +310,7 @@ class PlayLogic_PVP
                     if (playerDataList[j].m_uid.CompareTo(uid) == 0)
                     {
                         // 还回报名费
-                        if(m_roomList[i].m_roomState == RoomData.RoomState.RoomState_waiting)
+                        if (m_roomList[i].m_roomState == RoomData.RoomState.RoomState_waiting)
                         {
                             PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(m_roomList[i].m_gameRoomType);
                             string baomingfei = pvpGameRoomData.baomingfei;
@@ -331,6 +337,61 @@ class PlayLogic_PVP
                             }
                         }
 
+                        // 给客户端回复
+                        {
+                            JObject respondJO = new JObject();
+                            respondJO.Add("tag", tag);
+                            respondJO.Add("playAction", playAction);
+                            respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_OK);
+                            respondJO.Add("gameroomtype", m_roomList[i].m_gameRoomType);
+                            respondJO.Add("roomId", m_roomList[i].getRoomId());
+
+                            // 发送给客户端
+                            PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());
+                        }
+
+                        doTaskPlayerCloseConn(connId);
+
+                        return;
+                    }
+                }
+            }
+
+            // 玩家不在房间内，则退出房间失败，给客户端回复
+            {
+                JObject respondJO = new JObject();
+                respondJO.Add("tag", tag);
+                respondJO.Add("playAction", playAction);
+                respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_CommonFail);
+
+                // 发送给客户端
+                PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());
+            }
+        }
+        catch (Exception ex)
+        {
+            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_ExitPVP异常：" + ex.Message);
+        }
+    }
+
+    void doTask_ExitGame(IntPtr connId, string data)
+    {
+        try
+        {
+            JObject jo = JObject.Parse(data);
+            string tag = jo.GetValue("tag").ToString();
+            string uid = jo.GetValue("uid").ToString();
+            int playAction = Convert.ToInt32(jo.GetValue("playAction"));
+
+            // 检测该玩家是否已经加入房间
+            for (int i = 0; i < m_roomList.Count; i++)
+            {
+                List<PlayerData> playerDataList = m_roomList[i].getPlayerDataList();
+
+                for (int j = 0; j < playerDataList.Count; j++)
+                {
+                    if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                    {
                         // 给客户端回复
                         {
                             JObject respondJO = new JObject();
@@ -1417,6 +1478,13 @@ class PlayLogic_PVP
                 {
                     if (playerDataList[j].m_connId == connId)
                     {
+                        // 记录逃跑数据
+                        if ((m_roomList[i].m_roomState != RoomData.RoomState.RoomState_waiting) &&
+                            (m_roomList[i].m_roomState != RoomData.RoomState.RoomState_end))
+                        {
+                            Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        }
+
                         switch (m_roomList[i].m_roomState)
                         {
                             case RoomData.RoomState.RoomState_waiting:
@@ -2030,6 +2098,11 @@ class PlayLogic_PVP
                             {
                                 Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
                             }
+
+                            // 记录胜利次数数据
+                            {
+                                Request_RecordUserGameData.doRequest(now_room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Win);
+                            }
                         }
                         // 加入淘汰人员列表里
                         else
@@ -2059,6 +2132,11 @@ class PlayLogic_PVP
                             if (!now_room.getPlayerDataList()[i].m_isAI)
                             {
                                 Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
+                            }
+
+                            // 记录胜利次数数据
+                            {
+                                Request_RecordUserGameData.doRequest(now_room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.GameAction.GameAction_Win);
                             }
                         }
                         // 加入淘汰人员列表里
