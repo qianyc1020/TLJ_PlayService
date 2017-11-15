@@ -56,7 +56,8 @@ public class HPServerUtil
     {
         try
         {
-            m_tcpServer.IpAddress = NetConfig.s_playService_ip;
+            //m_tcpServer.IpAddress = NetConfig.s_playService_ip;
+            m_tcpServer.IpAddress = "0.0.0.0";
             m_tcpServer.Port = (ushort)NetConfig.s_playService_port;
 
             // 启动服务
@@ -290,6 +291,21 @@ public class HPServerUtil
             else if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
             {
                 NetRespond_UserInfo_Game.doAskCilentReq_UserInfo_Game(receiveObj.m_connId, text);
+            }
+            // 使用buff
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_UseBuff) == 0)
+            {
+                NetRespond_UseBuff.doAskCilentReq_UseBuff(receiveObj.m_connId, text);
+            }
+            // 是否已经加入游戏
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_IsJoinGame) == 0)
+            {
+                NetRespond_IsJoinGame.doAskCilentReq_IsJoinGame(receiveObj.m_connId, text);
+            }
+            // 请求恢复房间
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_RetryJoinGame) == 0)
+            {
+                NetRespond_RetryJoinGame.doAskCilentReq_RetryJoinGame(receiveObj.m_connId, text);
             }
         }
         else

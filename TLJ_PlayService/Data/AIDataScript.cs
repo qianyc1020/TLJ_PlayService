@@ -56,16 +56,46 @@ class AIDataScript
     public string getOneAI()
     {
         string uid = "";
-        for (int i = 0; i < m_dataList.Count; i++)
-        {
-            if (!m_dataList[i].m_isUsed)
-            {
-                uid = m_dataList[i].m_uid;
-                m_dataList[i].m_isUsed = true;
 
-                break;
+        {
+            bool hasNoUsed = false;
+            for (int i = 0; i < m_dataList.Count; i++)
+            {
+                if (!m_dataList[i].m_isUsed)
+                {
+                    hasNoUsed = true;
+                    break;
+                }
+            }
+
+            if (!hasNoUsed)
+            {
+                return uid;
             }
         }
+
+        while (true)
+        {
+            int r = RandomUtil.getRandom(0, m_dataList.Count - 1);
+            if (!m_dataList[r].m_isUsed)
+            {
+                uid = m_dataList[r].m_uid;
+                m_dataList[r].m_isUsed = true;
+
+                return uid;
+            }
+        }
+
+        //for (int i = 0; i < m_dataList.Count; i++)
+        //{
+        //    if (!m_dataList[i].m_isUsed)
+        //    {
+        //        uid = m_dataList[i].m_uid;
+        //        m_dataList[i].m_isUsed = true;
+
+        //        break;
+        //    }
+        //}
 
         return uid;
     }

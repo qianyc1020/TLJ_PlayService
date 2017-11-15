@@ -56,6 +56,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\GameBase.cs" />
+    <Compile Include="Game\GameLogic.cs" />
+    <Compile Include="Game\PlayerData.cs" />
+    <Compile Include="Game\RoomData.cs" />
+    <Compile Include="Game\TrusteeshipLogic.cs" />
+    <Compile Include="Request\Request_UseBuff.cs" />
+    <Compile Include="Request\Request_UserInfo_Game.cs" />
+    <Compile Include="Utils\TimerUtil.cs" />
     <None Include="App.config" />
     <Compile Include="Commons\CommonClass.cs" />
     <Compile Include="Commons\CommonUtil.cs" />
@@ -64,6 +72,9 @@
     <Compile Include="Game\AllotPoker.cs" />
     <Compile Include="Game\PVPChangCiUtil.cs" />
     <Compile Include="NetResponds\NetRespond_GetPVPGameRoom.cs" />
+    <Compile Include="NetResponds\NetRespond_RetryJoinGame.cs" />
+    <Compile Include="NetResponds\NetRespond_IsJoinGame.cs" />
+    <Compile Include="NetResponds\NetRespond_UseBuff.cs" />
     <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
     <Compile Include="Data\PVPGameRoomDataScript.cs" />

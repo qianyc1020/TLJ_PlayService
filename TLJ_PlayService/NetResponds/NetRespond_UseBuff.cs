@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using TLJ_PlayService;
 
-class NetRespond_UserInfo_Game
+class NetRespond_UseBuff
 {
-    public static string doAskCilentReq_UserInfo_Game(IntPtr connId, string reqData)
+    public static string doAskCilentReq_UseBuff(IntPtr connId, string reqData)
     {
         JObject respondJO = new JObject();
 
@@ -26,7 +26,7 @@ class NetRespond_UserInfo_Game
                 temp.Add("connId", connId.ToInt32());
 
                 temp.Add("uid", uid);
-                temp.Add("isClientReq", (int)jo.GetValue("isClientReq"));
+                temp.Add("prop_id", (int)jo.GetValue("prop_id"));
 
                 if (!PlayService.m_mySqlServerUtil.sendMseeage(temp.ToString()))
                 {

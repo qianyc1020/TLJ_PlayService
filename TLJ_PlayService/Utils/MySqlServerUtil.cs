@@ -125,27 +125,52 @@ public class MySqlServerUtil
 
     HandleResult OnReceive(TcpClient sender, byte[] bytes)
     {
-        string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-        LogUtil.getInstance().addDebugLog("收到数据库服务器消息:" + str);
+        try
+        {
+            string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            LogUtil.getInstance().addDebugLog("收到数据库服务器消息:" + str);
 
-        JObject jo = JObject.Parse(str);
-        string tag = jo.GetValue("tag").ToString();
-        int connId = Convert.ToInt32(jo.GetValue("connId"));
+            JObject jo = JObject.Parse(str);
+            string tag = jo.GetValue("tag").ToString();
 
-        // 获取游戏内玩家信息
-        if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
-        {
-            NetRespond_UserInfo_Game.onMySqlRespond(connId, str);
+            // 获取游戏内玩家信息
+            if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
+            {
+                int connId = Convert.ToInt32(jo.GetValue("connId"));
+                int isClientReq = (int)jo.GetValue("isClientReq");
+
+                // 客户端请求的
+                if (isClientReq == 1)
+                {
+                    NetRespond_UserInfo_Game.onMySqlRespond(connId, str);
+                }
+                // 服务端请求的
+                else
+                {
+                    Request_UserInfo_Game.onMySqlRespond(str);
+                }
+            }
+            // 获取pvp场次信息
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_GetPVPGameRoom) == 0)
+            {
+                int connId = Convert.ToInt32(jo.GetValue("connId"));
+                NetRespond_GetPVPGameRoom.onMySqlRespond(connId, str);
+            }
+            // 拉取机器人列表
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_GetAIList) == 0)
+            {
+                Request_GetAIList.onMySqlRespond(str);
+            }
+            // 使用buff
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_UseBuff) == 0)
+            {
+                int connId = Convert.ToInt32(jo.GetValue("connId"));
+                NetRespond_UseBuff.onMySqlRespond(connId, str);
+            }
         }
-        // 获取pvp场次信息
-        else if (tag.CompareTo(TLJCommon.Consts.Tag_GetPVPGameRoom) == 0)
+        catch (Exception ex)
         {
-            NetRespond_GetPVPGameRoom.onMySqlRespond(connId, str);
-        }
-        // 拉取机器人列表
-        else if (tag.CompareTo(TLJCommon.Consts.Tag_GetAIList) == 0)
-        {
-            Request_GetAIList.onMySqlRespond(str);
+            LogUtil.getInstance().addErrorLog("MySqlServerUtil.OnReceive----异常：" + ex.Message);
         }
 
         return HandleResult.Ok;
