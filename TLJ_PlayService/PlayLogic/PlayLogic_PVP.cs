@@ -332,12 +332,12 @@ class PlayLogic_PVP: GameBase
                 {
                     if (playerDataList[j].m_connId == connId)
                     {
-                        // 记录逃跑数据
-                        if ((m_roomList[i].m_roomState != RoomState.RoomState_waiting) &&
-                            (m_roomList[i].m_roomState != RoomState.RoomState_end))
-                        {
-                            Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
-                        }
+                        //// 记录逃跑数据
+                        //if ((m_roomList[i].m_roomState != RoomState.RoomState_waiting) &&
+                        //    (m_roomList[i].m_roomState != RoomState.RoomState_end))
+                        //{
+                        //    Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        //}
 
                         switch (m_roomList[i].m_roomState)
                         {
@@ -618,6 +618,7 @@ class PlayLogic_PVP: GameBase
                             if (!now_room.getPlayerDataList()[i].m_isAI)
                             {
                                 Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
+                                Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 212);
                             }
 
                             // 记录胜利次数数据
@@ -652,7 +653,7 @@ class PlayLogic_PVP: GameBase
                             // 提交任务
                             if (!now_room.getPlayerDataList()[i].m_isAI)
                             {
-                                Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 203);
+                                Request_ProgressTask.doRequest(now_room.getPlayerDataList()[i].m_uid, 212);
                             }
 
                             // 记录胜利次数数据
@@ -699,10 +700,23 @@ class PlayLogic_PVP: GameBase
                         PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId,
                             respondJO.ToString());
                     }
+                    else
+                    {
+                        if (!(now_room.getPlayerDataList()[i].m_isAI))
+                        {
+                            // 记录逃跑数据
+                            Request_RecordUserGameData.doRequest(now_room.getPlayerDataList()[i].m_uid, now_room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        }
+                    }
 
                     if (now_room.getPlayerDataList()[i].m_isAI)
                     {
                         AIDataScript.getInstance().backOneAI(now_room.getPlayerDataList()[i].m_uid);
+                    }
+
+                    // 告诉数据库服务器该玩家打完一局
+                    {
+                        Request_GameOver.doRequest(now_room.getPlayerDataList()[i].m_uid, now_room.m_gameRoomType);
                     }
                 }
             }
@@ -882,6 +896,12 @@ class PlayLogic_PVP: GameBase
                             string title = gameroomname + "奖励";
                             string content = "恭喜您在" + gameroomname + "获得第" + curPVPRoomPlayerList.m_playerList[i].m_rank + "名，为您送上专属奖励";
                             Request_SendMailToUser.doRequest(curPVPRoomPlayerList.m_playerList[i].m_uid, title, content, curPVPRoomPlayerList.m_playerList[i].m_pvpReward);
+                        }
+
+                        // 提交任务
+                        if (i == 0)
+                        {
+                            Request_ProgressTask.doRequest(curPVPRoomPlayerList.m_playerList[i].m_uid, 214);
                         }
                     }
                 }

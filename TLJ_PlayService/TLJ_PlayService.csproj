@@ -56,11 +56,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commons\OtherConfig.cs" />
     <Compile Include="Game\GameBase.cs" />
     <Compile Include="Game\GameLogic.cs" />
     <Compile Include="Game\PlayerData.cs" />
     <Compile Include="Game\RoomData.cs" />
     <Compile Include="Game\TrusteeshipLogic.cs" />
+    <Compile Include="Request\Request_GameOver.cs" />
     <Compile Include="Request\Request_UseBuff.cs" />
     <Compile Include="Request\Request_UserInfo_Game.cs" />
     <Compile Include="Utils\TimerUtil.cs" />

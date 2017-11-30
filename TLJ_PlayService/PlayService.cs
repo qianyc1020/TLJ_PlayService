@@ -15,7 +15,7 @@ namespace TLJ_PlayService
         public static HPServerUtil m_serverUtil;
         public static MySqlServerUtil m_mySqlServerUtil;
         public static string TAG = "PlayService";
-        public static ILog log;
+        //public static ILog log;
         public PlayService()
         {
             InitializeComponent();
@@ -23,15 +23,22 @@ namespace TLJ_PlayService
 
         protected override void OnStart(string[] args)
         {
-            LogUtil.getInstance().start("C:\\Users\\Administrator\\Desktop\\TLJ_PlayServiceLog");
-            log4net.Config.XmlConfigurator.Configure();
-            log = LogManager.GetLogger(TAG);
-            log.Info("日志开启");
+            if (!OtherConfig.init())
+            {
+                return;
+            }
+
+            LogUtil.getInstance().start(OtherConfig.s_logPath + "TLJ_PlayServiceLog");
+
             if (!NetConfig.init())
             {
                 return;
             }
 
+            //log4net.Config.XmlConfigurator.Configure();
+            //log = LogManager.GetLogger(TAG);
+            //log.Info("日志开启");
+            
             m_serverUtil = new HPServerUtil();
             m_mySqlServerUtil = new MySqlServerUtil();
 

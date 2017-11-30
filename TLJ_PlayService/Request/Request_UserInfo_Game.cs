@@ -47,8 +47,8 @@ class Request_UserInfo_Game
 
             for (int i = 0; i < buff_list.Count; i++)
             {
-                int prop_id = (int)buff_list[i]["PropId"];
-                int buff_num = (int)buff_list[i]["PropNum"];
+                int prop_id = (int)buff_list[i]["prop_id"];
+                int buff_num = (int)buff_list[i]["buff_num"];
                 playerDate.m_buffData.Add(new BuffData(prop_id, buff_num));
             }
         }

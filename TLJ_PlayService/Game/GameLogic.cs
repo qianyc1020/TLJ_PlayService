@@ -58,6 +58,12 @@ class GameLogic
                                 case "HuaFei":
                                     {
                                         Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 206);
+
+                                        // 提交任务
+                                        if (tempList[2].CompareTo("16") == 0)
+                                        {
+                                            Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 218);
+                                        }
                                     }
                                     break;
                             }
@@ -470,6 +476,7 @@ class GameLogic
             JObject jo = JObject.Parse(data);
             string tag = jo.GetValue("tag").ToString();
             string uid = jo.GetValue("uid").ToString();
+            int type = Convert.ToInt32(jo.GetValue("type"));
             int content_id = Convert.ToInt32(jo.GetValue("content_id"));
 
             RoomData room = GameLogic.getRoomByPlayerUid(gameBase, uid);
@@ -604,6 +611,11 @@ class GameLogic
             respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_QiangZhuEnd);
             respondJO.Add("zhuangjiaUid", room.m_zhuangjiaPlayerData.m_uid);
             respondJO.Add("masterPokerType", room.m_masterPokerType);
+
+            // 提交任务
+            {
+                Request_ProgressTask.doRequest(room.m_zhuangjiaPlayerData.m_uid, 215);
+            }
 
             // 发送给客户端
             for (int k = 0; k < room.getPlayerDataList().Count; k++)
@@ -1183,10 +1195,24 @@ class GameLogic
                                     //检测是否甩牌成功
                                     List<PokerInfo> shuaiPaiPoker = PlayRuleUtil.GetShuaiPaiPoker(room, outPokerList);
                                     bool isSuccess = (shuaiPaiPoker.Count == 0 ? true : false);
-                                    PlayService.log.Info("甩牌结果:" + isSuccess);
+                                    //PlayService.log.Info("甩牌结果:" + isSuccess);
                                     //   甩牌成功
                                     if (isSuccess)
                                     {
+                                        // 提交任务
+                                        {
+                                            Request_ProgressTask.doRequest(uid, 208);
+                                        }
+
+                                        // 提交任务
+                                        for (int k = 0; k < outPokerList.Count; k++)
+                                        {
+                                            if (outPokerList[k].m_num == 14)
+                                            {
+                                                Request_ProgressTask.doRequest(uid, 211);
+                                            }
+                                        }
+
                                         // 从此人牌堆里删除他出的牌
                                         {
                                             for (int m = 0; m < ja.Count; m++)
@@ -1256,6 +1282,12 @@ class GameLogic
                                                             playerDataList[j].getPokerList().RemoveAt(n);
                                                         }
 
+                                                        // 提交任务
+                                                        if (num == 14)
+                                                        {
+                                                            Request_ProgressTask.doRequest(uid, 211);
+                                                        }
+
                                                         break;
                                                     }
                                                 }
@@ -1297,6 +1329,12 @@ class GameLogic
                                                     playerDataList[j].getPokerList().RemoveAt(n);
                                                 }
 
+                                                // 提交任务
+                                                if (num == 14)
+                                                {
+                                                    Request_ProgressTask.doRequest(uid, 211);
+                                                }
+
                                                 break;
                                             }
                                         }
@@ -1309,7 +1347,27 @@ class GameLogic
                                 // 提交任务
                                 if (outPokerType == CheckOutPoker.OutPokerType.OutPokerType_TuoLaJi)
                                 {
-                                    Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 204);
+                                    Request_ProgressTask.doRequest(uid, 204);
+
+                                    for (int k = 0; k < outPokerList .Count / 2; k++)
+                                    {
+                                        Request_ProgressTask.doRequest(uid, 210);
+                                    }
+                                }
+
+                                // 提交任务
+                                if (outPokerType == CheckOutPoker.OutPokerType.OutPokerType_Double)
+                                {
+                                    Request_ProgressTask.doRequest(uid, 210);
+                                }
+
+                                // 提交任务
+                                for(int k = 0; k < outPokerList.Count; k++)
+                                {
+                                    if (outPokerList[k].m_num == 14)
+                                    {
+                                        Request_ProgressTask.doRequest(uid, 211);
+                                    }
                                 }
 
                                 for (int m = 0; m < ja.Count; m++)

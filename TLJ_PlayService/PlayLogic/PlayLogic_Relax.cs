@@ -232,12 +232,12 @@ class PlayLogic_Relax: GameBase
                 {
                     if (playerDataList[j].m_connId == connId)
                     {
-                        // 记录逃跑数据
-                        if ((m_roomList[i].m_roomState != RoomState.RoomState_waiting) &&
-                            (m_roomList[i].m_roomState != RoomState.RoomState_end))
-                        {
-                            Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
-                        }
+                        //// 记录逃跑数据
+                        //if ((m_roomList[i].m_roomState != RoomState.RoomState_waiting) &&
+                        //    (m_roomList[i].m_roomState != RoomState.RoomState_end))
+                        //{
+                        //    Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        //}
 
                         switch (m_roomList[i].m_roomState)
                         {
@@ -522,6 +522,7 @@ class PlayLogic_Relax: GameBase
                             if (!room.getPlayerDataList()[i].m_isAI)
                             {
                                 Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 203);
+                                Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 212);
                             }
 
                             // 记录胜利次数数据
@@ -550,6 +551,7 @@ class PlayLogic_Relax: GameBase
                             if (!room.getPlayerDataList()[i].m_isAI)
                             {
                                 Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 203);
+                                Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 212);
                             }
 
                             // 记录胜利次数数据
@@ -590,12 +592,25 @@ class PlayLogic_Relax: GameBase
 
                         respondJO.Add("score", room.getPlayerDataList()[i].m_score);
 
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId,respondJO.ToString());
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
+                    }
+                    else
+                    {
+                        if (!(room.getPlayerDataList()[i].m_isAI))
+                        {
+                            // 记录逃跑数据
+                            Request_RecordUserGameData.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType, (int)TLJCommon.Consts.GameAction.GameAction_Run);
+                        }
                     }
 
                     if (room.getPlayerDataList()[i].m_isAI)
                     {
                         AIDataScript.getInstance().backOneAI(room.getPlayerDataList()[i].m_uid);
+                    }
+
+                    // 告诉数据库服务器该玩家打完一局
+                    {
+                        Request_GameOver.doRequest(room.getPlayerDataList()[i].m_uid, room.m_gameRoomType);
                     }
                 }
             }
