@@ -38,7 +38,7 @@ public class CompareWhoMax
             List<PokerInfo> outPokerList = playerData.m_curOutPokerList;
             PlayRuleUtil.SetPokerWeight(outPokerList, room.m_levelPokerNum, (Consts.PokerType) room.m_masterPokerType);
         }
-       
+
         PlayerData maxPlayer = CompareBoth(tempList[0], tempList[1], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[2], room.m_levelPokerNum, room.m_masterPokerType);
         maxPlayer = CompareBoth(maxPlayer, tempList[3], room.m_levelPokerNum, room.m_masterPokerType);
@@ -61,32 +61,28 @@ public class CompareWhoMax
 
         if (playerOutPokerList1 == null || playerOutPokerList2 == null)
         {
-            //TLJ_PlayService.PlayService.log.Info("有玩家出牌的数据为空");
+            TLJ_PlayService.PlayService.NLog.Warn("有玩家出牌的数据为空");
+            LogAllPoker(player1);
+            LogAllPoker(player2);
             return player1;
         }
 
         if (playerOutPokerList2.Count == 0 || playerOutPokerList1.Count == 0)
         {
-            //TLJ_PlayService.PlayService.log.Info("有玩家出牌的数据为0");
+            TLJ_PlayService.PlayService.NLog.Warn("有玩家出牌的数据为0");
+            LogAllPoker(player1);
+            LogAllPoker(player2);
             return player1;
         }
 
         if (playerOutPokerList1.Count != playerOutPokerList2.Count)
         {
-            //TLJ_PlayService.PlayService.log.Info("有玩家出牌大小不一样:"+ playerOutPokerList1.Count+"-----"+ playerOutPokerList2.Count);
-            foreach (var VARIABLE in playerOutPokerList1)
-            {
-                //TLJ_PlayService.PlayService.log.Info("第一个人的出牌:" + VARIABLE.m_pokerType + VARIABLE.m_num);
-            }
+            TLJ_PlayService.PlayService.NLog.Warn("出牌的牌数不一样");
+            LogAllPoker(player1);
+            LogAllPoker(player2);
             return player1;
         }
-
-        //TLJ_PlayService.PlayService.log.Info("玩家一：" + playerOutPokerList1[0].m_num + " " +
-        //                                         playerOutPokerList1[0].m_pokerType + " " +
-        //                                         playerOutPokerList1[0].m_weight
-        //                                         + "---玩家二" + playerOutPokerList2[0].m_num + " " +
-        //                                         playerOutPokerList2[0].m_pokerType + " " +
-        //                                         playerOutPokerList2[0].m_weight);
+      
         CheckOutPoker.OutPokerType outPokerType =
             CheckOutPoker.checkOutPokerType(playerOutPokerList1, roomMLevelPokerNum, roomMMasterPokerType);
         CheckOutPoker.OutPokerType outPokerType2 =
@@ -211,5 +207,12 @@ public class CompareWhoMax
             }
         }
         return player1;
+    }
+
+    private static void LogAllPoker(PlayerData player)
+    {
+        string m_curOutPokerList = Newtonsoft.Json.JsonConvert.SerializeObject(player?.m_curOutPokerList);
+        string m_allotPokerList = Newtonsoft.Json.JsonConvert.SerializeObject(player?.m_allotPokerList);
+        TLJ_PlayService.PlayService.NLog.Warn($"{player?.m_uid}:\n当前出牌：{m_curOutPokerList}\n手牌：{m_allotPokerList}");
     }
 }
