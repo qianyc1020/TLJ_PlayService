@@ -96,9 +96,9 @@ public class TrusteeshipLogic
 
                 List<TLJCommon.PokerInfo> myOutPokerList = new List<TLJCommon.PokerInfo>();
 
-                if (playerData.getPokerList().Count < 8)
+                if (playerData.getPokerList().Count != 33)
                 {
-                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管埋底:" + "数量不足");
+                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管埋底出错:手牌数量不为33");
                     return;
                 }
 
@@ -119,6 +119,10 @@ public class TrusteeshipLogic
 
                 //LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管：帮" + playerData.m_uid + "埋底:" + data.ToString());
                 GameLogic.doTask_MaiDi(gameBase, playerData.m_connId, data.ToString());
+            }
+            else
+            {
+                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":当前倒计时结束埋底的人跟房间埋底的人不符合："+playerData.m_uid + "  " + room.m_curMaiDiPlayer.m_uid);
             }
         }
         catch (Exception ex)

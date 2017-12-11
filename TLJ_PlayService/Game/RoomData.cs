@@ -12,10 +12,12 @@ public class RoomData
     }
 
     public int m_roomId;
+    public int m_wanfaType;
     public string m_gameRoomType;
     public int m_rounds_pvp = 1;
     public int m_outPokerDur = 15000;       // 出牌时间：毫秒
-    public int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
+    //public int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
+    public int m_tuoguanOutPokerDur = 500; // 托管出牌时间:毫秒
     public int m_qiangzhuTime = 10000;      // 抢主时间：毫秒
     public int m_maidiTime = 20000;         // 埋底时间：毫秒
     public int m_chaodiTime = 10000;        // 炒底时间：毫秒
@@ -30,6 +32,8 @@ public class RoomData
     public PlayerData m_curMaiDiPlayer = null;
     public PlayerData m_curChaoDiPlayer = null;
     public PlayerData m_curRoundFirstPlayer = null;
+
+    public List<TLJCommon.PokerInfo> m_allOutPokerList = new List<TLJCommon.PokerInfo>();
 
     // 本房间玩家信息
     List<PlayerData> m_playerDataList = new List<PlayerData>();
@@ -85,10 +89,12 @@ public class RoomData
             if (list[0].CompareTo("PVP") == 0)
             {
                 m_tag = TLJCommon.Consts.Tag_JingJiChang;
+                m_wanfaType = (int)TLJCommon.Consts.WanFaType.WanFaType_PVP;
             }
             if (list[0].CompareTo("XiuXian") == 0)
             {
                 m_tag = TLJCommon.Consts.Tag_XiuXianChang;
+                m_wanfaType = (int)TLJCommon.Consts.WanFaType.WanFaType_Relax;
             }
         }
 
@@ -182,5 +188,10 @@ public class RoomData
                 break;
             }
         }
+    }
+
+    public void addOutPoker(int num,int pokerType)
+    {
+        m_allOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
     }
 }

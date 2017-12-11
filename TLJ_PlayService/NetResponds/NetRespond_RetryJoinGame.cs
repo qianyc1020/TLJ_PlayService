@@ -27,9 +27,19 @@ class NetRespond_RetryJoinGame
                     respondJO.Add("tag", TLJCommon.Consts.Tag_ResumeGame);
                     respondJO.Add("gameroomtype", room.m_gameRoomType);
                     respondJO.Add("roomState", (int)room.m_roomState);
+                    respondJO.Add("isUseJiPaiQi", playerData.m_isUseJiPaiQi);
                     respondJO.Add("levelPokerNum", room.m_levelPokerNum);
-                    respondJO.Add("myLevelPoker",2);
-                    respondJO.Add("otherLevelPoker", 2);
+                    respondJO.Add("myLevelPoker", playerData.m_myLevelPoker);
+
+                    if (room.getPlayerDataList().IndexOf(playerData) == 3)
+                    {
+                        respondJO.Add("otherLevelPoker", room.getPlayerDataList()[0].m_myLevelPoker);
+                    }
+                    else
+                    {
+                        respondJO.Add("otherLevelPoker", room.getPlayerDataList()[room.getPlayerDataList().IndexOf(playerData) + 1].m_myLevelPoker);
+                    }
+
                     respondJO.Add("masterPokerType", room.m_masterPokerType);
                     respondJO.Add("teammateUID", playerData.m_teammateUID);
                     respondJO.Add("getAllScore", room.m_getAllScore);
@@ -62,6 +72,23 @@ class NetRespond_RetryJoinGame
                     else
                     {
                         respondJO.Add("curOutPokerPlayer", "");
+                    }
+
+                    // 当前出牌的人是否是自由出牌
+                    if (room.m_curRoundFirstPlayer != null && room.m_curOutPokerPlayer != null)
+                    {
+                        if (room.m_curRoundFirstPlayer.m_uid.CompareTo(room.m_curOutPokerPlayer.m_uid) == 0)
+                        {
+                            respondJO.Add("isFreeOutPoker", 1);
+                        }
+                        else
+                        {
+                            respondJO.Add("isFreeOutPoker", 0);
+                        }
+                    }
+                    else
+                    {
+                        respondJO.Add("isFreeOutPoker", 0);
                     }
 
                     // 当前埋底的人
@@ -105,29 +132,26 @@ class NetRespond_RetryJoinGame
 
                             respondJO.Add("player" + i + "OutPokerList", ja_curRoundPlayerOutPokerList);
                         }
+                    }
 
+                    // 当局所有已经出掉的牌
+                    {
+                        JArray ja_allOutPokerList = new JArray();
 
-                        //JObject jo_curRoundAllPlayerOutPokerList = new JObject();
-                        //for (int i = 0; i < room.getPlayerDataList().Count; i++)
-                        //{
-                        //    JArray jo_curRoundPlayerOutPokerList = new JArray();
-                        //    for (int j = 0; j < room.getPlayerDataList()[i].m_curOutPokerList.Count;j++)
-                        //    {
-                        //        JObject temp = new JObject();
+                        for (int i = 0; i < room.m_allOutPokerList.Count; i++)
+                        {
+                            JObject temp = new JObject();
 
-                        //        int num = room.getPlayerDataList()[i].m_curOutPokerList[j].m_num;
-                        //        int pokerType = (int)room.getPlayerDataList()[i].m_curOutPokerList[j].m_pokerType;
+                            int num = room.m_allOutPokerList[i].m_num;
+                            int pokerType = (int)room.m_allOutPokerList[i].m_pokerType;
 
-                        //        temp.Add("num", num);
-                        //        temp.Add("pokerType", pokerType);
+                            temp.Add("num", num);
+                            temp.Add("pokerType", pokerType);
 
-                        //        jo_curRoundPlayerOutPokerList.Add(temp);
-                        //    }
+                            ja_allOutPokerList.Add(temp);
+                        }
 
-                        //    jo_curRoundAllPlayerOutPokerList.Add("outPokerList",jo_curRoundPlayerOutPokerList);
-                        //}
-
-                        //respondJO.Add("curRoundAllPlayerOutPokerList", jo_curRoundAllPlayerOutPokerList);
+                        respondJO.Add("allOutPokerList", ja_allOutPokerList);
                     }
 
                     // userList

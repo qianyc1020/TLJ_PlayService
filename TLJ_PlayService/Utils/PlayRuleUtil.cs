@@ -206,8 +206,12 @@ public class PlayRuleUtil
         //如果甩的牌都是主牌
         if (IsAllMasterPoker(outPokerList, room.m_levelPokerNum, room.m_masterPokerType))
         {
-            for (int i = 1; i < playerDatas.Count; i++)
+            for (int i = 0; i < playerDatas.Count; i++)
             {
+                if (playerDatas[i].m_uid == room.m_curRoundFirstPlayer.m_uid)
+                {
+                    continue;
+                }
                 //得到其余玩家的手牌
                 List<PokerInfo> pokerList = playerDatas[i].getPokerList();
                 List<PokerInfo> masterPoker = GetMasterPoker(pokerList, room.m_levelPokerNum, room.m_masterPokerType);
@@ -235,7 +239,7 @@ public class PlayRuleUtil
                     //甩牌失败,单牌比别人小
                     else
                     {
-                        //TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
+                        TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
                         resultList.Add(minSingle);
                         return resultList;
                     }
@@ -251,8 +255,12 @@ public class PlayRuleUtil
         else if (IsAllFuPoker(outPokerList, room.m_levelPokerNum, room.m_masterPokerType))
         {
             Consts.PokerType mPokerType = outPokerList[0].m_pokerType;
-            for (int i = 1; i < playerDatas.Count; i++)
+            for (int i = 0; i < playerDatas.Count; i++)
             {
+                if (playerDatas[i].m_uid == room.m_curRoundFirstPlayer.m_uid)
+                {
+                    continue;
+                }
                 //得到其余玩家的手牌
                 List<PokerInfo> pokerList = playerDatas[i].getPokerList();
                 //得到指定花色的牌
@@ -282,7 +290,7 @@ public class PlayRuleUtil
                     //甩牌失败,单牌比别人小
                     else
                     {
-                        //TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
+                        TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌比别人小");
                         resultList.Add(minSingle);
                         return resultList;
                     }

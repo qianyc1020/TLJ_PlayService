@@ -167,27 +167,32 @@ class PlayLogic_Relax: GameBase
                 return;
             }
 
-            // 在已有的房间寻找可以加入的房间
-            for (int i = 0; i < m_roomList.Count; i++)
+            lock (m_roomList)
             {
-                //if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
-                if ((gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0) && (1 == m_roomList[i].m_rounds_pvp))
+                // 在已有的房间寻找可以加入的房间
+                for (int i = 0; i < m_roomList.Count; i++)
                 {
-                    if (m_roomList[i].joinPlayer(new PlayerData(connId, uid, false)))
+                    //if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
+                    if ((gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0) && (1 == m_roomList[i].m_rounds_pvp) && (m_roomList[i].m_roomState == RoomState.RoomState_waiting))
                     {
-                        room = m_roomList[i];
-                        break;
+                        if (m_roomList[i].joinPlayer(new PlayerData(connId, uid, false, gameroomtype)))
+                        {
+                            room = m_roomList[i];
+                            break;
+                        }
                     }
                 }
-            }
 
-            // 当前没有房间可加入的话则创建一个新的房间
-            if (room == null)
-            {
-                room = new RoomData(this, m_roomList.Count + 1, gameroomtype);
-                room.joinPlayer(new PlayerData(connId, uid, false));
+                // 当前没有房间可加入的话则创建一个新的房间
+                if (room == null)
+                {
+                    room = new RoomData(this, m_roomList.Count + 1, gameroomtype);
+                    room.joinPlayer(new PlayerData(connId, uid, false, gameroomtype));
 
-                m_roomList.Add(room);
+                    m_roomList.Add(room);
+
+                    LogUtil.getInstance().addDebugLog("新建休闲场房间：" + room.getRoomId());
+                }
             }
 
             // 加入房间成功，给客户端回复
@@ -460,11 +465,13 @@ class PlayLogic_Relax: GameBase
     {
         try
         {
+            room.m_roomState = RoomState.RoomState_end;
+
             //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
 
             // 计算每个玩家的金币（积分）
-            GameUtil.setPlayerScore(room,true);
+            GameUtil.setPlayerScore(room,false);
 
             // 加减金币
             {
@@ -585,14 +592,17 @@ class PlayLogic_Relax: GameBase
                     // 推送给客户端
                     if (!room.getPlayerDataList()[i].m_isOffLine)
                     {
-                        if (respondJO.GetValue("score") != null)
+                        if (!(room.getPlayerDataList()[i].m_isAI))
                         {
-                            respondJO.Remove("score");
+                            if (respondJO.GetValue("score") != null)
+                            {
+                                respondJO.Remove("score");
+                            }
+
+                            respondJO.Add("score", room.getPlayerDataList()[i].m_score);
+
+                            PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
                         }
-
-                        respondJO.Add("score", room.getPlayerDataList()[i].m_score);
-
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
                     }
                     else
                     {
@@ -615,10 +625,11 @@ class PlayLogic_Relax: GameBase
                 }
             }
 
-            room.m_roomState = RoomState.RoomState_end;
-
             // 检查是否删除该房间
             {
+                // 先清理房间内离线的人和AI
+                GameUtil.clearRoomNonePlayer(room);
+
                 if (GameUtil.checkRoomNonePlayer(room))
                 {
                     LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":所有人都离线，解散该房间：" + room.getRoomId());

@@ -41,6 +41,12 @@ class Request_UserInfo_Game
             string uid = jo.GetValue("uid").ToString();
 
             PlayerData playerDate = GameUtil.getRoomByUid(uid).getPlayerDataByUid(uid);
+            if (playerDate == null)
+            {
+                LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.onMySqlRespond----游戏服务器里没有此人数据：" + uid + "," + respondData);
+                return;
+            }
+
             playerDate.m_buffData.Clear();
 
             JArray buff_list = (JArray)JsonConvert.DeserializeObject(jo.GetValue("BuffData").ToString());
@@ -51,10 +57,16 @@ class Request_UserInfo_Game
                 int buff_num = (int)buff_list[i]["buff_num"];
                 playerDate.m_buffData.Add(new BuffData(prop_id, buff_num));
             }
+
+            // 金币数量
+            {
+                int gold = (int)jo.GetValue("gold");
+                playerDate.m_gold = gold;
+            }
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.onMySqlRespond----" + ex.Message);
+            LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.onMySqlRespond----" + ex.Message + "," + respondData);
 
             // 客户端参数错误
             //respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));

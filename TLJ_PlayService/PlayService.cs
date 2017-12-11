@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
+﻿using NLog;
 using System.ServiceProcess;
-using System.Text;
-using log4net;
 
 namespace TLJ_PlayService
 {
@@ -15,6 +8,7 @@ namespace TLJ_PlayService
         public static HPServerUtil m_serverUtil;
         public static MySqlServerUtil m_mySqlServerUtil;
         public static string TAG = "PlayService";
+        public static Logger log = LogManager.GetLogger(TAG);
         //public static ILog log;
         public PlayService()
         {

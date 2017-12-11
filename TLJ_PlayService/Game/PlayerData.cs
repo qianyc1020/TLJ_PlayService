@@ -11,11 +11,15 @@ public class PlayerData
     public int m_isBanker = 0;      // 是否是庄家
     public int m_myLevelPoker = 2;
     public int m_score = 0;
+    public int m_gold = 0;
     public int m_rank = 0;
     public bool m_isOffLine = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;
+    public bool m_isPVP = false;
+    public bool m_isUseJiPaiQi = false;
     public string m_pvpReward = "";
+    public string m_gameRoomType;
 
     List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();
     public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();
@@ -25,11 +29,26 @@ public class PlayerData
 
     public TimerUtil m_timerUtil = new TimerUtil();
 
-    public PlayerData(IntPtr connId, string uid, bool isAI)
+    public PlayerData(IntPtr connId, string uid, bool isAI,string gameRoomType)
     {
         m_connId = connId;
         m_uid = uid;
         m_isAI = isAI;
+        m_gameRoomType = gameRoomType;
+
+        // 场次
+        {
+            List<string> list = new List<string>();
+            CommonUtil.splitStr(m_gameRoomType, list, '_');
+            if (list[0].CompareTo("PVP") == 0)
+            {
+                m_score = 1000;
+                m_isPVP = true;
+            }
+            if (list[0].CompareTo("XiuXian") == 0)
+            {
+            }
+        }
 
         if (m_isAI)
         {
@@ -70,6 +89,11 @@ public class PlayerData
 
     public void setPokerList(List<TLJCommon.PokerInfo> pokerList)
     {
+        if (pokerList.Count != 25)
+        {
+            LogUtil.getInstance().addDebugLog("PlayerData.setPokerList----给" + m_uid + "发牌的张数不对：" + pokerList.Count);
+        }
+
         m_pokerList = pokerList;
     }
 

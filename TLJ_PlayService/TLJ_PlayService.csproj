@@ -34,11 +34,11 @@
     <Reference Include="HPSocketCS">
       <HintPath>Libs\HPSocketCS.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
-      <HintPath>Libs\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.12\lib\net40\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -66,7 +66,6 @@
     <Compile Include="Request\Request_UseBuff.cs" />
     <Compile Include="Request\Request_UserInfo_Game.cs" />
     <Compile Include="Utils\TimerUtil.cs" />
-    <None Include="App.config" />
     <Compile Include="Commons\CommonClass.cs" />
     <Compile Include="Commons\CommonUtil.cs" />
     <Compile Include="Commons\NetConfig.cs" />
@@ -115,6 +114,14 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -173,27 +173,32 @@ class PlayLogic_PVP: GameBase
                 return;
             }
 
-            // 在已有的房间寻找可以加入的房间
-            for (int i = 0; i < m_roomList.Count; i++)
+            lock (m_roomList)
             {
-                //if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
-                if ((gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0) && (1 == m_roomList[i].m_rounds_pvp))
+                // 在已有的房间寻找可以加入的房间
+                for (int i = 0; i < m_roomList.Count; i++)
                 {
-                    if (m_roomList[i].joinPlayer(new PlayerData(connId, uid, false)))
+                    //if (gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0)
+                    if ((gameroomtype.CompareTo(m_roomList[i].m_gameRoomType) == 0) && (1 == m_roomList[i].m_rounds_pvp) && (m_roomList[i].m_roomState == RoomState.RoomState_waiting))
                     {
-                        room = m_roomList[i];
-                        break;
+                        if (m_roomList[i].joinPlayer(new PlayerData(connId, uid, false, gameroomtype)))
+                        {
+                            room = m_roomList[i];
+                            break;
+                        }
                     }
                 }
-            }
 
-            // 当前没有房间可加入的话则创建一个新的房间
-            if (room == null)
-            {
-                room = new RoomData(this,m_roomList.Count + 1, gameroomtype);
-                room.joinPlayer(new PlayerData(connId, uid, false));
+                // 当前没有房间可加入的话则创建一个新的房间
+                if (room == null)
+                {
+                    room = new RoomData(this, m_roomList.Count + 1, gameroomtype);
+                    room.joinPlayer(new PlayerData(connId, uid, false, gameroomtype));
 
-                m_roomList.Add(room);
+                    m_roomList.Add(room);
+
+                    LogUtil.getInstance().addDebugLog("新建比赛场房间：" + room.getRoomId());
+                }
             }
 
             // 扣除报名费
@@ -587,13 +592,71 @@ class PlayLogic_PVP: GameBase
     {
         try
         {
-            //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + now_room.getRoomId());
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + now_room.getRoomId());
 
+            now_room.m_roomState = RoomState.RoomState_end;
+
             // 计算每个玩家的金币（积分）
-            GameUtil.setPlayerScore(now_room,false);
+            GameUtil.setPlayerScore(now_room,true);
 
             List<PlayerData> winPlayerList = new List<PlayerData>();
+
+            string gameRoomType = now_room.m_gameRoomType;
+            int rounds_pvp = now_room.m_rounds_pvp;
+
+            
+            bool isContiune = true;         // 是否打到最后一轮            
+            bool isJueShengJu = false;      // 下一局是否是决胜局
+
+            {
+                List<string> listTemp = new List<string>();
+                CommonUtil.splitStr(now_room.m_gameRoomType, listTemp, '_');
+                int jirenchang = int.Parse(listTemp[2]);
+                switch (jirenchang)
+                {
+                    case 8:
+                        {
+                            if (rounds_pvp == 3)
+                            {
+                                isContiune = false;
+                            }
+                            // 决胜局
+                            else if (rounds_pvp == 2)
+                            {
+                                isJueShengJu = true;
+                            }
+                        }
+                        break;
+
+                    case 16:
+                        {
+                            if (rounds_pvp == 4)
+                            {
+                                isContiune = false;
+                            }
+                            // 决胜局
+                            else if (rounds_pvp == 3)
+                            {
+                                isJueShengJu = true;
+                            }
+                        }
+                        break;
+
+                    case 32:
+                        {
+                            if (rounds_pvp == 5)
+                            {
+                                isContiune = false;
+                            }
+                            // 决胜局
+                            else if (rounds_pvp == 4)
+                            {
+                                isJueShengJu = true;
+                            }
+                        }
+                        break;
+                }
+            }
 
             // 逻辑处理
             {
@@ -625,11 +688,22 @@ class PlayLogic_PVP: GameBase
                             {
                                 Request_RecordUserGameData.doRequest(now_room.getPlayerDataList()[i].m_uid, now_room.m_gameRoomType,(int)TLJCommon.Consts.GameAction.GameAction_Win);
                             }
+
+                            // 分数在原来的基础上减半，防止玩家之间分数差距太大
+                            {
+                                now_room.getPlayerDataList()[i].m_score /= 2;
+                            }
                         }
                         // 加入淘汰人员列表里
                         else
                         {
                             PVPChangCiUtil.getInstance().addPlayerToThere(now_room.m_gameRoomType, now_room.getPlayerDataList()[i]);
+
+                            //// 分数在原来的基础上减10000，防止比晋级的人分数高，影响排名
+                            //if (!isJueShengJu && isContiune)
+                            //{
+                            //    now_room.getPlayerDataList()[i].m_score -= 10000;
+                            //}
                         }
                     }
                 }
@@ -660,11 +734,22 @@ class PlayLogic_PVP: GameBase
                             {
                                 Request_RecordUserGameData.doRequest(now_room.getPlayerDataList()[i].m_uid, now_room.m_gameRoomType,(int)TLJCommon.Consts.GameAction.GameAction_Win);
                             }
+
+                            // 分数在原来的基础上减半，防止玩家之间分数差距太大
+                            {
+                                now_room.getPlayerDataList()[i].m_score /= 2;
+                            }
                         }
                         // 加入淘汰人员列表里
                         else
                         {
                             PVPChangCiUtil.getInstance().addPlayerToThere(now_room.m_gameRoomType, now_room.getPlayerDataList()[i]);
+
+                            //// 分数在原来的基础上减10000，防止比晋级的人分数高，影响排名
+                            //if (!isJueShengJu && isContiune)
+                            //{
+                            //    now_room.getPlayerDataList()[i].m_score -= 10000;
+                            //}
                         }
                     }
                 }
@@ -697,8 +782,17 @@ class PlayLogic_PVP: GameBase
                     // 推送给客户端
                     if (!now_room.getPlayerDataList()[i].m_isOffLine)
                     {
-                        PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId,
-                            respondJO.ToString());
+                        if (!(now_room.getPlayerDataList()[i].m_isAI))
+                        {
+                            if (respondJO.GetValue("score") != null)
+                            {
+                                respondJO.Remove("score");
+                            }
+
+                            respondJO.Add("score", now_room.getPlayerDataList()[i].m_score);
+
+                            PlayService.m_serverUtil.sendMessage(now_room.getPlayerDataList()[i].m_connId, respondJO.ToString());
+                        }
                     }
                     else
                     {
@@ -721,78 +815,11 @@ class PlayLogic_PVP: GameBase
                 }
             }
 
-            now_room.m_roomState = RoomState.RoomState_end;
-
-            //// 检查是否删除该房间
-            //{
-            //    if (GameUtil.checkRoomNonePlayer(now_room))
-            //    {
-            //        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":所有人都离线，解散该房间：" + now_room.getRoomId());
-            //        removeRoom(now_room);
-
-            //        return;
-            //    }
-            //}
-
-            string gameRoomType = now_room.m_gameRoomType;
-            int rounds_pvp = now_room.m_rounds_pvp;
-            
-            // 检查是否打到最后一轮
-            bool isContiune = true;
+            if (isJueShengJu)
             {
-                List<string> listTemp = new List<string>();
-                CommonUtil.splitStr(now_room.m_gameRoomType, listTemp, '_');
-                int jirenchang = int.Parse(listTemp[2]);
-                switch (jirenchang)
-                {
-                    case 8:
-                    {
-                        if (rounds_pvp == 3)
-                        {
-                            isContiune = false;
-                        }
-                        // 决胜局
-                        else if (rounds_pvp == 2)
-                        {
-                            jueshengju(now_room);
+                jueshengju(now_room);
 
-                            return;
-                        }
-                    }
-                    break;
-
-                    case 16:
-                    {
-                        if (rounds_pvp == 4)
-                        {
-                            isContiune = false;
-                        }
-                        // 决胜局
-                        else if (rounds_pvp == 3)
-                        {
-                            jueshengju(now_room);
-
-                            return;
-                        }
-                    }
-                    break;
-
-                    case 32:
-                    {
-                        if (rounds_pvp == 5)
-                        {
-                            isContiune = false;
-                        }
-                        // 决胜局
-                        else if (rounds_pvp == 4)
-                        {
-                            jueshengju(now_room);
-
-                            return;
-                        }
-                    }
-                    break;
-                }
+                return;
             }
 
             // 进入新房间，准备开始下一局
@@ -811,47 +838,44 @@ class PlayLogic_PVP: GameBase
                         {
                             RoomData room = null;
 
-                            // 在已有的房间寻找可以加入的房间
-                            for (int j = 0; j < m_roomList.Count; j++)
+                            // 玩家数据清理
                             {
-                                if ((gameRoomType.CompareTo(m_roomList[j].m_gameRoomType) == 0) && ((rounds_pvp + 1) == m_roomList[j].m_rounds_pvp))
-                                {
-                                    if (m_roomList[j].joinPlayer(winPlayerList[i]))
-                                    {
-                                        room = m_roomList[j];
-                                        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":找到新房间：" + room.getRoomId());
+                                winPlayerList[i].m_isBanker = 0;
+                            }
 
-                                        break;
+                            lock (m_roomList)
+                            {
+                                // 在已有的房间寻找可以加入的房间
+                                for (int j = 0; j < m_roomList.Count; j++)
+                                {
+                                    if ((gameRoomType.CompareTo(m_roomList[j].m_gameRoomType) == 0) && ((rounds_pvp + 1) == m_roomList[j].m_rounds_pvp) && (m_roomList[j].m_roomState == RoomState.RoomState_waiting))
+                                    {
+                                        if (m_roomList[j].joinPlayer(winPlayerList[i]))
+                                        {
+                                            room = m_roomList[j];
+                                            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":找到新房间：" + room.getRoomId());
+
+                                            break;
+                                        }
                                     }
+                                }
+
+                                // 当前没有房间可加入的话则创建一个新的房间
+                                if (room == null)
+                                {
+                                    room = new RoomData(this, m_roomList.Count + 1, gameRoomType);
+                                    room.joinPlayer(winPlayerList[i]);
+                                    room.m_rounds_pvp = rounds_pvp + 1;
+
+                                    m_roomList.Add(room);
+
+                                    LogUtil.getInstance().addDebugLog("新建比赛场房间：" + room.getRoomId());
+
+                                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":创建新房间：" + room.getRoomId());
                                 }
                             }
 
-                            // 当前没有房间可加入的话则创建一个新的房间
-                            if (room == null)
-                            {
-                                room = new RoomData(this, m_roomList.Count + 1, gameRoomType);
-                                room.joinPlayer(winPlayerList[i]);
-                                room.m_rounds_pvp = now_room.m_rounds_pvp + 1;
-
-                                m_roomList.Add(room);
-
-                                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":创建新房间：" + room.getRoomId());
-                            }
-
                             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":该新房间人数：" + room.getPlayerDataList().Count);
-
-                            //// 加入房间成功，给客户端回复
-                            //{
-                            //    JObject respondJO = new JObject();
-                            //    respondJO.Add("tag", m_tag);
-                            //    respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_JoinGame);
-                            //    respondJO.Add("gameroomtype", room.m_gameRoomType);
-                            //    respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_OK);
-                            //    respondJO.Add("roomId", room.getRoomId());
-
-                            //    // 发送给客户端
-                            //    PlayService.m_serverUtil.sendMessage(winPlayerList[i].m_connId, respondJO.ToString());
-                            //}
 
                             if (room.getPlayerDataList().Count == 4)
                             {
@@ -984,13 +1008,12 @@ class PlayLogic_PVP: GameBase
             RoomData new_room = new RoomData(this, m_roomList.Count + 1, room.m_gameRoomType);
             new_room.m_rounds_pvp = room.m_rounds_pvp + 1;
             m_roomList.Add(new_room);
-
-            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":创建新房间：" + new_room.getRoomId());
+            LogUtil.getInstance().addDebugLog("新建比赛场决胜局房间：" + new_room.getRoomId());
 
             for (int i = 0; i < room.getPlayerDataList().Count; i++)
             {
-                PlayerData playData = new PlayerData(room.getPlayerDataList()[i].m_connId, room.getPlayerDataList()[i].m_uid, room.getPlayerDataList()[i].m_isAI);
-                playData.m_score = room.getPlayerDataList()[i].m_score;
+                PlayerData playData = new PlayerData(room.getPlayerDataList()[i].m_connId, room.getPlayerDataList()[i].m_uid, room.getPlayerDataList()[i].m_isAI, room.getPlayerDataList()[i].m_gameRoomType);
+                playData.m_score = (room.getPlayerDataList()[i].m_score);
                 new_room.joinPlayer(playData);
             }
             

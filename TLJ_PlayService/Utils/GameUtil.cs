@@ -130,17 +130,52 @@ class GameUtil
 
     public static bool checkRoomNonePlayer(RoomData room)
     {
+        //// 删除机器人和离线的人
+        //for (int i = room.getPlayerDataList().Count - 1; i >= 0 ; i--)
+        //{
+        //    if (room.getPlayerDataList()[i].m_isAI)
+        //    {
+        //        room.getPlayerDataList().RemoveAt(i);
+        //        break;
+        //    }
+
+        //    if (room.getPlayerDataList()[i].m_isOffLine)
+        //    {
+        //        room.getPlayerDataList().RemoveAt(i);
+        //        break;
+        //    }
+        //}
+
         bool isRemove = true;
-        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        if (room.getPlayerDataList().Count > 0)
         {
-            if (!room.getPlayerDataList()[i].m_isOffLine)
-            {
-                isRemove = false;
-                break;
-            }
+            isRemove = false;
         }
 
         return isRemove;
+    }
+
+    public static void clearRoomNonePlayer(RoomData room)
+    {
+        // 删除机器人
+        for (int i = room.getPlayerDataList().Count - 1; i >= 0; i--)
+        {
+            if (room.getPlayerDataList()[i].m_isAI)
+            {
+                LogUtil.getInstance().addDebugLog("清理机器人：" + room.getPlayerDataList()[i].m_uid);
+                room.getPlayerDataList().RemoveAt(i);
+            }
+        }
+
+        // 删除离线的人
+        for (int i = room.getPlayerDataList().Count - 1; i >= 0; i--)
+        {
+            if (room.getPlayerDataList()[i].m_isOffLine)
+            {
+                LogUtil.getInstance().addDebugLog("清理离线的人：" + room.getPlayerDataList()[i].m_uid);
+                room.getPlayerDataList().RemoveAt(i);
+            }
+        }
     }
 
     public static int getGameRoomPlayerCount(string gameRoomType)
@@ -170,7 +205,7 @@ class GameUtil
     {
         try
         {
-            float jichufenshu = 1000;
+            float jichufenshu = 985;
             float changcixishu = 1;
             float defenxishu = 1;
             float xianjiadefen;
@@ -211,15 +246,15 @@ class GameUtil
             {
                 if (room.m_getAllScore == 0)
                 {
-                    defenxishu = -3.8f;
+                    defenxishu = -3.6f;
                 }
                 else if ((room.m_getAllScore >= 5) && (room.m_getAllScore <= 40))
                 {
-                    defenxishu = -2.8f;
+                    defenxishu = -2.6f;
                 }
                 else if ((room.m_getAllScore >= 45) && (room.m_getAllScore <= 75))
                 {
-                    defenxishu = -1.8f;
+                    defenxishu = -1.6f;
                 }
                 else if (room.m_getAllScore == 80)
                 {
@@ -227,36 +262,94 @@ class GameUtil
                 }
                 else if ((room.m_getAllScore >= 85) && (room.m_getAllScore <= 120))
                 {
-                    defenxishu = 1.8f;
+                    defenxishu = 1.6f;
                 }
                 else if ((room.m_getAllScore >= 125) && (room.m_getAllScore <= 195))
                 {
-                    defenxishu = 2.8f;
+                    defenxishu = 2.6f;
                 }
                 else if (room.m_getAllScore == 200)
                 {
-                    defenxishu = 3.8f;
+                    defenxishu = 3.6f;
                 }
             }
 
             xianjiadefen = jichufenshu * changcixishu * defenxishu;
 
-            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            if (!canFuShu)
             {
-                if (room.getPlayerDataList()[i].m_isBanker == 1)
+                // 闲家赢
+                if (xianjiadefen > 0)
                 {
-                    room.getPlayerDataList()[i].m_score += (-(int)xianjiadefen);
+                    float winerCanGetScote = 0;
+
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        if (room.getPlayerDataList()[i].m_isBanker == 1)
+                        {
+                            if (room.getPlayerDataList()[i].m_gold >= xianjiadefen)
+                            {
+                                winerCanGetScote += xianjiadefen;
+                                room.getPlayerDataList()[i].m_score = (int)(-xianjiadefen);
+                            }
+                            else
+                            {
+                                winerCanGetScote += room.getPlayerDataList()[i].m_gold;
+                                room.getPlayerDataList()[i].m_score = (-room.getPlayerDataList()[i].m_gold);
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        if (room.getPlayerDataList()[i].m_isBanker != 1)
+                        {
+                            room.getPlayerDataList()[i].m_score = (int)winerCanGetScote / 2;
+                        }
+                    }
                 }
+                // 庄家赢
                 else
                 {
-                    room.getPlayerDataList()[i].m_score += (int)xianjiadefen;
-                }
+                    float winerCanGetScote = 0;
 
-                if (!canFuShu)
-                {
-                    if (room.getPlayerDataList()[i].m_score < 0)
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
                     {
-                        room.getPlayerDataList()[i].m_score = 0;
+                        if (room.getPlayerDataList()[i].m_isBanker != 1)
+                        {
+                            if (room.getPlayerDataList()[i].m_gold >= (-xianjiadefen))
+                            {
+                                winerCanGetScote += (-xianjiadefen);
+                                room.getPlayerDataList()[i].m_score = (int)xianjiadefen;
+                            }
+                            else
+                            {
+                                winerCanGetScote += room.getPlayerDataList()[i].m_gold;
+                                room.getPlayerDataList()[i].m_score = (-room.getPlayerDataList()[i].m_gold);
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                    {
+                        if (room.getPlayerDataList()[i].m_isBanker == 1)
+                        {
+                            room.getPlayerDataList()[i].m_score = (int)winerCanGetScote / 2;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    if (room.getPlayerDataList()[i].m_isBanker == 1)
+                    {
+                        room.getPlayerDataList()[i].m_score += (-(int)xianjiadefen);
+                    }
+                    else
+                    {
+                        room.getPlayerDataList()[i].m_score += (int)xianjiadefen;
                     }
                 }
             }
