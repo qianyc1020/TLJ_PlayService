@@ -130,22 +130,6 @@ class GameUtil
 
     public static bool checkRoomNonePlayer(RoomData room)
     {
-        //// 删除机器人和离线的人
-        //for (int i = room.getPlayerDataList().Count - 1; i >= 0 ; i--)
-        //{
-        //    if (room.getPlayerDataList()[i].m_isAI)
-        //    {
-        //        room.getPlayerDataList().RemoveAt(i);
-        //        break;
-        //    }
-
-        //    if (room.getPlayerDataList()[i].m_isOffLine)
-        //    {
-        //        room.getPlayerDataList().RemoveAt(i);
-        //        break;
-        //    }
-        //}
-
         bool isRemove = true;
         if (room.getPlayerDataList().Count > 0)
         {
