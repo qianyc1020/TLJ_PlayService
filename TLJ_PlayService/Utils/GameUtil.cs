@@ -252,7 +252,7 @@ class GameUtil
                 {
                     defenxishu = 2.6f;
                 }
-                else if (room.m_getAllScore == 200)
+                else if (room.m_getAllScore >= 200)
                 {
                     defenxishu = 3.6f;
                 }
