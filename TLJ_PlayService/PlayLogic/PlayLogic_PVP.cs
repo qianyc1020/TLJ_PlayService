@@ -37,7 +37,7 @@ class PlayLogic_PVP: GameBase
 
             for (int j = 0; j < playerDataList.Count; j++)
             {
-                if (!playerDataList[j].m_isOffLine)
+                if (!playerDataList[j].isOffLine())
                 {
                     ++count;
                 }
@@ -128,6 +128,12 @@ class PlayLogic_PVP: GameBase
                 case (int)TLJCommon.Consts.PlayAction.PlayAction_Chat:
                 {
                     GameLogic.doTask_Chat(this, connId, data);
+                }
+                break;
+
+                case (int)TLJCommon.Consts.PlayAction.PlayAction_SetTuoGuanState:
+                {
+                    GameLogic.doTask_SetTuoGuanState(this, connId, data);
                 }
                 break;
             }
@@ -324,6 +330,11 @@ class PlayLogic_PVP: GameBase
         return m_roomList;
     }
 
+    public override string getTag()
+    {
+        return m_tag;
+    }
+
     public override bool doTaskPlayerCloseConn(IntPtr connId)
     {
         try
@@ -348,7 +359,7 @@ class PlayLogic_PVP: GameBase
                         {
                             case RoomState.RoomState_waiting:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在本桌满人之前退出：" + playerDataList[j].m_uid);
 
@@ -398,11 +409,11 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_qiangzhu:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抢主阶段退出：" + playerDataList[j].m_uid);
 
-                                        playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].setIsOffLine(true);
 
                                         GameUtil.checkAllOffLine(room);
                                     }
@@ -415,11 +426,11 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_zhuangjiamaidi:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在庄家埋底阶段退出：" + playerDataList[j].m_uid);
 
-                                        playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].setIsOffLine(true);
 
                                         GameUtil.checkAllOffLine(room);
 
@@ -442,11 +453,11 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_chaodi:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在抄底阶段退出：" + playerDataList[j].m_uid);
 
-                                        playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].setIsOffLine(true);
 
                                         GameUtil.checkAllOffLine(room);
 
@@ -461,11 +472,11 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_othermaidi:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在Other埋底阶段退出：" + playerDataList[j].m_uid);
 
-                                        playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].setIsOffLine(true);
 
                                         GameUtil.checkAllOffLine(room);
 
@@ -480,10 +491,10 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_gaming:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在游戏中退出：" + playerDataList[j].m_uid);
-                                        playerDataList[j].m_isOffLine = true;
+                                        playerDataList[j].setIsOffLine(true);
 
                                         GameUtil.checkAllOffLine(room);
 
@@ -502,7 +513,7 @@ class PlayLogic_PVP: GameBase
 
                             case RoomState.RoomState_end:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在本桌打完后退出：" + playerDataList[j].m_uid);
 
@@ -554,7 +565,7 @@ class PlayLogic_PVP: GameBase
 
                             default:
                                 {
-                                    if (!playerDataList[j].m_isOffLine)
+                                    if (!playerDataList[j].isOffLine())
                                     {
                                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在未知阶段退出：" + playerDataList[j].m_uid);
 
@@ -588,7 +599,7 @@ class PlayLogic_PVP: GameBase
     }
 
     // 游戏结束
-    public override void gameOver(RoomData now_room, string data)
+    public override void gameOver(RoomData now_room)
     {
         try
         {
@@ -760,8 +771,6 @@ class PlayLogic_PVP: GameBase
                 LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":胜利的人：" + winPlayerList[i].m_uid + "  isBanker:" + winPlayerList[i].m_isBanker);
             }
 
-            JObject jo = JObject.Parse(data);
-
             // 通知
             {
                 JObject respondJO;
@@ -772,15 +781,13 @@ class PlayLogic_PVP: GameBase
                     respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_GameOver);
                     respondJO.Add("getAllScore", now_room.m_getAllScore);
                     respondJO.Add("isBankerWin", now_room.m_getAllScore >= 80 ? 0 : 1);
-                    respondJO.Add("pre_uid", jo.GetValue("uid"));
-                    respondJO.Add("pre_outPokerList", jo.GetValue("pokerList"));
                 }
 
                 // 给在线的人推送
                 for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
                 {
                     // 推送给客户端
-                    if (!now_room.getPlayerDataList()[i].m_isOffLine)
+                    if (!now_room.getPlayerDataList()[i].isOffLine())
                     {
                         if (!(now_room.getPlayerDataList()[i].m_isAI))
                         {
@@ -833,7 +840,7 @@ class PlayLogic_PVP: GameBase
 
                 for (int i = 0; i < winPlayerList.Count; i++)
                 {
-                    if (!winPlayerList[i].m_isOffLine)
+                    if (!winPlayerList[i].isOffLine())
                     {
                         {
                             RoomData room = null;
@@ -946,7 +953,7 @@ class PlayLogic_PVP: GameBase
                     // 给在线的人推送
                     for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
                     {
-                        if (!now_room.getPlayerDataList()[i].m_isOffLine)
+                        if (!now_room.getPlayerDataList()[i].isOffLine())
                         {
                             if (respondJO.GetValue("mingci") != null)
                             {
@@ -996,7 +1003,7 @@ class PlayLogic_PVP: GameBase
             // 给在线的人推送
             for (int i = 0; i < room.getPlayerDataList().Count; i++)
             {
-                if (!room.getPlayerDataList()[i].m_isOffLine)
+                if (!room.getPlayerDataList()[i].isOffLine())
                 {
                     PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, respondJO.ToString());
                 }

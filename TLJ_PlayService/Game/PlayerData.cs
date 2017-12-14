@@ -13,7 +13,9 @@ public class PlayerData
     public int m_score = 0;
     public int m_gold = 0;
     public int m_rank = 0;
-    public bool m_isOffLine = false;
+    public int m_vipLevel = 0;
+    bool m_isOffLine = false;
+    bool m_isTuoGuan = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;
     public bool m_isPVP = false;
@@ -53,6 +55,7 @@ public class PlayerData
         if (m_isAI)
         {
             m_isOffLine = true;
+            m_isTuoGuan = true;
         }
 
         m_timerUtil.setTimerCallBack(timerCallback);
@@ -65,22 +68,38 @@ public class PlayerData
             case TimerType.TimerType_outPoker:
                 {
                     RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                    if (!m_isTuoGuan)
+                    {
+                        m_isTuoGuan = true;
+                        changeTuoGuanState();
+                    }
                     TrusteeshipLogic.trusteeshipLogic_OutPoker(room.m_gameBase, room,this);
                 }
                 break;
 
             case TimerType.TimerType_maidi:
                 {
-                    LogUtil.getInstance().addDebugLog("埋底时间结束");
                     RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                    if (!m_isTuoGuan)
+                    {
+                        m_isTuoGuan = true;
+                        changeTuoGuanState();
+                    }
                     TrusteeshipLogic.trusteeshipLogic_MaiDi(room.m_gameBase, room, this);
                 }
                 break;
 
             case TimerType.TimerType_chaodi:
                 {
-                    LogUtil.getInstance().addDebugLog("炒底时间结束");
                     RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                    if (!m_isTuoGuan)
+                    {
+                        m_isTuoGuan = true;
+                        changeTuoGuanState();
+                    }
                     TrusteeshipLogic.trusteeshipLogic_ChaoDi(room.m_gameBase, room, this);
                 }
                 break;
@@ -106,7 +125,50 @@ public class PlayerData
     {
         m_isBanker = 0;
         m_isOffLine = false;
+        m_isTuoGuan = false;
         m_isContinueGame = false;
+    }
+
+    public bool isOffLine()
+    {
+        return m_isOffLine;
+    }
+
+    public void setIsOffLine(bool isOffLine)
+    {
+        m_isOffLine = isOffLine;
+        m_isTuoGuan = isOffLine;
+    }
+
+    public bool isTuoGuan()
+    {
+        return m_isTuoGuan;
+    }
+
+    public void setIsTuoGuan(bool isTuoGuan)
+    {
+        m_isTuoGuan = isTuoGuan;
+    }
+
+    public GameBase getGameBase()
+    {
+        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+        if (room != null)
+        {
+            return room.m_gameBase;
+        }
+
+        return null;
+    }
+
+    public void changeTuoGuanState()
+    {
+        GameBase gameBase = getGameBase();
+        if (gameBase != null)
+        {
+            GameLogic.tellPlayerTuoGuanState(gameBase, this, m_isTuoGuan);
+        }
     }
 }
 

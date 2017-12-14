@@ -57,6 +57,27 @@ class NetRespond_UseBuff
     {
         try
         {
+            {
+                JObject jo = JObject.Parse(respondData);
+                int code = (int)jo.GetValue("code");
+
+                if (code == (int)TLJCommon.Consts.Code.Code_OK)
+                {
+                    string uid = jo.GetValue("uid").ToString();
+                    int prop_id = (int)jo.GetValue("prop_id");
+
+                    // 记牌器
+                    if (prop_id == (int)TLJCommon.Consts.Prop.Prop_jipaiqi)
+                    {
+                        PlayerData playerData = GameUtil.getPlayerDataByUid(uid);
+                        if (playerData != null)
+                        {
+                            playerData.m_isUseJiPaiQi = true;
+                        }
+                    }
+                }
+            }
+
             // 发送给客户端
             {
                 PlayService.m_serverUtil.sendMessage((IntPtr)connId, respondData);

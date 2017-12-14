@@ -57,11 +57,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\OtherConfig.cs" />
+    <Compile Include="Debug\CustomPoker.cs" />
+    <Compile Include="Debug\DebugConfig.cs" />
     <Compile Include="Game\GameBase.cs" />
     <Compile Include="Game\GameLogic.cs" />
     <Compile Include="Game\PlayerData.cs" />
     <Compile Include="Game\RoomData.cs" />
     <Compile Include="Game\TrusteeshipLogic.cs" />
+    <Compile Include="NetResponds\NetRespond_DebugSetPoker.cs" />
     <Compile Include="Request\Request_GameOver.cs" />
     <Compile Include="Request\Request_UseBuff.cs" />
     <Compile Include="Request\Request_UserInfo_Game.cs" />

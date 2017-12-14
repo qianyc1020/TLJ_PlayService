@@ -74,6 +74,16 @@ class NetRespond_RetryJoinGame
                         respondJO.Add("curOutPokerPlayer", "");
                     }
 
+                    // 最后埋底的人
+                    if (room.m_lastMaiDiPlayer != null)
+                    {
+                        respondJO.Add("lastMaiDiPlayer", room.m_lastMaiDiPlayer.m_uid);
+                    }
+                    else
+                    {
+                        respondJO.Add("lastMaiDiPlayer", "");
+                    }
+
                     // 当前出牌的人是否是自由出牌
                     if (room.m_curRoundFirstPlayer != null && room.m_curOutPokerPlayer != null)
                     {
@@ -212,9 +222,23 @@ class NetRespond_RetryJoinGame
                         respondJO.Add("allotPokerList", ja);
                     }
 
+                    // diPokerList
+                    {
+                        JArray ja = new JArray();
+                        for (int i = 0; i < room.getDiPokerList().Count; i++)
+                        {
+                            JObject temp = new JObject();
+                            temp.Add("num", room.getDiPokerList()[i].m_num);
+                            temp.Add("pokerType", (int)room.getDiPokerList()[i].m_pokerType);
+
+                            ja.Add(temp);
+                        }
+                        respondJO.Add("diPokerList", ja);
+                    }
+
                     // 把玩家设为在线
                     {
-                        playerData.m_isOffLine = false;
+                        playerData.setIsOffLine(false);
                         playerData.m_connId = connId;
                     }
 

@@ -39,6 +39,7 @@ class Request_UserInfo_Game
         {
             JObject jo = JObject.Parse(respondData);
             string uid = jo.GetValue("uid").ToString();
+            int vipLevel = (int)jo.GetValue("vipLevel");
 
             PlayerData playerDate = GameUtil.getRoomByUid(uid).getPlayerDataByUid(uid);
             if (playerDate == null)
@@ -47,6 +48,7 @@ class Request_UserInfo_Game
                 return;
             }
 
+            playerDate.m_vipLevel = vipLevel;
             playerDate.m_buffData.Clear();
 
             JArray buff_list = (JArray)JsonConvert.DeserializeObject(jo.GetValue("BuffData").ToString());

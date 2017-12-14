@@ -307,6 +307,11 @@ public class HPServerUtil
             {
                 NetRespond_RetryJoinGame.doAskCilentReq_RetryJoinGame(receiveObj.m_connId, text);
             }
+            // 自定义牌型
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_DebugSetPoker) == 0)
+            {
+                NetRespond_DebugSetPoker.doAskCilentReq_DebugSetPoker(receiveObj.m_connId, text);
+            }
         }
         else
         {
