@@ -1190,10 +1190,21 @@ public class PlayRuleUtil
 
     public static int GetDiPaiBeiLv(List<PokerInfo> pokers, int mLevelPokerNum, int masterPokerType)
     {
+        SetPokerWeight(pokers, mLevelPokerNum, (Consts.PokerType)masterPokerType);
+        
         var tuoLaJi = GetTuoLaJi(pokers, mLevelPokerNum, masterPokerType);
-        if (tuoLaJi.Count > 0) return 8;
+
+        if (tuoLaJi.Count > 0)
+        {
+            return 8;
+        }
+
         List<PokerInfo> doublePoker;
-        if (IsContainDoublePoker(pokers, out doublePoker)) return 4;
+        if (IsContainDoublePoker(pokers, out doublePoker))
+        {
+            return 4;
+        }
+
         return 2;
     }
 }
