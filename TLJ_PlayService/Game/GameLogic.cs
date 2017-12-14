@@ -1518,11 +1518,13 @@ class GameLogic
             bool isFreeOutPoker = false;
             bool curRoundXianJiaWin = false;
 
+            PlayerData maxPlayerData = null;
+
             // 一轮出牌结束
             if (room.m_curRoundFirstPlayer.m_uid.CompareTo(nextPlayerData.m_uid) == 0)
             {
                 // 选出这一轮出的牌最大的人，作为下一轮先出牌的人
-                PlayerData maxPlayerData = CompareWhoMax.compareWhoMax(room);
+                maxPlayerData = CompareWhoMax.compareWhoMax(room);
 
                 room.m_curOutPokerPlayer = maxPlayerData;
                 room.m_curRoundFirstPlayer = maxPlayerData;
@@ -1590,7 +1592,8 @@ class GameLogic
                             }
                         }
 
-                        dipaiScore *= 2;
+                        // 底牌分数X倍率
+                        dipaiScore *= PlayRuleUtil.GetDiPaiBeiLv(maxPlayerData.m_curOutPokerList, room.m_levelPokerNum,room.m_masterPokerType);
                         room.m_getAllScore += dipaiScore;
                     }
 
