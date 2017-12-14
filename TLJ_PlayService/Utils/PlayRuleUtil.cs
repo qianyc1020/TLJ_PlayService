@@ -1187,4 +1187,13 @@ public class PlayRuleUtil
 
         return result;
     }
+
+    public static int GetDiPaiBeiLv(List<PokerInfo> pokers, int mLevelPokerNum, int masterPokerType)
+    {
+        var tuoLaJi = GetTuoLaJi(pokers, mLevelPokerNum, masterPokerType);
+        if (tuoLaJi.Count > 0) return 8;
+        List<PokerInfo> doublePoker;
+        if (IsContainDoublePoker(pokers, out doublePoker)) return 4;
+        return 2;
+    }
 }
