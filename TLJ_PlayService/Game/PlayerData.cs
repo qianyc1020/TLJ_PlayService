@@ -124,9 +124,15 @@ public class PlayerData
     public void clearData()
     {
         m_isBanker = 0;
-        m_isOffLine = false;
+        //m_isOffLine = false;
         m_isTuoGuan = false;
         m_isContinueGame = false;
+        m_isUseJiPaiQi = false;
+
+        m_pokerList.Clear();
+        m_allotPokerList.Clear();
+        m_curOutPokerList.Clear();
+        m_buffData.Clear();
     }
 
     public bool isOffLine()

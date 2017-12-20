@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TLJCommon;
+using TLJ_PlayService;
 
 
 public class PlayRuleUtil
@@ -202,7 +203,7 @@ public class PlayRuleUtil
             minSingle = firestSingleList[0];
         }
         //TLJ_PlayService.PlayService.log.Info("有几个玩家：" + playerDatas.Count);
-
+        //        PlayService.log.Warn($"第一个人出牌uid:{room.m_curRoundFirstPlayer.m_uid}");
         //如果甩的牌都是主牌
         if (IsAllMasterPoker(outPokerList, room.m_levelPokerNum, room.m_masterPokerType))
         {
@@ -210,6 +211,7 @@ public class PlayRuleUtil
             {
                 if (playerDatas[i].m_uid == room.m_curRoundFirstPlayer.m_uid)
                 {
+
                     continue;
                 }
                 //得到其余玩家的手牌
@@ -322,6 +324,18 @@ public class PlayRuleUtil
                     GetAllTljFromDouble(firestDoubleList, mLevelPokerNum, mMasterPokerType);
                 List<List<PokerInfo>> OtherAllTlj =
                     GetAllTljFromDouble(OtherDoubleleList, mLevelPokerNum, mMasterPokerType);
+
+                for (int i = 0; i < firstAllTlj.Count; i++)
+                {
+                    List<PokerInfo> pokerInfos = firstAllTlj[i];
+
+                    for (int j = 0; j < pokerInfos.Count; j++)
+                    {
+                        firestDoubleList.Remove(pokerInfos[j]);
+                    }
+                }
+
+                var count = firestDoubleList.Count;
                 //如果甩牌的对子中包括拖拉机,则和其他玩家手中的拖拉机比较
                 if (firstAllTlj.Count > 0)
                 {
@@ -356,9 +370,24 @@ public class PlayRuleUtil
                             }
                         }
                     }
-                    //其他玩家手中没有拖拉机
+                    //其他玩家手中没有拖拉机,比较对子
                     else
                     {
+                        if (firestDoubleList.Count > 0)
+                        {
+                            if (firestDoubleList[0].m_weight >= OtherDoubleleList[OtherDoubleleList.Count - 1].m_weight)
+                            {
+                                //该玩家牌大，不作处理
+                            }
+                            else
+                            {
+                                //甩牌失败,单牌大，但是对子比别人小
+                                //TLJ_PlayService.PlayService.log.Info("甩牌失败,单牌大，但是对子比别人小");
+                                list.Add(firestDoubleList[0]);
+                                list.Add(firestDoubleList[1]);
+                                return list;
+                            }
+                        }
                         //TLJ_PlayService.PlayService.log.Info("没有拖拉机");
                         //该玩家牌大，不作处理 
                     }
@@ -781,69 +810,6 @@ public class PlayRuleUtil
                     //第一个人出的是主牌
                     List<PokerInfo> masterPoker = GetMasterPoker(tempAll, mLevelPokerNum, masterPokerType);
                     GetPokerWhenShuaiP(firstPokerList, masterPoker, tempAll, count, resultList);
-
-                    //                                List<List<PokerInfo>> allTljFromFirst = GetAllTljFromDouble(firstDoublePoker, mLevelPokerNum, masterPokerType);
-                    //                                List<List<PokerInfo>> allTljFromMy = GetAllTljFromDouble(myDoublePoker, mLevelPokerNum, masterPokerType);
-                    //
-                    //                                for (int i = 0; i < allTljFromFirst.Count; i++)
-                    //                                {
-                    //                                    for (int j = 0; j < allTljFromFirst[i].Count; j++)
-                    //                                    {
-                    //                                        firstDoublePoker.Remove(allTljFromFirst[i][j]);
-                    //                                    }
-                    //                                }
-                    //
-                    //                                for (int i = 0; i < allTljFromMy.Count; i++)
-                    //                                {
-                    //                                    for (int j = 0; j < allTljFromMy[i].Count; j++)
-                    //                                    {
-                    //                                        myDoublePoker.Remove(allTljFromMy[i][j]);
-                    //                                    }
-                    //                                }
-                    //
-                    //
-                    //                                //两个都有拖拉机
-                    //                                if (allTljFromFirst.Count > 0 && allTljFromMy.Count > 0)
-                    //                                {
-                    //                                   
-                    //
-                    //                                    if (allTljFromFirst.Count >= allTljFromMy.Count)
-                    //                                    {
-                    //                                        //将拖拉机全部出去
-                    //                                        foreach (var TljPokerList in allTljFromMy)
-                    //                                        {
-                    //                                            tempAll.AddRange(TljPokerList);
-                    //                                        }
-                    //
-                    //                                        for (int i = 0; i < count - tempAll.Count; i++)
-                    //                                        {
-                    //                                            
-                    //                                        }
-                    //
-                    //                                        
-                    //                                    }
-                    //                                }
-                    //                                //没有拖拉机
-                    //                                else
-                    //                                {
-                    //                                    for (int i = 0; i < firstDoublePoker.Count; i++)
-                    //                                    {
-                    //                                        tempList.Add(myDoublePoker[i]);
-                    //                                        myDoublePoker.Remove(myDoublePoker[i]);
-                    //                                    }
-                    //
-                    //                                    for (int i = 0; i < firstSinglePoker.Count; i++)
-                    //                                    {
-                    //                                        if (mySinglePoker.Count == 0)
-                    //                                        {
-                    //                                            tempList.Add(myDoublePoker[i]);
-                    //                                        }
-                    //                                        else
-                    //                                        {
-                    //                                            tempList.Add(mySinglePoker[i]);
-                    //                                        }
-                    //                                    }
-                    //                                }
                 }
                 //甩的是副牌
                 else
@@ -857,6 +823,12 @@ public class PlayRuleUtil
                 break;
         }
 
+        if (firstPokerList.Count != resultList.Count)
+        {
+            TLJ_PlayService.PlayService.log.Warn($"托管的出的牌的牌数不一致,托管出了{resultList.Count}张,第一个人出了{firstPokerList.Count}张");
+        }
+
+        TLJ_PlayService.PlayService.log.Warn($"托管跟牌数：{resultList.Count},{Newtonsoft.Json.JsonConvert.SerializeObject(resultList)}");
         return resultList;
     }
 
@@ -925,8 +897,7 @@ public class PlayRuleUtil
     }
 
     private static void GetPokerWhenTlj(List<PokerInfo> myPokerList, List<PokerInfo> masterPoker,
-        List<PokerInfo> tempList, int count, int mLevelPokerNum,
-        int masterPokerType)
+        List<PokerInfo> tempList, int count, int mLevelPokerNum, int masterPokerType)
     {
         //从手牌中去除该类型的牌
         foreach (var poker in masterPoker)
@@ -971,27 +942,27 @@ public class PlayRuleUtil
                 }
                 else
                 {
-                    List<PokerInfo> tljList = allTljFromDouble[0];
-
-                    if (tljList.Count >= count)
+                    foreach (var tljList in allTljFromDouble)
                     {
-                        for (int i = 0; i < count; i++)
+                        if (tljList.Count >= count)
                         {
-                            tempList.Add(tljList[i]);
+                            for (int i = 0; i < count; i++)
+                            {
+                                tempList.Add(tljList[i]);
+                            }
+                            return;
                         }
                     }
+
                     //拖拉机没有第一家的长
-                    else
+                    tempList.AddRange(allTljFromDouble[0]);
+                    foreach (var poker in allTljFromDouble[0])
                     {
-                        tempList.AddRange(tljList);
-                        foreach (var poker in tljList)
-                        {
-                            doublePoker.Remove(poker);
-                        }
-                        for (int j = 0; j < count - tljList.Count; j++)
-                        {
-                            tempList.Add(doublePoker[j]);
-                        }
+                        doublePoker.Remove(poker);
+                    }
+                    for (int j = 0; j < count - allTljFromDouble[0].Count; j++)
+                    {
+                        tempList.Add(doublePoker[j]);
                     }
                 }
             }
@@ -1079,7 +1050,7 @@ public class PlayRuleUtil
     }
 
     /// <summary>
-    /// 得到能够亮主的牌
+    /// 只在客户端调用,得到能够亮主的牌
     /// </summary>
     /// <param name="handerPoker"></param>
     /// <param name="liangZhuPoker"></param>
@@ -1104,9 +1075,23 @@ public class PlayRuleUtil
                     pokerInfos.Add(handerPoker[i]);
                 }
             }
+            List<PokerInfo> doublePoker = PlayRuleUtil.GetDoublePoker(jiPaiAndWang);
+            //大小王
+            foreach (var poker in doublePoker)
+            {
+                if (poker.m_pokerType == Consts.PokerType.PokerType_Wang)
+                {
+                    pokerInfos.Add(poker);
+                }
+            }
             return pokerInfos;
         }
-        else if (liangZhuPoker.Count == 2 || liangZhuPoker.Count == 1)
+        else if (liangZhuPoker.Count == 1)
+        {
+            List<PokerInfo> doublePoker = PlayRuleUtil.GetDoublePoker(jiPaiAndWang);
+            return doublePoker;
+        }
+        else if (liangZhuPoker.Count == 2)
         {
             Consts.PokerType mPokerType = liangZhuPoker[0].m_pokerType;
             List<PokerInfo> doublePoker = PlayRuleUtil.GetDoublePoker(jiPaiAndWang);
@@ -1117,6 +1102,13 @@ public class PlayRuleUtil
                     pokerInfos.Add(doublePoker[i]);
                     pokerInfos.Add(doublePoker[i + 1]);
                 }
+
+                if (liangZhuPoker[0].m_num == 15 && doublePoker[i].m_num == 16)
+                {
+                    pokerInfos.Add(doublePoker[i]);
+                    pokerInfos.Add(doublePoker[i + 1]);
+                    //                    ToastScript.createToast("dawang");
+                }
             }
             return pokerInfos;
         }
@@ -1126,7 +1118,8 @@ public class PlayRuleUtil
         }
     }
 
-    public static List<PokerInfo> GetPokerWhenFirst(List<PokerInfo> handerPoker, int mLevelPokerNum, int masterPokerType)
+    public static List<PokerInfo> GetPokerWhenFirst(List<PokerInfo> handerPoker, int mLevelPokerNum,
+        int masterPokerType)
     {
         SetPokerWeight(handerPoker, mLevelPokerNum, (Consts.PokerType)masterPokerType);
 
@@ -1160,7 +1153,6 @@ public class PlayRuleUtil
         }
         if (doublePoker.Count > 0)
         {
-
             result.Add(doublePoker[doublePoker.Count - 1]);
             result.Add(doublePoker[doublePoker.Count - 2]);
         }
@@ -1184,27 +1176,17 @@ public class PlayRuleUtil
                 }
             }
         }
-
+        TLJ_PlayService.PlayService.log.Warn($"第一个人出牌数：{result.Count},{Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
         return result;
     }
 
     public static int GetDiPaiBeiLv(List<PokerInfo> pokers, int mLevelPokerNum, int masterPokerType)
     {
         SetPokerWeight(pokers, mLevelPokerNum, (Consts.PokerType)masterPokerType);
-        
         var tuoLaJi = GetTuoLaJi(pokers, mLevelPokerNum, masterPokerType);
-
-        if (tuoLaJi.Count > 0)
-        {
-            return 8;
-        }
-
+        if (tuoLaJi.Count > 0) return 8;
         List<PokerInfo> doublePoker;
-        if (IsContainDoublePoker(pokers, out doublePoker))
-        {
-            return 4;
-        }
-
+        if (IsContainDoublePoker(pokers, out doublePoker)) return 4;
         return 2;
     }
 }

@@ -29,7 +29,7 @@ class Request_ProgressTask
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_ProgressTask----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_ProgressTask----" + ex.Message);
         }
     }
 }

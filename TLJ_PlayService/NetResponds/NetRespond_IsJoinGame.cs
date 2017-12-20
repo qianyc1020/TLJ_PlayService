@@ -33,7 +33,7 @@ class NetRespond_IsJoinGame
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("NetRespond_IsJoinGame----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("NetRespond_IsJoinGame----" + ex.Message);
 
             // 客户端参数错误
             respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));

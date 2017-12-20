@@ -16,8 +16,8 @@ public class RoomData
     public string m_gameRoomType;
     public int m_rounds_pvp = 1;
     public int m_outPokerDur = 15000;       // 出牌时间：毫秒
-    public int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
-    //public int m_tuoguanOutPokerDur = 500; // 托管出牌时间:毫秒
+    //public int m_tuoguanOutPokerDur = 2000; // 托管出牌时间:毫秒
+    public int m_tuoguanOutPokerDur = 500; // 托管出牌时间:毫秒
     public int m_qiangzhuTime = 10000;      // 抢主时间：毫秒
     public int m_maidiTime = 40000;         // 埋底时间：毫秒
     public int m_chaodiTime = 10000;        // 炒底时间：毫秒

@@ -218,7 +218,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("GameUtil.checkRoomStartGame()----" + ex.Message + "tag:" + tag + "  roomid:" + room.getRoomId() + "gameroomtype:" + room.m_gameRoomType);
+            TLJ_PlayService.PlayService.log.Error("GameUtil.checkRoomStartGame()----" + ex.Message + "tag:" + tag + "  roomid:" + room.getRoomId() + "gameroomtype:" + room.m_gameRoomType);
         }
     }
 
@@ -410,7 +410,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_ContinueGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ContinueGame异常：" + ex.Message);
         }
     }
 
@@ -504,7 +504,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":ChangeRoom异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":ChangeRoom异常：" + ex.Message);
         }
     }
 
@@ -539,7 +539,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_Chat异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_Chat异常：" + ex.Message);
         }
     }
 
@@ -592,7 +592,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_TuoGuan：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_TuoGuan：" + ex.Message);
         }
     }
 
@@ -663,7 +663,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_ExitGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ExitGame异常：" + ex.Message);
         }
     }
 
@@ -711,7 +711,7 @@ class GameLogic
                             }
                             else
                             {
-                                LogUtil.getInstance().addErrorLog(m_logFlag + "----" + "机器人不足");
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + "机器人不足");
                             }
                         }
 
@@ -723,7 +723,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex.Message);
         }
     }
 
@@ -780,29 +780,60 @@ class GameLogic
             string uid = jo.GetValue("uid").ToString();
             int playAction = Convert.ToInt32(jo.GetValue("playAction"));
 
-            for (int i = 0; i < gameBase.getRoomList().Count; i++)
+            
+            RoomData room = GameUtil.getRoomByUid(uid);
+            if (room == null)
             {
-                RoomData room = gameBase.getRoomList()[i];
-                List<PlayerData> playerDataList = room.getPlayerDataList();
+                return;
+            }
 
-                for (int j = 0; j < playerDataList.Count; j++)
+            PlayerData playerData = room.getPlayerDataByUid(uid);
+            if (playerData == null)
+            {
+                return;
+            }
+
+            {
+                bool isQiangZhuSuccess = false;
+                List<TLJCommon.PokerInfo> qiangzhuPokerList = new List<TLJCommon.PokerInfo>();
+                JArray ja = (JArray)JsonConvert.DeserializeObject(jo.GetValue("pokerList").ToString());
+                for (int k = 0; k < ja.Count; k++)
                 {
-                    if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                    int num = Convert.ToInt32(ja[k]["num"]);
+                    int pokerType = Convert.ToInt32(ja[k]["pokerType"]);
+
+                    qiangzhuPokerList.Add(new PokerInfo(num, (Consts.PokerType)pokerType));
+                }
+
+                if (room.m_zhuangjiaPlayerData == null)
+                {
+                    room.m_zhuangjiaPlayerData = playerData;
+                    room.m_qiangzhuPokerList = qiangzhuPokerList;
+
+                    // 设置主牌花色
+                    room.m_masterPokerType = (int)room.m_qiangzhuPokerList[0].m_pokerType;
+
+                    isQiangZhuSuccess = true;
+                }
+                else
+                {
+                    if (qiangzhuPokerList.Count > room.m_qiangzhuPokerList.Count)
                     {
-                        bool isQiangZhuSuccess = false;
-                        List<TLJCommon.PokerInfo> qiangzhuPokerList = new List<TLJCommon.PokerInfo>();
-                        JArray ja = (JArray)JsonConvert.DeserializeObject(jo.GetValue("pokerList").ToString());
-                        for (int k = 0; k < ja.Count; k++)
-                        {
-                            int num = Convert.ToInt32(ja[k]["num"]);
-                            int pokerType = Convert.ToInt32(ja[k]["pokerType"]);
+                        room.m_qiangzhuPokerList.Clear();
+                        room.m_zhuangjiaPlayerData = playerData;
+                        room.m_qiangzhuPokerList = qiangzhuPokerList;
 
-                            qiangzhuPokerList.Add(new PokerInfo(num, (Consts.PokerType)pokerType));
-                        }
+                        // 设置主牌花色
+                        room.m_masterPokerType = (int)room.m_qiangzhuPokerList[0].m_pokerType;
 
-                        if (room.m_zhuangjiaPlayerData == null)
+                        isQiangZhuSuccess = true;
+                    }
+                    else
+                    {
+                        if (qiangzhuPokerList[0].m_pokerType > room.m_qiangzhuPokerList[0].m_pokerType)
                         {
-                            room.m_zhuangjiaPlayerData = playerDataList[j];
+                            room.m_qiangzhuPokerList.Clear();
+                            room.m_zhuangjiaPlayerData = playerData;
                             room.m_qiangzhuPokerList = qiangzhuPokerList;
 
                             // 设置主牌花色
@@ -810,12 +841,13 @@ class GameLogic
 
                             isQiangZhuSuccess = true;
                         }
-                        else
+                        // 大小王单独处理
+                        else if ((qiangzhuPokerList[0].m_pokerType == PokerType.PokerType_Wang) && (room.m_qiangzhuPokerList[0].m_pokerType == PokerType.PokerType_Wang))
                         {
-                            if (qiangzhuPokerList.Count > room.m_qiangzhuPokerList.Count)
+                            if (qiangzhuPokerList[0].m_num > room.m_qiangzhuPokerList[0].m_num)
                             {
                                 room.m_qiangzhuPokerList.Clear();
-                                room.m_zhuangjiaPlayerData = playerDataList[j];
+                                room.m_zhuangjiaPlayerData = playerData;
                                 room.m_qiangzhuPokerList = qiangzhuPokerList;
 
                                 // 设置主牌花色
@@ -823,44 +855,37 @@ class GameLogic
 
                                 isQiangZhuSuccess = true;
                             }
-                            else
-                            {
-                                if (qiangzhuPokerList[0].m_pokerType > room.m_qiangzhuPokerList[0].m_pokerType)
-                                {
-                                    room.m_qiangzhuPokerList.Clear();
-                                    room.m_zhuangjiaPlayerData = playerDataList[j];
-                                    room.m_qiangzhuPokerList = qiangzhuPokerList;
-
-                                    // 设置主牌花色
-                                    room.m_masterPokerType = (int)room.m_qiangzhuPokerList[0].m_pokerType;
-
-                                    isQiangZhuSuccess = true;
-                                }
-                            }
-                        }
-
-                        // 通知客户端
-                        if (isQiangZhuSuccess)
-                        {
-                            JObject respondJO = new JObject();
-                            respondJO.Add("tag", tag);
-                            respondJO.Add("playAction", playAction);
-                            respondJO.Add("uid", uid);
-                            respondJO.Add("pokerList", jo.GetValue("pokerList"));
-
-                            // 发送给客户端
-                            for (int k = 0; k < playerDataList.Count; k++)
-                            {
-                                PlayService.m_serverUtil.sendMessage(playerDataList[k].m_connId, respondJO.ToString());
-                            }
                         }
                     }
+                }
+
+                // 通知客户端
+                if (isQiangZhuSuccess)
+                {
+                    JObject respondJO = new JObject();
+                    respondJO.Add("tag", tag);
+                    respondJO.Add("playAction", playAction);
+                    respondJO.Add("uid", uid);
+                    respondJO.Add("pokerList", jo.GetValue("pokerList"));
+
+                    // 发送给客户端
+                    for (int k = 0; k < room.getPlayerDataList().Count; k++)
+                    {
+                        if (!room.getPlayerDataList()[k].isOffLine())
+                        {
+                            PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[k].m_connId, respondJO.ToString());
+                        }
+                    }
+                }
+                else
+                {
+                    TLJ_PlayService.PlayService.log.Debug(m_logFlag + "----" + ":doTask_QiangZhu失败");
                 }
             }
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_QiangZhu异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_QiangZhu异常：" + ex.Message);
         }
     }
 
@@ -990,7 +1015,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_MaiDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_MaiDi异常：" + ex.Message);
         }
     }
 
@@ -1089,18 +1114,18 @@ class GameLogic
                             }
                             else if (j <= 2)
                             {
-                                PlayService.log.Warn("该房间人数：" + room.getPlayerDataList().Count + "  J=" + j);
+                                PlayService.log.Info("该房间人数：" + room.getPlayerDataList().Count + "  J=" + j);
 
                                 for (int m = 0; m < room.getPlayerDataList().Count; m++)
                                 {
-                                    PlayService.log.Warn("该房间玩家信息：" + room.getRoomId() +"    "+ room.getPlayerDataList()[m].m_uid);
+                                    PlayService.log.Info("该房间玩家信息：" + room.getRoomId() +"    "+ room.getPlayerDataList()[m].m_uid);
                                 }
 
                                 playerDataNext = room.getPlayerDataList()[j + 1];
                             }
                             else
                             {
-                                LogUtil.getInstance().addErrorLog("m_logFlag----doTask_PlayerChaoDi：J越界，直接开始游戏");
+                                TLJ_PlayService.PlayService.log.Error("m_logFlag----doTask_PlayerChaoDi：J越界，直接开始游戏");
                                 playerDataNext = room.m_zhuangjiaPlayerData;
                             }
 
@@ -1128,7 +1153,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_PlayerChaoDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_PlayerChaoDi异常：" + ex.Message);
             PlayService.log.Warn(ex);
         }
     }
@@ -1176,7 +1201,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_CallPlayerOutPoker异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_CallPlayerOutPoker异常：" + ex.Message);
         }
     }
 
@@ -1248,7 +1273,7 @@ class GameLogic
                                 {
                                     // 提交任务
                                     {
-                                        Request_ProgressTask.doRequest(uid, 208);
+                                        Request_ProgressTask.doRequest(uid, 209);
                                     }
 
                                     // 处理此人出的牌
@@ -1349,7 +1374,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_ReceivePlayerOutPoker异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ReceivePlayerOutPoker异常：" + ex.Message);
         }
     }
 
@@ -1691,7 +1716,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":callPlayerMaiDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerMaiDi异常：" + ex.Message);
         }
     }
 
@@ -1745,7 +1770,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":callPlayerChaoDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerChaoDi异常：" + ex.Message);
         }
     }
 }

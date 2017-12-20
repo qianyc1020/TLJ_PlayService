@@ -340,7 +340,7 @@ class GameUtil
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("GameUtil.setPlayerScore()----" + ex.Message + "gameRoomType:" + room.m_gameRoomType);
+            TLJ_PlayService.PlayService.log.Error("GameUtil.setPlayerScore()----" + ex.Message + "gameRoomType:" + room.m_gameRoomType);
         }
     }
 

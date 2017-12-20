@@ -29,7 +29,7 @@ class Request_UserInfo_Game
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.doRequest----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_UserInfo_Game.doRequest----" + ex.Message);
         }
     }
 
@@ -44,7 +44,7 @@ class Request_UserInfo_Game
             PlayerData playerDate = GameUtil.getRoomByUid(uid).getPlayerDataByUid(uid);
             if (playerDate == null)
             {
-                LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.onMySqlRespond----游戏服务器里没有此人数据：" + uid + "," + respondData);
+                TLJ_PlayService.PlayService.log.Error("Request_UserInfo_Game.onMySqlRespond----游戏服务器里没有此人数据：" + uid + "," + respondData);
                 return;
             }
 
@@ -68,7 +68,7 @@ class Request_UserInfo_Game
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("Request_UserInfo_Game.onMySqlRespond----" + ex.Message + "," + respondData);
+            TLJ_PlayService.PlayService.log.Error("Request_UserInfo_Game.onMySqlRespond----" + ex.Message + "," + respondData);
 
             // 客户端参数错误
             //respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));

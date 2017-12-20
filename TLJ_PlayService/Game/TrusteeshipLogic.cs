@@ -73,7 +73,7 @@ public class TrusteeshipLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":trusteeshipLogic异常1：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":trusteeshipLogic异常1：" + ex.Message);
         }
     }
 
@@ -127,7 +127,7 @@ public class TrusteeshipLogic
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ".trusteeshipLogic_MaiDi: " + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".trusteeshipLogic_MaiDi: " + ex.Message);
         }
     }
 

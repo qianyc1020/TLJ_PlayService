@@ -30,7 +30,7 @@ class Request_RecordUserGameData
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_RecordUserGameData----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_RecordUserGameData----" + ex.Message);
         }
     }
 }

@@ -33,7 +33,7 @@ class NetRespond_DebugSetPoker
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("NetRespond_DebugSetPoker.doAskCilentReq_DebugSetPoker----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("NetRespond_DebugSetPoker.doAskCilentReq_DebugSetPoker----" + ex.Message);
 
             //// 发送给客户端
             //PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());

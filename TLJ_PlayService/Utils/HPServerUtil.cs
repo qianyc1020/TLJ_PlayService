@@ -206,7 +206,7 @@ public class HPServerUtil
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("OnReceive:" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("OnReceive:" + ex.Message);
         }
 
         return HandleResult.Ok;

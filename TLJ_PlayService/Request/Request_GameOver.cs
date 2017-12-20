@@ -29,7 +29,7 @@ class Request_GameOver
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_GameOver.doRequest----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_GameOver.doRequest----" + ex.Message);
         }
     }
 }

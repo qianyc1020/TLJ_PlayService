@@ -36,7 +36,7 @@ class Request_SendMailToUser
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_SendMailToUser----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_SendMailToUser----" + ex.Message);
         }
     }
 }

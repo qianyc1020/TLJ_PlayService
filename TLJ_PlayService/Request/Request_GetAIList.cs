@@ -30,7 +30,7 @@ class Request_GetAIList
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_GetAIList.doRequest----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_GetAIList.doRequest----" + ex.Message);
         }
     }
 
@@ -42,7 +42,7 @@ class Request_GetAIList
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("Request_GetAIList.onMySqlRespond----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_GetAIList.onMySqlRespond----" + ex.Message);
 
             // 客户端参数错误
             //respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));

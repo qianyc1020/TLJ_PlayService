@@ -219,7 +219,7 @@ class PlayLogic_Relax: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex);
         }
     }
 
@@ -465,7 +465,7 @@ class PlayLogic_Relax: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTaskPlayerCloseConn异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTaskPlayerCloseConn异常：" + ex);
         }
 
         return false;
@@ -477,6 +477,7 @@ class PlayLogic_Relax: GameBase
         try
         {
             room.m_roomState = RoomState.RoomState_end;
+            room.m_masterPokerType = -1;
 
             //LogUtil.getInstance().addDebugLog("比赛结束，解散该房间：" + room.getRoomId());
             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
@@ -646,7 +647,7 @@ class PlayLogic_Relax: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":gameOver异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":gameOver异常：" + ex);
         }
     }
 }

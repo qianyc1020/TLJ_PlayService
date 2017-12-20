@@ -169,7 +169,7 @@ class PlayLogic_PVP: GameBase
                     JObject respondJO = new JObject();
                     respondJO.Add("tag", tag);
                     respondJO.Add("playAction", playAction);
-                    respondJO.Add("gameroomtype", gameroomtype);
+                    respondJO.Add("gameRoomType", GameUtil.getRoomByUid(uid).m_gameRoomType);
                     respondJO.Add("code", (int) TLJCommon.Consts.Code.Code_CommonFail);
 
                     // 发送给客户端
@@ -223,7 +223,7 @@ class PlayLogic_PVP: GameBase
                 JObject respondJO = new JObject();
                 respondJO.Add("tag", tag);
                 respondJO.Add("playAction", playAction);
-                respondJO.Add("gameroomtype", gameroomtype);
+                respondJO.Add("gameRoomType", gameroomtype);
                 respondJO.Add("code", (int) TLJCommon.Consts.Code.Code_OK);
                 respondJO.Add("roomId", room.getRoomId());
 
@@ -236,7 +236,7 @@ class PlayLogic_PVP: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex);
         }
     }
 
@@ -319,7 +319,7 @@ class PlayLogic_PVP: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTask_ExitPVP异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ExitPVP异常：" + ex);
         }
     }
 
@@ -592,7 +592,7 @@ class PlayLogic_PVP: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":doTaskPlayerCloseConn异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTaskPlayerCloseConn异常：" + ex);
         }
 
         return false;
@@ -859,6 +859,7 @@ class PlayLogic_PVP: GameBase
                                     {
                                         if (m_roomList[j].joinPlayer(winPlayerList[i]))
                                         {
+                                            winPlayerList[i].clearData();
                                             room = m_roomList[j];
                                             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":找到新房间：" + room.getRoomId());
 
@@ -870,6 +871,8 @@ class PlayLogic_PVP: GameBase
                                 // 当前没有房间可加入的话则创建一个新的房间
                                 if (room == null)
                                 {
+                                    winPlayerList[i].clearData();
+
                                     room = new RoomData(this, m_roomList.Count + 1, gameRoomType);
                                     room.joinPlayer(winPlayerList[i]);
                                     room.m_rounds_pvp = rounds_pvp + 1;
@@ -982,7 +985,7 @@ class PlayLogic_PVP: GameBase
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog(m_logFlag + "----" + ":gameOver异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":gameOver异常：" + ex);
         }
     }
 

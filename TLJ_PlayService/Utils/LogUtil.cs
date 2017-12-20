@@ -79,6 +79,8 @@ class LogUtil
     // 添加Debug日志，\r\n为换行
     public void addDebugLog(string data)
     {
+        TLJ_PlayService.PlayService.log.Info(data);
+        /**
         if (!m_isStartRecordLog)
         {
             Debug.WriteLine("插入日志失败，日志记录未开启");
@@ -93,11 +95,14 @@ class LogUtil
         {
             m_waitRecoedDebugLogList.Add(getCurTime() + "----" + data);
         }
+        */
     }
 
     // 添加Error日志，\r\n为换行
     public void addErrorLog(string data)
     {
+        TLJ_PlayService.PlayService.log.Warn(data);
+        /**
         if (!m_isStartRecordLog)
         {
             Debug.WriteLine("插入日志失败，日志记录未开启");
@@ -112,6 +117,7 @@ class LogUtil
         {
             m_waitRecoedErrorLogList.Add(getCurTime() + "----" + data);
         }
+        */
     }
 
     // 立刻写到日志文本里面，不要常用

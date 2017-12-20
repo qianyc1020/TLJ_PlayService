@@ -35,7 +35,7 @@ class Request_ChangeUserWealth
         catch (Exception ex)
         {
             // 客户端参数错误
-            LogUtil.getInstance().addErrorLog("Request_ChangeUserWealth----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("Request_ChangeUserWealth----" + ex.Message);
         }
     }
 }

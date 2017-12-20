@@ -249,7 +249,7 @@ class NetRespond_RetryJoinGame
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("NetRespond_RetryJoinGame----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("NetRespond_RetryJoinGame----" + ex);
 
             // 客户端参数错误
             respondJO.Add("code", Convert.ToInt32(TLJCommon.Consts.Code.Code_ParamError));

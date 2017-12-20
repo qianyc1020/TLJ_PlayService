@@ -49,7 +49,7 @@ class AIDataScript
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("AIDataScript.initJson----" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("AIDataScript.initJson----" + ex.Message);
         }
     }
 

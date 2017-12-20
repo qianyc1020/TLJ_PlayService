@@ -25,7 +25,7 @@ public class MySqlServerUtil
         // 设置包头标识,与对端设置保证一致性
         m_tcpClient.PackHeaderFlag = 0xff;
         // 设置最大封包大小
-        m_tcpClient.MaxPackSize = 0x1000;
+        m_tcpClient.MaxPackSize = TLJCommon.Consts.MaxPackSize;
     }
 
     public void start()
@@ -170,7 +170,7 @@ public class MySqlServerUtil
         }
         catch (Exception ex)
         {
-            LogUtil.getInstance().addErrorLog("MySqlServerUtil.OnReceive----异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error("MySqlServerUtil.OnReceive----异常：" + ex.Message);
         }
 
         return HandleResult.Ok;
