@@ -116,6 +116,12 @@ public class PVPGameRoomData
     public string gameroomtype;
     public string gameroomname;
     public int kaisairenshu;
+
     public string baomingfei;
+    public int baomingfei_type = 0;
+    public int baomingfei_num = 0;
+
     public string reward;
+    public int reward_id = 0;
+    public int reward_num = 0;
 }

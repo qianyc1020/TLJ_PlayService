@@ -110,26 +110,11 @@ class GameUtil
         return doubleList;
     }
 
-    public static void checkAllOffLine(RoomData room)
-    {
-        bool isAllOffLine = true;
-        for (int i = 0; i < room.getPlayerDataList().Count; i++)
-        {
-            if (!room.getPlayerDataList()[i].isOffLine())
-            {
-                isAllOffLine = false;
-                break;
-            }
-        }
-
-        if (isAllOffLine)
-        {
-            //room.m_tuoguanOutPokerDur = 100;
-        }
-    }
-
     public static bool checkRoomNonePlayer(RoomData room)
     {
+        // 清理机器人和离线的人
+        clearRoomNonePlayer(room);
+
         bool isRemove = true;
         if (room.getPlayerDataList().Count > 0)
         {
@@ -147,6 +132,8 @@ class GameUtil
             if (room.getPlayerDataList()[i].m_isAI)
             {
                 LogUtil.getInstance().addDebugLog("清理机器人：" + room.getPlayerDataList()[i].m_uid);
+
+                AIDataScript.getInstance().backOneAI(room.getPlayerDataList()[i].m_uid);
                 room.getPlayerDataList().RemoveAt(i);
             }
         }
@@ -346,116 +333,175 @@ class GameUtil
 
     public static void setPVPReward(PVPRoomPlayerList curPVPRoomPlayerList)
     {
-        if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_8) == 0)
+        string gameRoomType = curPVPRoomPlayerList.m_gameRoomType;
+
+        List<string> list = new List<string>();
+        CommonUtil.splitStr(gameRoomType, list, '_');
+
+        if (list.Count == 3)
         {
-            // 第一名
+            if (list[0].CompareTo("PVP") == 0)
             {
-                int getHuiZhangNum = 2;
-                int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
-                
-                if ((vipLevel >= 2) && (vipLevel <= 4))
-                {
-                    getHuiZhangNum += 1;
-                }
-                else if ((vipLevel >= 5) && (vipLevel <= 7))
-                {
-                    getHuiZhangNum += 2;
-                }
-                else if ((vipLevel >= 8) && (vipLevel <= 10))
-                {
-                    getHuiZhangNum += 3;
-                }
+                PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(gameRoomType);
 
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:10000;110:" + getHuiZhangNum;
-            }
-
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:7000;110:1";
-            }
-        }
-        else if(curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_16) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 2;
-                int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
-
-                if ((vipLevel >= 2) && (vipLevel <= 4))
+                // PVP-金币场
+                if (list[1].CompareTo("JinBi") == 0)
                 {
-                    getHuiZhangNum += 1;
-                }
-                else if ((vipLevel >= 5) && (vipLevel <= 7))
-                {
-                    getHuiZhangNum += 2;
-                }
-                else if ((vipLevel >= 8) && (vipLevel <= 10))
-                {
-                    getHuiZhangNum += 3;
-                }
+                    // 5000金币场
+                    if (pvpGameRoomData.reward_num == 5000)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 2;
+                            int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
 
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:20000;110:" + getHuiZhangNum;
-            }
+                            if ((vipLevel >= 2) && (vipLevel <= 4))
+                            {
+                                getHuiZhangNum += 1;
+                            }
+                            else if ((vipLevel >= 5) && (vipLevel <= 7))
+                            {
+                                getHuiZhangNum += 2;
+                            }
+                            else if ((vipLevel >= 8) && (vipLevel <= 10))
+                            {
+                                getHuiZhangNum += 3;
+                            }
 
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:15000;110:1";
-            }
-        }
-        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_8) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 1;
-                int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:5000;110:" + getHuiZhangNum;
+                        }
 
-                if ((vipLevel >= 2) && (vipLevel <= 4))
-                {
-                    getHuiZhangNum += 1;
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:2000;110:1";
+                        }
+                    }
+                    // 15000金币场
+                    else if (pvpGameRoomData.reward_num == 15000)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 2;
+                            int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
+
+                            if ((vipLevel >= 2) && (vipLevel <= 4))
+                            {
+                                getHuiZhangNum += 1;
+                            }
+                            else if ((vipLevel >= 5) && (vipLevel <= 7))
+                            {
+                                getHuiZhangNum += 2;
+                            }
+                            else if ((vipLevel >= 8) && (vipLevel <= 10))
+                            {
+                                getHuiZhangNum += 3;
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:15000;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:10000;110:1";
+                        }
+                    }
+                    // 50000金币场
+                    else if (pvpGameRoomData.reward_num == 50000)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 3;
+                            int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
+
+                            if ((vipLevel >= 2) && (vipLevel <= 4))
+                            {
+                                getHuiZhangNum += 1;
+                            }
+                            else if ((vipLevel >= 5) && (vipLevel <= 7))
+                            {
+                                getHuiZhangNum += 2;
+                            }
+                            else if ((vipLevel >= 8) && (vipLevel <= 10))
+                            {
+                                getHuiZhangNum += 3;
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:50000;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:30000;110:2";
+                        }
+
+                        // 第三名
+                        {
+                            curPVPRoomPlayerList.m_playerList[2].m_pvpReward = "1:10000;110:1";
+                        }
+                    }
                 }
-                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                // PVP-话费场
+                else if (list[1].CompareTo("HuaFei") == 0)
                 {
-                    getHuiZhangNum += 2;
-                }
-                else if ((vipLevel >= 8) && (vipLevel <= 10))
-                {
-                    getHuiZhangNum += 3;
-                }
+                    // 1元话费场
+                    if (pvpGameRoomData.reward_num == 1)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 1;
+                            int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
 
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "111:1;110:" + getHuiZhangNum;
-            }
+                            if ((vipLevel >= 2) && (vipLevel <= 4))
+                            {
+                                getHuiZhangNum += 1;
+                            }
+                            else if ((vipLevel >= 5) && (vipLevel <= 7))
+                            {
+                                getHuiZhangNum += 2;
+                            }
+                            else if ((vipLevel >= 8) && (vipLevel <= 10))
+                            {
+                                getHuiZhangNum += 3;
+                            }
 
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000;110:1";
-            }
-        }
-        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_16) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 2;
-                int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "111:1;110:" + getHuiZhangNum;
+                        }
 
-                if ((vipLevel >= 2) && (vipLevel <= 4))
-                {
-                    getHuiZhangNum += 1;
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000;110:1";
+                        }
+                    }
+                    // 5元话费场
+                    else if (pvpGameRoomData.reward_num == 5)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 2;
+                            int vipLevel = curPVPRoomPlayerList.m_playerList[0].m_vipLevel;
+
+                            if ((vipLevel >= 2) && (vipLevel <= 4))
+                            {
+                                getHuiZhangNum += 1;
+                            }
+                            else if ((vipLevel >= 5) && (vipLevel <= 7))
+                            {
+                                getHuiZhangNum += 2;
+                            }
+                            else if ((vipLevel >= 8) && (vipLevel <= 10))
+                            {
+                                getHuiZhangNum += 3;
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "112:1;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:5000;110:1";
+                        }
+                    }
                 }
-                else if ((vipLevel >= 5) && (vipLevel <= 7))
-                {
-                    getHuiZhangNum += 2;
-                }
-                else if ((vipLevel >= 8) && (vipLevel <= 10))
-                {
-                    getHuiZhangNum += 3;
-                }
-
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "112:1;110:" + getHuiZhangNum;
-            }
-
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:10000;110:1";
             }
         }
     }
@@ -565,6 +611,45 @@ class GameUtil
             for (int j = 0; j < playerDataList.Count; j++)
             {
                 if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                {
+                    playerData = playerDataList[j];
+
+                    return playerData;
+                }
+            }
+        }
+
+        return playerData;
+    }
+
+    public static PlayerData getPlayerDataByConnId(IntPtr connId)
+    {
+        PlayerData playerData = null;
+
+        // 先在休闲场里找
+        for (int i = 0; i < PlayLogic_Relax.getInstance().getRoomList().Count; i++)
+        {
+            List<PlayerData> playerDataList = PlayLogic_Relax.getInstance().getRoomList()[i].getPlayerDataList();
+
+            for (int j = 0; j < playerDataList.Count; j++)
+            {
+                if (playerDataList[j].m_connId== connId)
+                {
+                    playerData = playerDataList[j];
+
+                    return playerData;
+                }
+            }
+        }
+
+        // 然后在比赛场里找
+        for (int i = 0; i < PlayLogic_PVP.getInstance().getRoomList().Count; i++)
+        {
+            List<PlayerData> playerDataList = PlayLogic_PVP.getInstance().getRoomList()[i].getPlayerDataList();
+
+            for (int j = 0; j < playerDataList.Count; j++)
+            {
+                if (playerDataList[j].m_connId == connId)
                 {
                     playerData = playerDataList[j];
 

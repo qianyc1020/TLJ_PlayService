@@ -30,7 +30,7 @@ class NetRespond_OnlineInfo
                 {
                     JObject temp = new JObject();
                     temp.Add("room_id", PlayLogic_Relax.getInstance().getRoomList()[i].getRoomId());
-                    temp.Add("room_state", (int)PlayLogic_Relax.getInstance().getRoomList()[i].m_roomState);
+                    temp.Add("room_state", (int)PlayLogic_Relax.getInstance().getRoomList()[i].getRoomState());
 
                     string str = "";
                     for (int j = 0; j < PlayLogic_Relax.getInstance().getRoomList()[i].getPlayerDataList().Count; j++)

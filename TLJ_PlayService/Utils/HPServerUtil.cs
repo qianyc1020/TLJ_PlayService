@@ -99,7 +99,26 @@ public class HPServerUtil
 
         if (m_tcpServer.Send(connId, bytes, bytes.Length))
         {
-            LogUtil.getInstance().addDebugLog("发送消息给客户端：" + text);
+            // 日志
+            {
+                PlayerData playerData = GameUtil.getPlayerDataByConnId(connId);
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "发送消息给客户端：" + text);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("发送消息给客户端：" + text);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("发送消息给客户端：" + text);
+                }
+            }
         }
         else
         {
@@ -165,7 +184,28 @@ public class HPServerUtil
         try
         {
             string text = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            LogUtil.getInstance().addDebugLog("收到客户端原始消息：" + text);
+
+            // 日志
+            {
+                PlayerData playerData = GameUtil.getPlayerDataByConnId(connId);
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "收到客户端原始消息：" + text);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("收到客户端原始消息：" + text);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("收到客户端原始消息：" + text);
+                }
+            }
+
             {
                 text = m_endStr + text;
                 text = text.Replace("\r\n", "");
@@ -216,7 +256,26 @@ public class HPServerUtil
     {
         --m_curPlayerCount;
 
-        LogUtil.getInstance().addDebugLog("与客户端断开:" + connId);
+        // 日志
+        {
+            PlayerData playerData = GameUtil.getPlayerDataByConnId(connId);
+            if (playerData != null)
+            {
+                RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                if (room != null)
+                {
+                    LogUtil.getInstance().writeRoomLog(room, "与客户端断开:" + connId);
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("与客户端断开:" + connId);
+                }
+            }
+            else
+            {
+                LogUtil.getInstance().addDebugLog("与客户端断开:" + connId);
+            }
+        }
 
         //Thread thread = new Thread(hasPlayerExit);
         //thread.Start(connId);
@@ -245,8 +304,27 @@ public class HPServerUtil
 
         ReceiveObj receiveObj = (ReceiveObj)obj;
         string text = receiveObj.m_data;
-
-        LogUtil.getInstance().addDebugLog("收到客户端消息：" + text);
+        
+        // 日志
+        {
+            PlayerData playerData = GameUtil.getPlayerDataByConnId(receiveObj.m_connId);
+            if (playerData != null)
+            {
+                RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                if (room != null)
+                {
+                    LogUtil.getInstance().writeRoomLog(room, "收到客户端消息：" + text);
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("收到客户端消息：" + text);
+                }
+            }
+            else
+            {
+                LogUtil.getInstance().addDebugLog("收到客户端消息：" + text);
+            }
+        }
 
         JObject jo;
         try
@@ -256,7 +334,26 @@ public class HPServerUtil
         catch (JsonReaderException ex)
         {
             // 传过来的数据不是json格式的，一律不理
-            LogUtil.getInstance().addDebugLog("客户端传来非json数据：" + text);
+            // 日志
+            {
+                PlayerData playerData = GameUtil.getPlayerDataByConnId(receiveObj.m_connId);
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "客户端传来非json数据：" + text);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("客户端传来非json数据：" + text);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("客户端传来非json数据：" + text);
+                }
+            }
 
             m_endStr = "";
 
@@ -312,11 +409,35 @@ public class HPServerUtil
             {
                 NetRespond_DebugSetPoker.doAskCilentReq_DebugSetPoker(receiveObj.m_connId, text);
             }
+            // 心跳
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_HeartBeat_Play) == 0)
+            {
+                NetRespond_HeartBeat_Play.doAskCilentReq_HeartBeat_Play(receiveObj.m_connId, text);
+            }
         }
         else
         {
             // 传过来的数据没有tag字段的，一律不理
-            LogUtil.getInstance().addDebugLog("客户端传来的数据没有Tag：" + text);
+            // 日志
+            {
+                PlayerData playerData = GameUtil.getPlayerDataByConnId(receiveObj.m_connId);
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "客户端传来的数据没有Tag：" + text);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("客户端传来的数据没有Tag：" + text);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("客户端传来的数据没有Tag：" + text);
+                }
+            }
             return;
         }
     }
@@ -324,13 +445,57 @@ public class HPServerUtil
     void hasPlayerExit(object obj)
     {
         IntPtr connId = (IntPtr)obj;
-        if (PlayLogic_Relax.getInstance().doTaskPlayerCloseConn(connId))
+
+        PlayerData playerData = GameUtil.getPlayerDataByConnId(connId);
+        if (playerData == null)
         {
-            LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+            LogUtil.getInstance().addDebugLog("踢出玩家失败，找不到IntPtr：" + connId + "对应的玩家");
+            return;
         }
-        else if (PlayLogic_PVP.getInstance().doTaskPlayerCloseConn(connId))
+
+        if (PlayLogic_Relax.getInstance().doTaskPlayerCloseConn(playerData.m_uid))
         {
-            LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+            // 日志
+            {
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "踢出玩家成功：" + connId);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+                }
+            }
+        }
+        else if (PlayLogic_PVP.getInstance().doTaskPlayerCloseConn(playerData.m_uid))
+        {
+            // 日志
+            {
+                if (playerData != null)
+                {
+                    RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
+                    if (room != null)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "踢出玩家成功：" + connId);
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+                    }
+                }
+                else
+                {
+                    LogUtil.getInstance().addDebugLog("踢出玩家成功：" + connId);
+                }
+            }
         }
         else
         {

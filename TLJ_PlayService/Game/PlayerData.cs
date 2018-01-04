@@ -20,11 +20,12 @@ public class PlayerData
     public bool m_isAI = false;
     public bool m_isPVP = false;
     public bool m_isUseJiPaiQi = false;
+    public bool m_isUseJiaBeiKa = false;
     public string m_pvpReward = "";
     public string m_gameRoomType;
 
-    List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();
-    public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();
+    List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();                    // 玩家手牌（发完牌之后）
+    public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();        // 当前已经发的牌
     public List<TLJCommon.PokerInfo> m_curOutPokerList = new List<TLJCommon.PokerInfo>();
 
     public List<BuffData> m_buffData = new List<BuffData>();
@@ -63,46 +64,53 @@ public class PlayerData
 
     void timerCallback(object obj)
     {
-        switch ((TimerType)obj)
+        try
         {
-            case TimerType.TimerType_outPoker:
-                {
-                    RoomData room = GameUtil.getRoomByUid(m_uid);
-
-                    if (!m_isTuoGuan)
+            switch ((TimerType)obj)
+            {
+                case TimerType.TimerType_outPoker:
                     {
-                        m_isTuoGuan = true;
-                        changeTuoGuanState();
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_OutPoker(room.m_gameBase, room, this);
                     }
-                    TrusteeshipLogic.trusteeshipLogic_OutPoker(room.m_gameBase, room,this);
-                }
-                break;
+                    break;
 
-            case TimerType.TimerType_maidi:
-                {
-                    RoomData room = GameUtil.getRoomByUid(m_uid);
-
-                    if (!m_isTuoGuan)
+                case TimerType.TimerType_maidi:
                     {
-                        m_isTuoGuan = true;
-                        changeTuoGuanState();
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_MaiDi(room.m_gameBase, room, this);
                     }
-                    TrusteeshipLogic.trusteeshipLogic_MaiDi(room.m_gameBase, room, this);
-                }
-                break;
+                    break;
 
-            case TimerType.TimerType_chaodi:
-                {
-                    RoomData room = GameUtil.getRoomByUid(m_uid);
-
-                    if (!m_isTuoGuan)
+                case TimerType.TimerType_chaodi:
                     {
-                        m_isTuoGuan = true;
-                        changeTuoGuanState();
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_ChaoDi(room.m_gameBase, room, this);
                     }
-                    TrusteeshipLogic.trusteeshipLogic_ChaoDi(room.m_gameBase, room, this);
-                }
-                break;
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error("PlayerData----" + "timerCallback: " + ex);
         }
     }
 
@@ -128,6 +136,7 @@ public class PlayerData
         m_isTuoGuan = false;
         m_isContinueGame = false;
         m_isUseJiPaiQi = false;
+        m_isUseJiaBeiKa = false;
 
         m_pokerList.Clear();
         m_allotPokerList.Clear();

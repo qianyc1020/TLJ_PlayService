@@ -26,18 +26,26 @@ class NetRespond_RetryJoinGame
                 {
                     respondJO.Add("tag", TLJCommon.Consts.Tag_ResumeGame);
                     respondJO.Add("gameroomtype", room.m_gameRoomType);
-                    respondJO.Add("roomState", (int)room.m_roomState);
+                    respondJO.Add("roomState", (int)room.getRoomState());
                     respondJO.Add("isUseJiPaiQi", playerData.m_isUseJiPaiQi);
+                    respondJO.Add("isUseJiaBeiKa", playerData.m_isUseJiaBeiKa);
                     respondJO.Add("levelPokerNum", room.m_levelPokerNum);
                     respondJO.Add("myLevelPoker", playerData.m_myLevelPoker);
 
-                    if (room.getPlayerDataList().IndexOf(playerData) == 3)
+                    if (room.getPlayerDataList().Count == 4)
                     {
-                        respondJO.Add("otherLevelPoker", room.getPlayerDataList()[0].m_myLevelPoker);
+                        if (room.getPlayerDataList().IndexOf(playerData) == 3)
+                        {
+                            respondJO.Add("otherLevelPoker", room.getPlayerDataList()[0].m_myLevelPoker);
+                        }
+                        else
+                        {
+                            respondJO.Add("otherLevelPoker", room.getPlayerDataList()[room.getPlayerDataList().IndexOf(playerData) + 1].m_myLevelPoker);
+                        }
                     }
                     else
                     {
-                        respondJO.Add("otherLevelPoker", room.getPlayerDataList()[room.getPlayerDataList().IndexOf(playerData) + 1].m_myLevelPoker);
+                        respondJO.Add("otherLevelPoker", 2);
                     }
 
                     respondJO.Add("masterPokerType", room.m_masterPokerType);
@@ -119,6 +127,26 @@ class NetRespond_RetryJoinGame
                     else
                     {
                         respondJO.Add("curChaoDiPlayer", "");
+                    }
+                    
+                    // 上一个人抢主用的牌
+                    {
+                        JArray ja_qiangzhuPokerList = new JArray();
+
+                        for (int i = 0; i < room.m_qiangzhuPokerList.Count; i++)
+                        {
+                            JObject temp = new JObject();
+
+                            int num = room.m_qiangzhuPokerList[i].m_num;
+                            int pokerType = (int)room.m_qiangzhuPokerList[i].m_pokerType;
+
+                            temp.Add("num", num);
+                            temp.Add("pokerType", pokerType);
+
+                            ja_qiangzhuPokerList.Add(temp);
+                        }
+
+                        respondJO.Add("qiangzhuPokerList", ja_qiangzhuPokerList);
                     }
 
                     // 当前回合出的牌

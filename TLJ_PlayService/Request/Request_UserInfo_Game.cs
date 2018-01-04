@@ -41,7 +41,7 @@ class Request_UserInfo_Game
             string uid = jo.GetValue("uid").ToString();
             int vipLevel = (int)jo.GetValue("vipLevel");
 
-            PlayerData playerDate = GameUtil.getRoomByUid(uid).getPlayerDataByUid(uid);
+            PlayerData playerDate = GameUtil.getPlayerDataByUid(uid);
             if (playerDate == null)
             {
                 TLJ_PlayService.PlayService.log.Error("Request_UserInfo_Game.onMySqlRespond----游戏服务器里没有此人数据：" + uid + "," + respondData);

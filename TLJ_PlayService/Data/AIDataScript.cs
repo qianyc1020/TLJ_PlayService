@@ -43,8 +43,17 @@ class AIDataScript
 
                     m_dataList.Add(temp);
 
-                    LogUtil.getInstance().addDebugLog("AIDataScript.initJson---" + "增加机器人：" + temp.m_uid);
+                    //LogUtil.getInstance().addDebugLog("AIDataScript.initJson---" + "增加机器人：" + temp.m_uid);
+                    TLJ_PlayService.PlayService.log.Error("AIDataScript.initJson---" + "增加机器人：" + temp.m_uid);
+
+                    //// 限制机器人数量
+                    //if (m_dataList.Count >= 2)
+                    //{
+                    //    return;
+                    //}
                 }
+
+                TLJ_PlayService.PlayService.log.Error("AIDataScript.initJson---" + "机器人总数量：" + m_dataList.Count);
             }
         }
         catch (Exception ex)
@@ -55,59 +64,124 @@ class AIDataScript
 
     public string getOneAI()
     {
-        string uid = "";
-
+        lock (m_dataList)
         {
-            bool hasNoUsed = false;
-            for (int i = 0; i < m_dataList.Count; i++)
+            string uid = "";
+            int restAICount = 0;
+
             {
-                if (!m_dataList[i].m_isUsed)
+                for (int i = 0; i < m_dataList.Count; i++)
                 {
-                    hasNoUsed = true;
-                    break;
+                    if (!m_dataList[i].m_isUsed)
+                    {
+                        ++restAICount;
+                    }
+                }
+
+                if (restAICount == 0)
+                {
+                    return uid;
                 }
             }
 
-            if (!hasNoUsed)
+            if (restAICount >= (m_dataList.Count / 2))
             {
-                return uid;
-            }
-        }
+                while (true)
+                {
+                    int r = RandomUtil.getRandom(0, m_dataList.Count - 1);
+                    if (!m_dataList[r].m_isUsed)
+                    {
+                        uid = m_dataList[r].m_uid;
 
-        while (true)
-        {
-            int r = RandomUtil.getRandom(0, m_dataList.Count - 1);
-            if (!m_dataList[r].m_isUsed)
+                        RoomData room = GameUtil.getRoomByUid(uid);
+                        if (room == null)
+                        {
+                            m_dataList[r].m_isUsed = true;
+                            
+                            {
+                                int num = 0;
+                                for (int i = 0; i < m_dataList.Count; i++)
+                                {
+                                    if (!m_dataList[i].m_isUsed)
+                                    {
+                                        ++num;
+                                    }
+                                }
+                                TLJ_PlayService.PlayService.log.Error("AIDataScript.getOneAI()----借出去机器人：" + uid + "    剩余机器人：" + num);
+                            }
+
+                            return uid;
+                        }
+                        else
+                        {
+                            TLJ_PlayService.PlayService.log.Error("AIDataScript.getOneAI()----该机器人没有被使用，却在房间中：" + room.getRoomId() + "   " + uid);
+                        }
+                    }
+                }
+            }
+            else
             {
-                uid = m_dataList[r].m_uid;
-                m_dataList[r].m_isUsed = true;
+                for (int i = 0; i < m_dataList.Count; i++)
+                {
+                    if (!m_dataList[i].m_isUsed)
+                    {
+                        uid = m_dataList[i].m_uid;
 
-                return uid;
+                        RoomData room = GameUtil.getRoomByUid(uid);
+                        if (room == null)
+                        {
+                            m_dataList[i].m_isUsed = true;
+                            
+                            {
+                                int num = 0;
+                                for (int j = 0; j < m_dataList.Count; j++)
+                                {
+                                    if (!m_dataList[j].m_isUsed)
+                                    {
+                                        ++num;
+                                    }
+                                }
+                                TLJ_PlayService.PlayService.log.Error("AIDataScript.getOneAI()----借出去机器人：" + uid + "    剩余机器人：" + num);
+                            }
+
+                            return uid;
+                        }
+                        else
+                        {
+                            TLJ_PlayService.PlayService.log.Error("AIDataScript.getOneAI()----该机器人没有被使用，却在房间中：" + room.getRoomId() + "   " + uid);
+                        }
+                    }
+                }
             }
+
+            return uid;
         }
-
-        //for (int i = 0; i < m_dataList.Count; i++)
-        //{
-        //    if (!m_dataList[i].m_isUsed)
-        //    {
-        //        uid = m_dataList[i].m_uid;
-        //        m_dataList[i].m_isUsed = true;
-
-        //        break;
-        //    }
-        //}
-
-        return uid;
     }
 
     public void backOneAI(string uid)
     {
-        for (int i = 0; i < m_dataList.Count; i++)
+        lock (m_dataList)
         {
-            if (m_dataList[i].m_uid.CompareTo(uid) == 0)
+            for (int i = 0; i < m_dataList.Count; i++)
             {
-                m_dataList[i].m_isUsed = false;
-                break;
+                if (m_dataList[i].m_uid.CompareTo(uid) == 0)
+                {
+                    m_dataList[i].m_isUsed = false;
+                    
+                    {
+                        int num = 0;
+                        for (int j = 0; j < m_dataList.Count; j++)
+                        {
+                            if (!m_dataList[j].m_isUsed)
+                            {
+                                ++num;
+                            }
+                        }
+                        TLJ_PlayService.PlayService.log.Error("AIDataScript.getOneAI()----还回来机器人：" + uid + "    剩余机器人：" + num);
+                    }
+
+                    break;
+                }
             }
         }
     }

@@ -24,6 +24,12 @@ class GameLogic
         {
             if (room.getPlayerDataList().Count == 4)
             {
+                // 停止匹配队友倒计时
+                room.m_timerUtil.stopTimer();
+
+                // 开始解散房间倒计时（设为15分钟，目的是房间异常后强制解散房间，否则玩家和机器人无法释放）
+                room.startBreakRoomTimer();
+
                 // 提交任务
                 {
                     for (int i = 0; i < room.getPlayerDataList().Count; i++)
@@ -59,11 +65,17 @@ class GameLogic
                                     {
                                         Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 206);
 
-                                        // 提交任务
-                                        if (tempList[2].CompareTo("16") == 0)
+                                        PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(room.m_gameRoomType);
+
+                                        if (pvpGameRoomData != null)
                                         {
-                                            Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 218);
+                                            // 5元话费奖励
+                                            if ((pvpGameRoomData.reward_id == 3) && (pvpGameRoomData.reward_num == 5))
+                                            { 
+                                                Request_ProgressTask.doRequest(room.getPlayerDataList()[i].m_uid, 218);
+                                            }
                                         }
+                                        
                                     }
                                     break;
                             }
@@ -84,7 +96,7 @@ class GameLogic
                 }
 
                 room.m_isStartGame = true;
-                room.m_roomState = RoomState.RoomState_qiangzhu;
+                room.setRoomState(RoomState.RoomState_qiangzhu);
 
                 // 设置级牌
                 if (initLevelPokerNum)
@@ -218,70 +230,84 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error("GameUtil.checkRoomStartGame()----" + ex.Message + "tag:" + tag + "  roomid:" + room.getRoomId() + "gameroomtype:" + room.m_gameRoomType);
+            TLJ_PlayService.PlayService.log.Error("GameUtil.checkRoomStartGame()----" + ex + "tag:" + tag + "  roomid:" + room.getRoomId() + "gameroomtype:" + room.m_gameRoomType);
         }
     }
 
     static void fapaiThread(object obj)
     {
-        RoomData room = (RoomData)obj;
-        // 一张一张给每人发牌
+        try
         {
-            for (int i = 0; i < 25; i++)
+            RoomData room = (RoomData)obj;
+            // 一张一张给每人发牌
             {
-                for (int j = 0; j < 4; j++)
+                for (int i = 0; i < 25; i++)
                 {
-                    int num = room.getPlayerDataList()[j].getPokerList()[i].m_num;
-                    int pokerType = (int)room.getPlayerDataList()[j].getPokerList()[i].m_pokerType;
-
-                    if (!room.getPlayerDataList()[j].isOffLine())
+                    for (int j = 0; j < 4; j++)
                     {
-                        JObject jo2 = new JObject();
-                        jo2.Add("tag", room.m_tag);
-                        jo2.Add("uid", room.getPlayerDataList()[j].m_uid);
-                        jo2.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_FaPai);
-                        jo2.Add("num", num);
-                        jo2.Add("pokerType", pokerType);
+                        int num = room.getPlayerDataList()[j].getPokerList()[i].m_num;
+                        int pokerType = (int)room.getPlayerDataList()[j].getPokerList()[i].m_pokerType;
 
-                        if (i == 24)
+                        if (!room.getPlayerDataList()[j].isOffLine())
                         {
-                            jo2.Add("isEnd", 1);
-                        }
-                        else
-                        {
-                            jo2.Add("isEnd", 0);
+                            JObject jo2 = new JObject();
+                            jo2.Add("tag", room.m_tag);
+                            jo2.Add("uid", room.getPlayerDataList()[j].m_uid);
+                            jo2.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_FaPai);
+                            jo2.Add("num", num);
+                            jo2.Add("pokerType", pokerType);
+
+                            if (i == 24)
+                            {
+                                jo2.Add("isEnd", 1);
+                            }
+                            else
+                            {
+                                jo2.Add("isEnd", 0);
+                            }
+
+                            PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[j].m_connId, jo2.ToString());
                         }
 
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[j].m_connId, jo2.ToString());
+                        room.getPlayerDataList()[j].m_allotPokerList.Add(new PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
                     }
 
-                    room.getPlayerDataList()[j].m_allotPokerList.Add(new PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+                    Thread.Sleep(500);
                 }
-
-                Thread.Sleep(400);
             }
+
+            LogUtil.getInstance().writeRoomLog(room, "牌已发完");
+
+            // 抢主倒计时
+            room.m_timerUtil.startTimer(room.m_qiangzhuTime, TimerType.TimerType_qiangzhu);
         }
-
-        LogUtil.getInstance().addDebugLog("牌已发完");
-
-        // 抢主倒计时
-        room.m_timerUtil.startTimer(room.m_qiangzhuTime, TimerType.TimerType_qiangzhu);
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".fapaiThread: " + ex);
+        }
     }
 
-    public static void removeRoom(GameBase gameBase,RoomData room)
+    public static void removeRoom(GameBase gameBase,RoomData room,bool isClearRoom)
     {
-        // 把机器人还回去
-        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        try
         {
-            if (room.getPlayerDataList()[i].m_isAI)
+            // 把机器人还回去
+            if (isClearRoom)
             {
-                AIDataScript.getInstance().backOneAI(room.getPlayerDataList()[i].m_uid);
+                GameUtil.clearRoomNonePlayer(room);
             }
+
+            room.m_timerUtil.stopTimer();
+            room.m_timerUtil_breakRom.stopTimer();
+
+            LogUtil.getInstance().writeRoomLog(room, "GameUtils.removeRoom：删除房间：" + room.getRoomId());
+
+            gameBase.getRoomList().Remove(room);
         }
-
-        LogUtil.getInstance().addDebugLog("GameUtils.removeRoom：删除房间：" + room.getRoomId());
-
-        gameBase.getRoomList().Remove(room);
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".removeRoom: " + ex);
+        }
     }
 
     public static  RoomData getRoomByPlayerUid(GameBase gameBase, string uid)
@@ -363,8 +389,9 @@ class GameLogic
 
                         if (GameUtil.checkRoomNonePlayer(room))
                         {
-                            LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":此房间人数为0，解散房间：" + room.getRoomId());
-                            GameLogic.removeRoom(gameBase, room);
+                            LogUtil.getInstance().writeRoomLog(room,m_logFlag + "----" + ":此房间人数为0，解散房间：" + room.getRoomId());
+                            
+                            GameLogic.removeRoom(gameBase, room,true);
                         }
                     }
                 }
@@ -410,7 +437,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ContinueGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ContinueGame异常：" + ex);
         }
     }
 
@@ -453,7 +480,8 @@ class GameLogic
                     if (GameUtil.checkRoomNonePlayer(cur_room))
                     {
                         LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ".doTask_ChangeRoom:玩家换桌，该房间:" + cur_room.getRoomId() + "人数为空，解散该房间");
-                        GameLogic.removeRoom(gameBase, cur_room);
+                        
+                        GameLogic.removeRoom(gameBase, cur_room, true);
                     }
                 }
 
@@ -462,7 +490,7 @@ class GameLogic
                 // 在已有的房间寻找可以加入的房间
                 for (int i = 0; i < gameBase.getRoomList().Count; i++)
                 {
-                    if ((gameroomtype.CompareTo(gameBase.getRoomList()[i].m_gameRoomType) == 0) && (1 == gameBase.getRoomList()[i].m_rounds_pvp) && (gameBase.getRoomList()[i].m_roomState == RoomState.RoomState_waiting))
+                    if ((gameroomtype.CompareTo(gameBase.getRoomList()[i].m_gameRoomType) == 0) && (1 == gameBase.getRoomList()[i].m_rounds_pvp) && (gameBase.getRoomList()[i].getRoomState() == RoomState.RoomState_waiting))
                     //if (gameBase.getRoomList()[i].m_roomState == RoomState.RoomState_waiting)
                     {
                         if (gameBase.getRoomList()[i].joinPlayer(new PlayerData(connId, uid, false, gameroomtype)))
@@ -476,7 +504,8 @@ class GameLogic
                 // 当前没有房间可加入的话则创建一个新的房间
                 if (room == null)
                 {
-                    room = new RoomData(gameBase, gameBase.getRoomList().Count + 1, gameroomtype);
+                    //room = new RoomData(gameBase, gameBase.getRoomList().Count + 1, gameroomtype);
+                    room = new RoomData(gameBase, gameroomtype);
                     room.joinPlayer(new PlayerData(connId, uid, false,gameroomtype));
 
                     gameBase.getRoomList().Add(room);
@@ -504,7 +533,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":ChangeRoom异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":ChangeRoom异常：" + ex);
         }
     }
 
@@ -539,7 +568,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_Chat异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_Chat异常：" + ex);
         }
     }
 
@@ -592,23 +621,30 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_TuoGuan：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_TuoGuan：" + ex);
         }
     }
 
     public static void tellPlayerTuoGuanState(GameBase gameBase, PlayerData playerData, bool isTuoGuan)
     {
-        // 推送给客户端
-        if (!playerData.isOffLine())
+        try
         {
-            JObject respondJO = new JObject();
-            respondJO.Add("tag", gameBase.getTag());
-            respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_OK);
-            respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_SetTuoGuanState);
-            respondJO.Add("uid", playerData.m_uid);
-            respondJO.Add("isTuoGuan", isTuoGuan);
+            // 推送给客户端
+            if (!playerData.isOffLine())
+            {
+                JObject respondJO = new JObject();
+                respondJO.Add("tag", gameBase.getTag());
+                respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_OK);
+                respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_SetTuoGuanState);
+                respondJO.Add("uid", playerData.m_uid);
+                respondJO.Add("isTuoGuan", isTuoGuan);
 
-            PlayService.m_serverUtil.sendMessage(playerData.m_connId, respondJO.ToString());
+                PlayService.m_serverUtil.sendMessage(playerData.m_connId, respondJO.ToString());
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".tellPlayerTuoGuanState: " + ex);
         }
     }
 
@@ -643,7 +679,7 @@ class GameLogic
                             PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());
                         }
 
-                        gameBase.doTaskPlayerCloseConn(connId);
+                        gameBase.doTaskPlayerCloseConn(uid);
 
                         return;
                     }
@@ -663,110 +699,137 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ExitGame异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ExitGame异常：" + ex);
         }
     }
 
-    public static void doTask_WaitMatchTimeOut(GameBase gameBase, IntPtr connId, string data)
+    public static void doTask_WaitMatchTimeOut(RoomData room)
     {
         try
         {
-            JObject jo = JObject.Parse(data);
-            string tag = jo.GetValue("tag").ToString();
-            string uid = jo.GetValue("uid").ToString();
-
-            RoomData room = getRoomByPlayerUid(gameBase, uid);
-            
-            if (room != null)
+            lock (room)
             {
-                lock (room)
+                if (room.getRoomState() == RoomState.RoomState_waiting)
                 {
-                    if (room.m_roomState == RoomState.RoomState_waiting)
+                    // 由机器人填充缺的人
+                    int needAICount = 4 - room.getPlayerDataList().Count;
+                    List<string> ai_list = new List<string>();
+                    for (int i = 0; i < needAICount; i++)
                     {
-                        // 由机器人填充缺的人
-                        int needAICount = 4 - room.getPlayerDataList().Count;
-                        for (int i = 0; i < needAICount; i++)
+                        string ai_uid = AIDataScript.getInstance().getOneAI();
+                        ai_list.Add(ai_uid);
+
+                        if (ai_uid.CompareTo("") != 0)
                         {
-                            string ai_uid = AIDataScript.getInstance().getOneAI();
-                            if (ai_uid.CompareTo("") != 0)
+                            LogUtil.getInstance().writeRoomLog(room,m_logFlag + "----" + "给room:" + room.getRoomId() + "创建机器人：" + ai_uid);
+
+                            PlayerData playerData = new PlayerData((IntPtr)(-1), ai_uid, true, room.m_gameRoomType);
+
+                            // 如果是PVP的话，从第二轮开始，机器人的分数不能太假，要在合理的范围
+                            if (room.m_rounds_pvp > 1)
                             {
-                                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "给room:" + room.getRoomId() + "创建机器人：" + ai_uid);
-
-                                PlayerData playerData = new PlayerData((IntPtr)(-1), ai_uid, true, room.m_gameRoomType);
-
-                                // 如果是PVP的话，从第二轮开始，机器人的分数不能太假，要在合理的范围
-                                if (room.m_rounds_pvp > 1)
+                                for (int j = 0; j < room.getPlayerDataList().Count; j++)
                                 {
-                                    for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                    if (!room.getPlayerDataList()[j].m_isAI)
                                     {
-                                        if (!room.getPlayerDataList()[j].m_isAI)
-                                        {
-                                            playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
-                                            break;
-                                        }
+                                        playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
+                                        break;
                                     }
                                 }
+                            }
 
-                                room.joinPlayer(playerData);
-                            }
-                            else
-                            {
-                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + "机器人不足");
-                            }
+                            room.joinPlayer(playerData);
                         }
+                        else
+                        {
+                            LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + "机器人不足");
 
-                        // 检测房间人数是否可以开赛
-                        GameLogic.checkRoomStartGame(room, tag, true);
+                            // 通知客户端
+                            {
+                                JObject respondJO = new JObject();
+                                respondJO.Add("tag", room.m_tag);
+                                respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_MatchFail);
+
+                                for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                {
+                                    if (!room.getPlayerDataList()[j].isOffLine())
+                                    {
+                                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[j].m_connId, respondJO.ToString());
+                                    }
+                                }
+                            }
+
+                            // 把之前借的机器人还回去
+                            for (int j = 0; j < ai_list.Count; j++)
+                            {
+                                AIDataScript.getInstance().backOneAI(ai_list[j]);
+                            }
+
+                            // 解散该房间
+                            GameLogic.removeRoom(room.m_gameBase, room, true);
+
+                            return;
+                        }
+                    }
+
+                    // 检测房间人数是否可以开赛
+                    GameLogic.checkRoomStartGame(room, room.m_tag, true);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex);
+        }
+    }
+
+    public static void doTask_QiangZhuEnd(RoomData room)
+    {
+        try
+        {
+            {
+                JObject respondJO = new JObject();
+                respondJO.Add("tag", room.m_tag);
+                respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_QiangZhuEnd);
+                respondJO.Add("zhuangjiaUid", room.m_zhuangjiaPlayerData.m_uid);
+                respondJO.Add("masterPokerType", room.m_masterPokerType);
+
+                // 提交任务
+                {
+                    Request_ProgressTask.doRequest(room.m_zhuangjiaPlayerData.m_uid, 215);
+                }
+
+                // 发送给客户端
+                for (int k = 0; k < room.getPlayerDataList().Count; k++)
+                {
+                    if (respondJO.GetValue("isBanker") != null)
+                    {
+                        respondJO.Remove("isBanker");
+                    }
+
+                    if ((room.getPlayerDataList()[k].m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_uid) == 0) ||
+                        (room.getPlayerDataList()[k].m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_teammateUID) ==
+                         0))
+                    {
+                        room.getPlayerDataList()[k].m_isBanker = 1;
+                        respondJO.Add("isBanker", 1);
+                    }
+                    else
+                    {
+                        room.getPlayerDataList()[k].m_isBanker = 0;
+                        respondJO.Add("isBanker", 0);
+                    }
+
+                    if (!room.getPlayerDataList()[k].isOffLine())
+                    {
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[k].m_connId, respondJO.ToString());
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_JoinGame异常：" + ex.Message);
-        }
-    }
-
-    public static void doTask_QiangZhuEnd(RoomData room)
-    {
-        {
-            JObject respondJO = new JObject();
-            respondJO.Add("tag", room.m_tag);
-            respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_QiangZhuEnd);
-            respondJO.Add("zhuangjiaUid", room.m_zhuangjiaPlayerData.m_uid);
-            respondJO.Add("masterPokerType", room.m_masterPokerType);
-
-            // 提交任务
-            {
-                Request_ProgressTask.doRequest(room.m_zhuangjiaPlayerData.m_uid, 215);
-            }
-
-            // 发送给客户端
-            for (int k = 0; k < room.getPlayerDataList().Count; k++)
-            {
-                if (respondJO.GetValue("isBanker") != null)
-                {
-                    respondJO.Remove("isBanker");
-                }
-
-                if ((room.getPlayerDataList()[k].m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_uid) == 0) ||
-                    (room.getPlayerDataList()[k].m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_teammateUID) ==
-                     0))
-                {
-                    room.getPlayerDataList()[k].m_isBanker = 1;
-                    respondJO.Add("isBanker", 1);
-                }
-                else
-                {
-                    room.getPlayerDataList()[k].m_isBanker = 0;
-                    respondJO.Add("isBanker", 0);
-                }
-
-                if (!room.getPlayerDataList()[k].isOffLine())
-                {
-                    PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[k].m_connId, respondJO.ToString());
-                }
-            }
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".doTask_QiangZhuEnd: " + ex);
         }
     }
 
@@ -879,26 +942,28 @@ class GameLogic
                 }
                 else
                 {
-                    TLJ_PlayService.PlayService.log.Debug(m_logFlag + "----" + ":doTask_QiangZhu失败");
+                    LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + ":doTask_QiangZhu失败:" + uid);
                 }
             }
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_QiangZhu异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_QiangZhu异常：" + ex);
         }
     }
 
     // 庄家埋底
     public static void doTask_MaiDi(GameBase gameBase, IntPtr connId, string data)
     {
+        RoomData room = null;
+        string uid = "";
         try
         {
             JObject jo = JObject.Parse(data);
             string tag = jo.GetValue("tag").ToString();
-            string uid = jo.GetValue("uid").ToString();
+            uid = jo.GetValue("uid").ToString();
 
-            RoomData room = GameUtil.getRoomByUid(uid);
+            room = GameUtil.getRoomByUid(uid);
             if (room == null)
             {
                 return;
@@ -912,7 +977,7 @@ class GameLogic
                 
             if (playerData.getPokerList().Count != 33)
             {
-                LogUtil.getInstance().addDebugLog(m_logFlag + "----doTask_MaiDi错误：手牌张数不是33：" + uid);
+                LogUtil.getInstance().writeRoomLog(room,m_logFlag + "----doTask_MaiDi错误：手牌张数不是33：" + uid);
                 return;
             }
 
@@ -976,7 +1041,7 @@ class GameLogic
             // 本房间不可以炒底则直接开始游戏
             if (!room.m_canChaoDi)
             {
-                room.m_roomState = RoomState.RoomState_gaming;
+                room.setRoomState(RoomState.RoomState_gaming);
                 room.m_curOutPokerPlayer = room.m_zhuangjiaPlayerData;
                 room.m_curRoundFirstPlayer = room.m_zhuangjiaPlayerData;
 
@@ -986,7 +1051,7 @@ class GameLogic
             // 本房间可以炒底则通知玩家炒底
             else
             {
-                room.m_roomState = RoomState.RoomState_chaodi;
+                room.setRoomState(RoomState.RoomState_chaodi);
 
                 PlayerData nextChaoDiPlayerData = null;
                 if (room.getPlayerDataList().IndexOf(playerData) == 3)
@@ -1000,7 +1065,7 @@ class GameLogic
 
                 if (nextChaoDiPlayerData.m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_uid) == 0)
                 {
-                    room.m_roomState = RoomState.RoomState_gaming;
+                    room.setRoomState(RoomState.RoomState_gaming);
                     room.m_curOutPokerPlayer = room.m_zhuangjiaPlayerData;
                     room.m_curRoundFirstPlayer = room.m_zhuangjiaPlayerData;
 
@@ -1015,7 +1080,8 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_MaiDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_MaiDi异常：" + ex);
+            LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----:doTask_MaiDi异常：" + uid);
         }
     }
 
@@ -1024,136 +1090,133 @@ class GameLogic
     {
         try
         {
+            TLJ_PlayService.PlayService.log.Info("doTask_PlayerChaoDi");
             JObject jo = JObject.Parse(data);
             string tag = jo.GetValue("tag").ToString();
             string uid = jo.GetValue("uid").ToString();
             int playAction = Convert.ToInt32(jo.GetValue("playAction"));
             int hasPoker = Convert.ToInt32(jo.GetValue("hasPoker"));
 
-            for (int i = 0; i < gameBase.getRoomList().Count; i++)
+
+            RoomData room = GameUtil.getRoomByUid(uid);
+            if (room == null)
             {
-                RoomData room = gameBase.getRoomList()[i];
-                List<PlayerData> playerDataList = room.getPlayerDataList();
+                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_PlayerChaoDi出错：room=null,uid = " + uid);
+            }
 
-                for (int j = 0; j < playerDataList.Count; j++)
+            PlayerData playerData = room.getPlayerDataByUid(uid);
+            if (playerData == null)
+            {
+                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_PlayerChaoDi出错：playerData=null,uid = " + uid);
+            }
+
+            // 停止倒计时
+            playerData.m_timerUtil.stopTimer();
+
+            // 通知客户端
+            {
+                JObject respondJO = new JObject();
+                respondJO.Add("tag", tag);
+                respondJO.Add("playAction", playAction);
+                respondJO.Add("uid", uid);
+                respondJO.Add("hasPoker", hasPoker);
+
+                if (hasPoker == 1)
                 {
-                    if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                    respondJO.Add("pokerList", jo.GetValue("pokerList"));
+                }
+
+                // 底牌
+                if (hasPoker == 1)
+                {
+                    JArray pokerList = new JArray();
+                    for (int k = 0; k < room.getDiPokerList().Count; k++)
                     {
-                        PlayerData playerData = playerDataList[j];
+                        JObject temp = new JObject();
 
-                        // 停止倒计时
-                        playerData.m_timerUtil.stopTimer();
+                        int num = room.getDiPokerList()[k].m_num;
+                        int pokerType = (int)room.getDiPokerList()[k].m_pokerType;
 
-                        // 通知客户端
-                        {
-                            JObject respondJO = new JObject();
-                            respondJO.Add("tag", tag);
-                            respondJO.Add("playAction", playAction);
-                            respondJO.Add("uid", uid);
-                            respondJO.Add("hasPoker", hasPoker);
+                        temp.Add("num", num);
+                        temp.Add("pokerType", pokerType);
 
-                            if (hasPoker == 1)
-                            {
-                                respondJO.Add("pokerList", jo.GetValue("pokerList"));
-                            }
+                        pokerList.Add(temp);
 
-                            // 底牌
-                            if (hasPoker == 1)
-                            {
-                                JArray pokerList = new JArray();
-                                for (int k = 0; k < room.getDiPokerList().Count; k++)
-                                {
-                                    JObject temp = new JObject();
-
-                                    int num = room.getDiPokerList()[k].m_num;
-                                    int pokerType = (int)room.getDiPokerList()[k].m_pokerType;
-
-                                    temp.Add("num", num);
-                                    temp.Add("pokerType", pokerType);
-
-                                    pokerList.Add(temp);
-
-                                    // 把底牌加到庄家牌里面去
-                                    playerData.getPokerList().Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
-                                }
-
-                                respondJO.Add("diPokerList", pokerList);
-
-                                {
-                                    room.m_curMaiDiPlayer = playerData;
-                                    room.m_roomState = RoomState.RoomState_othermaidi;
-
-                                    // 开始倒计时
-                                    playerData.m_timerUtil.startTimer(room.m_maidiTime, TimerType.TimerType_maidi);
-
-                                    // 如果当前要炒底的人离线
-                                    if (playerData.isTuoGuan())
-                                    {
-                                        TrusteeshipLogic.trusteeshipLogic_MaiDi(gameBase, room, playerData);
-                                    }
-                                }
-                            }                            
-
-                            // 发送给客户端
-                            for (int k = 0; k < playerDataList.Count; k++)
-                            {
-                                if (!playerDataList[k].isOffLine())
-                                {
-                                    PlayService.m_serverUtil.sendMessage(playerDataList[k].m_connId, respondJO.ToString());
-                                }
-                            }
-                        }
-
-                        // 此玩家没有炒底，通知下一个人炒底
-                        if (hasPoker == 0)
-                        {
-                            PlayerData playerDataNext = null;
-                            if (j == 3)
-                            {
-                                playerDataNext = room.getPlayerDataList()[0];
-                            }
-                            else if (j <= 2)
-                            {
-                                PlayService.log.Info("该房间人数：" + room.getPlayerDataList().Count + "  J=" + j);
-
-                                for (int m = 0; m < room.getPlayerDataList().Count; m++)
-                                {
-                                    PlayService.log.Info("该房间玩家信息：" + room.getRoomId() +"    "+ room.getPlayerDataList()[m].m_uid);
-                                }
-
-                                playerDataNext = room.getPlayerDataList()[j + 1];
-                            }
-                            else
-                            {
-                                TLJ_PlayService.PlayService.log.Error("m_logFlag----doTask_PlayerChaoDi：J越界，直接开始游戏");
-                                playerDataNext = room.m_zhuangjiaPlayerData;
-                            }
-
-                            // 抄底一轮后结束抄底，开始游戏
-                            if (playerDataNext.m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_uid) == 0)
-                            {
-                                room.m_curOutPokerPlayer = room.m_zhuangjiaPlayerData;
-                                room.m_curRoundFirstPlayer = room.m_zhuangjiaPlayerData;
-
-                                // 开始本房间的比赛
-                                doTask_CallPlayerOutPoker(gameBase, room, room.m_zhuangjiaPlayerData, true);
-
-                                room.m_roomState = RoomState.RoomState_gaming;
-                            }
-                            else
-                            {
-                                callPlayerChaoDi(gameBase, room, playerDataNext);
-                            }
-                        }
-
-                        return;
+                        // 把底牌加到庄家牌里面去
+                        playerData.getPokerList().Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
                     }
+
+                    respondJO.Add("diPokerList", pokerList);
+
+                    {
+                        room.m_curMaiDiPlayer = playerData;
+                        room.setRoomState(RoomState.RoomState_othermaidi);
+
+                        // 开始倒计时
+                        playerData.m_timerUtil.startTimer(room.m_maidiTime, TimerType.TimerType_maidi);
+
+                        // 如果当前要炒底的人离线:几乎不可能
+                        if (playerData.isTuoGuan())
+                        {
+                            TrusteeshipLogic.trusteeshipLogic_MaiDi(gameBase, room, playerData);
+                        }
+                    }
+                }                            
+
+                // 发送给客户端
+                for (int k = 0; k < room.getPlayerDataList().Count; k++)
+                {
+                    if (!room.getPlayerDataList()[k].isOffLine())
+                    {
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[k].m_connId, respondJO.ToString());
+                    }
+                }
+            }
+
+            // 此玩家没有炒底，通知下一个人炒底
+            if (hasPoker == 0)
+            {
+                PlayerData playerDataNext = null;
+                int index = room.getPlayerDataList().IndexOf(playerData);
+                if (index == 3)
+                {
+                    playerDataNext = room.getPlayerDataList()[0];
+                }
+                else if (index <= 2)
+                {
+                    for (int m = 0; m < room.getPlayerDataList().Count; m++)
+                    {
+                        LogUtil.getInstance().writeRoomLog(room, "该房间玩家信息：" + room.getRoomId() + "    " + room.getPlayerDataList()[m].m_uid);
+                    }
+
+                    playerDataNext = room.getPlayerDataList()[index + 1];
+                }
+                else
+                {
+                    LogUtil.getInstance().writeRoomLog(room, "m_logFlag----doTask_PlayerChaoDi：index越界，直接开始游戏,index = :" + index);
+                    playerDataNext = room.m_zhuangjiaPlayerData;
+                }
+
+                // 抄底一轮后结束抄底，开始游戏
+                if (playerDataNext.m_uid.CompareTo(room.m_zhuangjiaPlayerData.m_uid) == 0)
+                {
+                    room.setRoomState(RoomState.RoomState_gaming);
+                    room.m_curOutPokerPlayer = room.m_zhuangjiaPlayerData;
+                    room.m_curRoundFirstPlayer = room.m_zhuangjiaPlayerData;
+
+                    // 开始本房间的比赛
+                    doTask_CallPlayerOutPoker(gameBase, room, room.m_zhuangjiaPlayerData, true);
+                                
+                }
+                else
+                {
+                    callPlayerChaoDi(gameBase, room, playerDataNext);
                 }
             }
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_PlayerChaoDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_PlayerChaoDi异常：" + ex);
             PlayService.log.Warn(ex);
         }
     }
@@ -1201,7 +1264,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_CallPlayerOutPoker异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_CallPlayerOutPoker异常：" + ex);
         }
     }
 
@@ -1221,6 +1284,13 @@ class GameLogic
 
                 if (playerData != null)
                 {
+                    if (room.m_curOutPokerPlayer.m_uid.CompareTo(playerData.m_uid) != 0)
+                    {
+                        string str = "doTask_ReceivePlayerOutPoker错误：当前出牌人应该是：" + room.m_curOutPokerPlayer.m_uid + ",但是现在收到的出牌人是：" + playerData.m_uid;
+                        LogUtil.getInstance().writeRoomLog(room, str);
+                        return;
+                    }
+
                     // 停止倒计时
                     playerData.m_timerUtil.stopTimer();
 
@@ -1374,7 +1444,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ReceivePlayerOutPoker异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":doTask_ReceivePlayerOutPoker异常：" + ex);
         }
     }
 
@@ -1531,13 +1601,28 @@ class GameLogic
         try
         {
             PlayerData nextPlayerData = null;
-            if (room.getPlayerDataList().IndexOf(room.m_curOutPokerPlayer) == 3)
+
             {
-                nextPlayerData = room.getPlayerDataList()[0];
-            }
-            else
-            {
-                nextPlayerData = room.getPlayerDataList()[room.getPlayerDataList().IndexOf(room.m_curOutPokerPlayer) + 1];
+                int index = 0;
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    if (playerData.m_uid.CompareTo(room.getPlayerDataList()[i].m_uid) == 0)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index == 3)
+                {
+                    nextPlayerData = room.getPlayerDataList()[0];
+                }
+                else
+                {
+                    nextPlayerData = room.getPlayerDataList()[index + 1];
+                }
+
+                LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----roomID = " + room.getRoomId() + "  当前出牌人：" + playerData.m_uid + "  下一个出牌人：" + nextPlayerData.m_uid);
             }
 
             bool isFreeOutPoker = false;
@@ -1548,6 +1633,19 @@ class GameLogic
             // 一轮出牌结束
             if (room.m_curRoundFirstPlayer.m_uid.CompareTo(nextPlayerData.m_uid) == 0)
             {
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    string str = "roomid = "+room.getRoomId() + "  玩家index-" + i + "  玩家uid=" + room.getPlayerDataList()[i].m_uid + "  出的牌：";
+                    for (int j = 0; j < room.getPlayerDataList()[i].m_curOutPokerList.Count; j++)
+                    {
+                        str += ("num = " + room.getPlayerDataList()[i].m_curOutPokerList[j].m_num + "  type = " + room.getPlayerDataList()[i].m_curOutPokerList[j].m_pokerType + "，");
+                    }
+
+                    str += ("，剩余手牌数量：" + room.getPlayerDataList()[i].getPokerList().Count + "。");
+                    
+                    LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----"+ str);
+                }
+
                 // 选出这一轮出的牌最大的人，作为下一轮先出牌的人
                 PlayerData maxPlayerData = CompareWhoMax.compareWhoMax(room);
                 
@@ -1653,7 +1751,7 @@ class GameLogic
     {
         try
         {
-            LogUtil.getInstance().addDebugLog("通知玩家开始埋底");
+            LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + "通知玩家开始埋底");
 
             room.m_curMaiDiPlayer = room.m_zhuangjiaPlayerData;
 
@@ -1716,7 +1814,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerMaiDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerMaiDi异常：" + ex);
         }
     }
 
@@ -1770,7 +1868,7 @@ class GameLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerChaoDi异常：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerChaoDi异常：" + ex);
         }
     }
 }

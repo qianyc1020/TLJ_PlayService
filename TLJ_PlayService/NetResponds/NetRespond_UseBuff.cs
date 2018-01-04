@@ -75,6 +75,31 @@ class NetRespond_UseBuff
                             playerData.m_isUseJiPaiQi = true;
                         }
                     }
+                    // 加倍卡
+                    else if (prop_id == (int)TLJCommon.Consts.Prop.Prop_jiabeika)
+                    {
+                        PlayerData playerData = GameUtil.getPlayerDataByUid(uid);
+                        if (playerData != null)
+                        {
+                            playerData.m_isUseJiaBeiKa = true;
+
+                            bool isFind = false;
+                            for (int i = 0; i < playerData.m_buffData.Count; i++)
+                            {
+                                if ((playerData.m_buffData[i].m_prop_id == (int)TLJCommon.Consts.Prop.Prop_jiabeika))
+                                {
+                                    isFind = true;
+                                    ++playerData.m_buffData[i].m_buff_num;
+                                    break;
+                                }
+                            }
+
+                            if (!isFind)
+                            {
+                                playerData.m_buffData.Add(new BuffData((int)TLJCommon.Consts.Prop.Prop_jiabeika, 1));
+                            }
+                        }
+                    }
                 }
             }
 

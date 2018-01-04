@@ -30,6 +30,22 @@ public class TrusteeshipLogic
                         if (playerData.m_uid.CompareTo(room.m_curRoundFirstPlayer.m_uid) == 0)
                         {
                             List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenFirst(playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
+
+                            {
+                                string str = "托管出牌--任意出：roomID = " + room.getRoomId() + "  uid = " + playerData.m_uid +"    ";
+                                for (int i = 0; i < listPoker.Count; i++)
+                                {
+                                    int num = listPoker[i].m_num;
+                                    int pokerType = (int)listPoker[i].m_pokerType;
+
+                                    str += ("num=" + num + "  type = " + pokerType + ",");
+                                }
+
+                                str += "。";
+                                
+                                LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + str);
+                            }
+
                             JArray jarray = new JArray();
                             for (int i = 0; i < listPoker.Count; i++)
                             {
@@ -49,6 +65,22 @@ public class TrusteeshipLogic
                         else
                         {
                             List<TLJCommon.PokerInfo> listPoker = PlayRuleUtil.GetPokerWhenTuoGuan(room.m_curRoundFirstPlayer.m_curOutPokerList, playerData.getPokerList(), room.m_levelPokerNum, room.m_masterPokerType);
+
+                            {
+                                string str = "托管出牌--跟牌：roomID = " + room.getRoomId() + "  uid = " + playerData.m_uid + "    ";
+                                for (int i = 0; i < listPoker.Count; i++)
+                                {
+                                    int num = listPoker[i].m_num;
+                                    int pokerType = (int)listPoker[i].m_pokerType;
+
+                                    str += ("num=" + num + "  type = " + pokerType + ",");
+                                }
+
+                                str += "。";
+                                
+                                LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + str);
+                            }
+
                             JArray jarray = new JArray();
                             for (int i = 0; i < listPoker.Count; i++)
                             {
@@ -73,7 +105,7 @@ public class TrusteeshipLogic
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":trusteeshipLogic异常1：" + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":trusteeshipLogic异常1：" + ex);
         }
     }
 
@@ -82,7 +114,7 @@ public class TrusteeshipLogic
     {
         try
         {
-            LogUtil.getInstance().addDebugLog("帮玩家埋底:" + playerData.m_uid);
+            LogUtil.getInstance().writeRoomLog(room, "帮玩家埋底:" + playerData.m_uid);
 
             if (room.m_curMaiDiPlayer.m_uid.CompareTo(playerData.m_uid) == 0)
             {
@@ -98,7 +130,7 @@ public class TrusteeshipLogic
 
                 if (playerData.getPokerList().Count != 33)
                 {
-                    LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管埋底出错:手牌数量不为33");
+                    LogUtil.getInstance().writeRoomLog(room, ":托管埋底出错:手牌数量不为33");
                     return;
                 }
 
@@ -122,27 +154,34 @@ public class TrusteeshipLogic
             }
             else
             {
-                LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":当前倒计时结束埋底的人跟房间埋底的人不符合："+playerData.m_uid + "  " + room.m_curMaiDiPlayer.m_uid);
+                LogUtil.getInstance().writeRoomLog(room, ":当前倒计时结束埋底的人跟房间埋底的人不符合：" + playerData.m_uid + "  " + room.m_curMaiDiPlayer.m_uid);
             }
         }
         catch (Exception ex)
         {
-            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".trusteeshipLogic_MaiDi: " + ex.Message);
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".trusteeshipLogic_MaiDi: " + ex);
         }
     }
 
     // 托管:抄底
     public static void trusteeshipLogic_ChaoDi(GameBase gameBase, RoomData room, PlayerData playerData)
     {
-        LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":托管：帮" + playerData.m_uid + "抄底");
+        try
+        {
+            LogUtil.getInstance().writeRoomLog(room, ":托管：帮" + playerData.m_uid + "抄底");
 
-        JObject data = new JObject();
+            JObject data = new JObject();
 
-        data["tag"] = room.m_tag;
-        data["uid"] = playerData.m_uid;
-        data["playAction"] = (int)TLJCommon.Consts.PlayAction.PlayAction_PlayerChaoDi;
-        data["hasPoker"] = 0;
+            data["tag"] = room.m_tag;
+            data["uid"] = playerData.m_uid;
+            data["playAction"] = (int)TLJCommon.Consts.PlayAction.PlayAction_PlayerChaoDi;
+            data["hasPoker"] = 0;
 
-        GameLogic.doTask_PlayerChaoDi(gameBase,playerData.m_connId, data.ToString());
+            GameLogic.doTask_PlayerChaoDi(gameBase, playerData.m_connId, data.ToString());
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ".trusteeshipLogic_ChaoDi: " + ex);
+        }
     }
 }

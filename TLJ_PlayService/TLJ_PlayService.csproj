@@ -63,8 +63,10 @@
     <Compile Include="Game\GameLogic.cs" />
     <Compile Include="Game\PlayerData.cs" />
     <Compile Include="Game\RoomData.cs" />
+    <Compile Include="Game\RoomManager.cs" />
     <Compile Include="Game\TrusteeshipLogic.cs" />
     <Compile Include="NetResponds\NetRespond_DebugSetPoker.cs" />
+    <Compile Include="NetResponds\NetRespond_HeartBeat_Play.cs" />
     <Compile Include="Request\Request_GameOver.cs" />
     <Compile Include="Request\Request_UseBuff.cs" />
     <Compile Include="Request\Request_UserInfo_Game.cs" />
@@ -115,6 +117,7 @@
   <ItemGroup>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
