@@ -635,15 +635,10 @@ class PlayLogic_PVP: GameBase
             bool isJueShengJu = false;      // 下一局是否是决胜局
 
             {
-                PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(gameRoomType);
-                if (pvpGameRoomData == null)
-                {
-                    LogUtil.getInstance().writeRoomLog(now_room, "获取比赛场信息失败：" + gameRoomType);
-                    return;
-                }
-
-                int kaisairenshu = pvpGameRoomData.kaisairenshu;
-                switch (kaisairenshu)
+                List<string> listTemp = new List<string>();
+                CommonUtil.splitStr(now_room.m_gameRoomType, listTemp, '_');
+                int jirenchang = int.Parse(listTemp[2]);
+                switch (jirenchang)
                 {
                     case 8:
                         {
@@ -924,7 +919,7 @@ class PlayLogic_PVP: GameBase
                     //    PVPChangCiUtil.getInstance().addPlayerToThere(gameRoomType, winPlayerList[i]);
                     //}
 
-                    // 加入到8、16、32人列表里
+                    // 加入到8、16人列表里
                     {
                         for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
                         {
@@ -1060,11 +1055,11 @@ class PlayLogic_PVP: GameBase
 
             // 开始决胜局
             {
-                // 延迟3秒开赛
-                Thread.Sleep(3000);
+                //// 延迟3秒开赛
+                //Thread.Sleep(3000);
 
-                // 检测房间人数是否可以开赛
-                GameLogic.checkRoomStartGame(new_room, m_tag, true);
+                // 延迟3秒开赛
+                new_room.m_timerUtil.startTimer(3000, TimerType.TimerType_pvpjueshengjuStart);
             }
         }
     }

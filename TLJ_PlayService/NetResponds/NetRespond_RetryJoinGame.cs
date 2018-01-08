@@ -28,7 +28,6 @@ class NetRespond_RetryJoinGame
                     respondJO.Add("gameroomtype", room.m_gameRoomType);
                     respondJO.Add("roomState", (int)room.getRoomState());
                     respondJO.Add("isUseJiPaiQi", playerData.m_isUseJiPaiQi);
-                    respondJO.Add("isUseJiaBeiKa", playerData.m_isUseJiaBeiKa);
                     respondJO.Add("levelPokerNum", room.m_levelPokerNum);
                     respondJO.Add("myLevelPoker", playerData.m_myLevelPoker);
 
@@ -127,26 +126,6 @@ class NetRespond_RetryJoinGame
                     else
                     {
                         respondJO.Add("curChaoDiPlayer", "");
-                    }
-                    
-                    // 上一个人抢主用的牌
-                    {
-                        JArray ja_qiangzhuPokerList = new JArray();
-
-                        for (int i = 0; i < room.m_qiangzhuPokerList.Count; i++)
-                        {
-                            JObject temp = new JObject();
-
-                            int num = room.m_qiangzhuPokerList[i].m_num;
-                            int pokerType = (int)room.m_qiangzhuPokerList[i].m_pokerType;
-
-                            temp.Add("num", num);
-                            temp.Add("pokerType", pokerType);
-
-                            ja_qiangzhuPokerList.Add(temp);
-                        }
-
-                        respondJO.Add("qiangzhuPokerList", ja_qiangzhuPokerList);
                     }
 
                     // 当前回合出的牌
@@ -272,6 +251,27 @@ class NetRespond_RetryJoinGame
 
                     // 发送给客户端
                     PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());
+
+                    // 推送头像昵称等信息
+                    {
+                        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                        {
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(room.getPlayerDataList()[i].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                string data = Newtonsoft.Json.JsonConvert.SerializeObject(userInfo_Game);
+
+                                for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                {
+                                    if ((!room.getPlayerDataList()[j].isOffLine()) && (room.getPlayerDataList()[j].m_uid.CompareTo(userInfo_Game.uid) != 0))
+                                    {
+                                        // 发送给客户端
+                                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[j].m_connId, data);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -11,16 +11,15 @@ public class PlayerData
     public int m_isBanker = 0;      // 是否是庄家
     public int m_myLevelPoker = 2;
     public int m_score = 0;
-    public int m_gold = 0;
+    //public int m_gold = 0;
     public int m_rank = 0;
-    public int m_vipLevel = 0;
+    //public int m_vipLevel = 0;
     bool m_isOffLine = false;
     bool m_isTuoGuan = false;
     public bool m_isContinueGame = false;
     public bool m_isAI = false;
     public bool m_isPVP = false;
     public bool m_isUseJiPaiQi = false;
-    public bool m_isUseJiaBeiKa = false;
     public string m_pvpReward = "";
     public string m_gameRoomType;
 
@@ -28,7 +27,7 @@ public class PlayerData
     public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();        // 当前已经发的牌
     public List<TLJCommon.PokerInfo> m_curOutPokerList = new List<TLJCommon.PokerInfo>();
 
-    public List<BuffData> m_buffData = new List<BuffData>();
+    //public List<BuffData> m_buffData = new List<BuffData>();
 
     public TimerUtil m_timerUtil = new TimerUtil();
 
@@ -136,12 +135,11 @@ public class PlayerData
         m_isTuoGuan = false;
         m_isContinueGame = false;
         m_isUseJiPaiQi = false;
-        m_isUseJiaBeiKa = false;
 
         m_pokerList.Clear();
         m_allotPokerList.Clear();
         m_curOutPokerList.Clear();
-        m_buffData.Clear();
+        //m_buffData.Clear();
     }
 
     public bool isOffLine()

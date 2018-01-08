@@ -507,16 +507,20 @@ class PlayLogic_Relax: GameBase
                     if (room.getPlayerDataList()[i].m_score > 0)
                     {
                         bool canUse = false;
-                        for (int j = 0; j < room.getPlayerDataList()[i].m_buffData.Count; j++)
+                        UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(room.getPlayerDataList()[i].m_uid);
+                        if (userInfo_Game != null)
                         {
-                            if ((room.getPlayerDataList()[i].m_buffData[j].m_prop_id == (int)TLJCommon.Consts.Prop.Prop_jiabeika) && (room.getPlayerDataList()[i].m_buffData[j].m_buff_num > 0))
+                            for (int j = 0; j < userInfo_Game.BuffData.Count; j++)
                             {
-                                room.getPlayerDataList()[i].m_buffData[j].m_buff_num -= 1;
-                                canUse = true;
-                                
-                                LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + ":此玩家有双倍金币buff，金币奖励加倍 :" + room.getPlayerDataList()[i].m_uid);
+                                if ((userInfo_Game.BuffData[j].prop_id == (int)TLJCommon.Consts.Prop.Prop_jiabeika) && (userInfo_Game.BuffData[j].buff_num > 0))
+                                {
+                                    userInfo_Game.BuffData[j].buff_num -= 1;
+                                    canUse = true;
 
-                                break;
+                                    LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + ":此玩家有双倍金币buff，金币奖励加倍 :" + room.getPlayerDataList()[i].m_uid);
+
+                                    break;
+                                }
                             }
                         }
 
@@ -525,7 +529,7 @@ class PlayLogic_Relax: GameBase
                             room.getPlayerDataList()[i].m_score *= 2;
 
                             // 扣除玩家buff：加倍卡
-                            //Request_UseBuff.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.Prop.Prop_jiabeika);
+                            Request_UseBuff.doRequest(room.getPlayerDataList()[i].m_uid, (int)TLJCommon.Consts.Prop.Prop_jiabeika);
                         }
                     }
 

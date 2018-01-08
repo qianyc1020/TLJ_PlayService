@@ -137,18 +137,7 @@ public class MySqlServerUtil
             if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
             {
                 int connId = Convert.ToInt32(jo.GetValue("connId"));
-                int isClientReq = (int)jo.GetValue("isClientReq");
-
-                // 客户端请求的
-                if (isClientReq == 1)
-                {
-                    NetRespond_UserInfo_Game.onMySqlRespond(connId, str);
-                }
-                // 服务端请求的
-                else
-                {
-                    Request_UserInfo_Game.onMySqlRespond(str);
-                }
+                Request_UserInfo_Game.onMySqlRespond(str);
             }
             // 获取pvp场次信息
             else if (tag.CompareTo(TLJCommon.Consts.Tag_GetPVPGameRoom) == 0)

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\OtherConfig.cs" />
+    <Compile Include="Data\UserInfo_Game_Manager.cs" />
     <Compile Include="Debug\CustomPoker.cs" />
     <Compile Include="Debug\DebugConfig.cs" />
     <Compile Include="Game\GameBase.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="NetResponds\NetRespond_RetryJoinGame.cs" />
     <Compile Include="NetResponds\NetRespond_IsJoinGame.cs" />
     <Compile Include="NetResponds\NetRespond_UseBuff.cs" />
-    <Compile Include="NetResponds\NetRespond_UserInfo_Game.cs" />
     <Compile Include="PlayLogic\PlayLogic_PVP.cs" />
     <Compile Include="Data\PVPGameRoomDataScript.cs" />
     <Compile Include="Request\Request_GetAIList.cs" />
@@ -117,7 +117,6 @@
   <ItemGroup>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

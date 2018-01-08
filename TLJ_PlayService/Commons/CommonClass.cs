@@ -11,6 +11,8 @@ public enum TimerType
     TimerType_maidi,
     TimerType_chaodi,
     TimerType_breakRoom,
+    TimerType_fapai,
+    TimerType_pvpjueshengjuStart,
 }
 
 public class PVPRoomPlayerList

@@ -37,33 +37,23 @@ class Request_UserInfo_Game
     {
         try
         {
-            JObject jo = JObject.Parse(respondData);
-            string uid = jo.GetValue("uid").ToString();
-            int vipLevel = (int)jo.GetValue("vipLevel");
+            UserInfo_Game userInfo_Game = Newtonsoft.Json.JsonConvert.DeserializeObject<UserInfo_Game>(respondData);
+            UserInfo_Game_Manager.addOneData(userInfo_Game);
 
-            PlayerData playerDate = GameUtil.getPlayerDataByUid(uid);
-            if (playerDate == null)
+            // 获取到玩家信息之后找到该玩家所在的房间，给同桌的玩家推送此人的信息
+            RoomData room = GameUtil.getRoomByUid(userInfo_Game.uid);
+            if (room != null)
             {
-                TLJ_PlayService.PlayService.log.Error("Request_UserInfo_Game.onMySqlRespond----游戏服务器里没有此人数据：" + uid + "," + respondData);
-                return;
-            }
+                string data = Newtonsoft.Json.JsonConvert.SerializeObject(userInfo_Game);
 
-            playerDate.m_vipLevel = vipLevel;
-            playerDate.m_buffData.Clear();
-
-            JArray buff_list = (JArray)JsonConvert.DeserializeObject(jo.GetValue("BuffData").ToString());
-
-            for (int i = 0; i < buff_list.Count; i++)
-            {
-                int prop_id = (int)buff_list[i]["prop_id"];
-                int buff_num = (int)buff_list[i]["buff_num"];
-                playerDate.m_buffData.Add(new BuffData(prop_id, buff_num));
-            }
-
-            // 金币数量
-            {
-                int gold = (int)jo.GetValue("gold");
-                playerDate.m_gold = gold;
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    if ((!room.getPlayerDataList()[i].isOffLine()) && (room.getPlayerDataList()[i].m_uid.CompareTo(userInfo_Game.uid) != 0))
+                    {
+                        // 发送给客户端
+                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, data);
+                    }
+                }
             }
         }
         catch (Exception ex)

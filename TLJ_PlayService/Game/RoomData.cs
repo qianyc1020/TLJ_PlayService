@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TLJ_PlayService;
+using TLJCommon;
 using static TLJCommon.Consts;
 
 public class RoomData
@@ -20,8 +21,8 @@ public class RoomData
     public int m_chaodiTime = 10000;        // 炒底时间：毫秒
     public int m_matchTime = 30000;         // 匹配队友时间：毫秒
     public int m_roomAliveTime = 900000;    // 房间生命周期：毫秒：15分钟
-    //public int m_roomAliveTime = 300000;    // 房间生命周期：毫秒：5分钟
-    
+    public int m_fapaiDurTime = 400;    // 房间生命周期：毫秒：15分钟
+
     public string m_tag;
 
     public bool m_isStartGame = false;
@@ -57,10 +58,14 @@ public class RoomData
     public TimerUtil m_timerUtil = new TimerUtil();
     public TimerUtil m_timerUtil_breakRom = new TimerUtil();
 
+    int m_fapaiIndex = 0;
+    public TimerUtil m_timerUtil_FaPai = new TimerUtil();
+
     public GameBase m_gameBase;
 
     public void clearData()
     {
+        m_fapaiIndex = 0;
         m_isStartGame = false;
         m_roomState = RoomState.RoomState_waiting;
 
@@ -110,17 +115,22 @@ public class RoomData
 
         m_timerUtil.setTimerCallBack(timerCallback);
         m_timerUtil_breakRom.setTimerCallBack(timerCallback_breakRom);
+        m_timerUtil_FaPai.setTimerCallBack(timerCallback_fapai);
 
         // 匹配队友倒计时
         m_timerUtil.startTimer(RandomUtil.getRandom(5, m_matchTime), TimerType.TimerType_waitMatchTimeOut);
-
-        
     }
 
     // 强制解散房间倒计时
     public void startBreakRoomTimer()
     {
         m_timerUtil_breakRom.startTimer(m_roomAliveTime, TimerType.TimerType_breakRoom);
+    }
+
+    // 开始定时发牌
+    public void startFaPaiTimer()
+    {
+        m_timerUtil_FaPai.startTimer(m_fapaiDurTime, TimerType.TimerType_fapai);
     }
 
     void timerCallback(object obj)
@@ -133,7 +143,7 @@ public class RoomData
                     {
                         if (m_roomState == RoomState.RoomState_qiangzhu)
                         {
-                            //LogUtil.getInstance().writeRoomLog(this, "抢主时间结束");
+                            LogUtil.getInstance().writeRoomLog(this, "抢主时间结束");
                             m_roomState = RoomState.RoomState_zhuangjiamaidi;
 
                             if (m_zhuangjiaPlayerData == null)
@@ -154,6 +164,13 @@ public class RoomData
                             LogUtil.getInstance().writeRoomLog(this, "匹配时间结束，给房间添加机器人");
                             GameLogic.doTask_WaitMatchTimeOut(this);
                         }
+                    }
+                    break;
+
+                case TimerType.TimerType_pvpjueshengjuStart:
+                    {
+                        // 检测房间人数是否可以开赛
+                        GameLogic.checkRoomStartGame(this, m_tag, true);
                     }
                     break;
             }
@@ -210,6 +227,67 @@ public class RoomData
         catch (Exception ex)
         {
             TLJ_PlayService.PlayService.log.Error("RoomData----" + "timerCallback_breakRom异常: " + ex);
+        }
+    }
+
+    void timerCallback_fapai(object obj)
+    {
+        try
+        {
+            switch ((TimerType)obj)
+            {
+                case TimerType.TimerType_fapai:
+                    {
+                        m_timerUtil_FaPai.stopTimer();
+
+                        for (int i = 0; i< getPlayerDataList().Count ; i++)
+                        {
+                            int num = getPlayerDataList()[i].getPokerList()[m_fapaiIndex].m_num;
+                            int pokerType = (int)getPlayerDataList()[i].getPokerList()[m_fapaiIndex].m_pokerType;
+                            
+                            if (!getPlayerDataList()[i].isOffLine())
+                            {
+                                JObject jo2 = new JObject();
+                                jo2.Add("tag", m_tag);
+                                jo2.Add("uid", getPlayerDataList()[i].m_uid);
+                                jo2.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_FaPai);
+                                jo2.Add("num", num);
+                                jo2.Add("pokerType", pokerType);
+
+                                if (m_fapaiIndex == 24)
+                                {
+                                    jo2.Add("isEnd", 1);
+                                }
+                                else
+                                {
+                                    jo2.Add("isEnd", 0);
+                                }
+
+                                PlayService.m_serverUtil.sendMessage(getPlayerDataList()[i].m_connId, jo2.ToString());
+                            }
+
+                            getPlayerDataList()[i].m_allotPokerList.Add(new PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+                        }
+
+                        // 牌未发完
+                        if (m_fapaiIndex < 24)
+                        {
+                            ++m_fapaiIndex;
+
+                            startFaPaiTimer();
+                        }
+                        // 牌已发完
+                        else
+                        {
+                            m_timerUtil.startTimer(m_qiangzhuTime, TimerType.TimerType_qiangzhu);
+                        }
+                    }
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error("RoomData----" + "timerCallback_fapai异常: " + ex);
         }
     }
 

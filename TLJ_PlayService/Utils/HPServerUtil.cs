@@ -449,11 +449,6 @@ public class HPServerUtil
             {
                 NetRespond_OnlineInfo.doAskCilentReq_OnlineInfo(receiveObj.m_connId, text);
             }
-            // 获取游戏内玩家信息
-            else if (tag.CompareTo(TLJCommon.Consts.Tag_UserInfo_Game) == 0)
-            {
-                NetRespond_UserInfo_Game.doAskCilentReq_UserInfo_Game(receiveObj.m_connId, text);
-            }
             // 使用buff
             else if (tag.CompareTo(TLJCommon.Consts.Tag_UseBuff) == 0)
             {

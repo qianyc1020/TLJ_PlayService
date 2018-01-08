@@ -14,9 +14,9 @@ class NetRespond_HeartBeat_Play
         try
         {
             JObject jo = JObject.Parse(reqData);
-            
+
             respondJO.Add("tag", jo.GetValue("tag").ToString());
-            
+
             // 发送给客户端
             PlayService.m_serverUtil.sendMessage(connId, respondJO.ToString());
         }
