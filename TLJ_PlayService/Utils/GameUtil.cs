@@ -347,8 +347,8 @@ class GameUtil
                 // PVP-金币场
                 if (list[1].CompareTo("JinBi") == 0)
                 {
-                    // 5000金币场
-                    if (pvpGameRoomData.reward_num == 5000)
+                    // 2000金币场
+                    if (pvpGameRoomData.reward_num == 2000)
                     {
                         // 第一名
                         {
@@ -377,7 +377,7 @@ class GameUtil
                         }
                     }
                     // 15000金币场
-                    else if (pvpGameRoomData.reward_num == 15000)
+                    else if (pvpGameRoomData.reward_num == 10000)
                     {
                         // 第一名
                         {
