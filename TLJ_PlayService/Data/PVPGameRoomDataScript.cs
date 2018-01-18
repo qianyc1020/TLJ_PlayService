@@ -42,8 +42,31 @@ class PVPGameRoomDataScript
                 temp.gameroomtype = (string)room_list[i]["gameroomtype"];
                 temp.gameroomname = (string)room_list[i]["gameroomname"];
                 temp.kaisairenshu = (int)room_list[i]["kaisairenshu"];
-                temp.baomingfei = (string)room_list[i]["baomingfei"];
-                temp.reward = (string)room_list[i]["reward"];
+
+                // 报名费
+                {
+                    temp.baomingfei = (string)room_list[i]["baomingfei"];
+
+                    if (temp.baomingfei.CompareTo("0") != 0)
+                    {
+                        List<string> list = new List<string>();
+                        CommonUtil.splitStr(temp.baomingfei, list, ':');
+
+                        temp.baomingfei_type = int.Parse(list[0]);
+                        temp.baomingfei_num = int.Parse(list[1]);
+                    }
+                }
+
+                // 奖励
+                {
+                    temp.reward = (string)room_list[i]["reward"];
+
+                    List<string> list = new List<string>();
+                    CommonUtil.splitStr(temp.reward, list, ':');
+
+                    temp.reward_id = int.Parse(list[0]);
+                    temp.reward_num = int.Parse(list[1]);
+                }
 
                 m_dataList.Add(temp);
             }

@@ -22,6 +22,7 @@ public class PlayerData
     public bool m_isUseJiPaiQi = false;
     public string m_pvpReward = "";
     public string m_gameRoomType;
+    public bool m_isFreeOutPoker = false;
 
     List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();                    // 玩家手牌（发完牌之后）
     public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();        // 当前已经发的牌
@@ -30,6 +31,7 @@ public class PlayerData
     //public List<BuffData> m_buffData = new List<BuffData>();
 
     public TimerUtil m_timerUtil = new TimerUtil();
+    public TimerUtil m_timerUtilOffLine = new TimerUtil();
 
     public PlayerData(IntPtr connId, string uid, bool isAI,string gameRoomType)
     {
@@ -59,6 +61,7 @@ public class PlayerData
         }
 
         m_timerUtil.setTimerCallBack(timerCallback);
+        m_timerUtilOffLine.setTimerCallBack(timerCallback_offLine);
     }
 
     void timerCallback(object obj)
@@ -70,6 +73,72 @@ public class PlayerData
                 case TimerType.TimerType_outPoker:
                     {
                         RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (room.m_curOutPokerPlayer.m_uid.CompareTo(m_uid) != 0)
+                        {
+                            string str = "PlayerData.timerCallback case TimerType.TimerType_outPoker错误：当前出牌人应该是：" + room.m_curOutPokerPlayer.m_uid + ",但是现在出牌倒计时结束的人是：" + m_uid;
+                            LogUtil.getInstance().writeRoomLog(room, str);
+                            return;
+                        }
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_OutPoker(room.m_gameBase, room, this);
+                    }
+                    break;
+
+                case TimerType.TimerType_maidi:
+                    {
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_MaiDi(room.m_gameBase, room, this);
+                    }
+                    break;
+
+                case TimerType.TimerType_chaodi:
+                    {
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (!m_isTuoGuan)
+                        {
+                            m_isTuoGuan = true;
+                            changeTuoGuanState();
+                        }
+                        TrusteeshipLogic.trusteeshipLogic_ChaoDi(room.m_gameBase, room, this);
+                    }
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error("PlayerData----" + "timerCallback: " + ex);
+        }
+    }
+
+    void timerCallback_offLine(object obj)
+    {
+        try
+        {
+            switch ((TimerType)obj)
+            {
+                case TimerType.TimerType_outPoker:
+                    {
+                        RoomData room = GameUtil.getRoomByUid(m_uid);
+
+                        if (room.m_curOutPokerPlayer.m_uid.CompareTo(m_uid) != 0)
+                        {
+                            string str = "PlayerData.timerCallback case TimerType.TimerType_outPoker错误：当前出牌人应该是：" + room.m_curOutPokerPlayer.m_uid + ",但是现在出牌倒计时结束的人是：" + m_uid;
+                            LogUtil.getInstance().writeRoomLog(room, str);
+                            return;
+                        }
 
                         if (!m_isTuoGuan)
                         {

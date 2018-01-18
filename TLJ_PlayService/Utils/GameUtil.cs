@@ -349,152 +349,177 @@ class GameUtil
 
     public static void setPVPReward(PVPRoomPlayerList curPVPRoomPlayerList)
     {
-        if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_8) == 0)
+        string gameRoomType = curPVPRoomPlayerList.m_gameRoomType;
+
+        List<string> list = new List<string>();
+        CommonUtil.splitStr(gameRoomType, list, '_');
+
+        if (list.Count == 3)
         {
-            // 第一名
+            if (list[0].CompareTo("PVP") == 0)
             {
-                int getHuiZhangNum = 1;
+                PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(gameRoomType);
 
-                UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
-                if (userInfo_Game != null)
+                // PVP-金币场
+                if (list[1].CompareTo("JinBi") == 0)
                 {
-                    int vipLevel = userInfo_Game.vipLevel;
+                    // 2000金币场
+                    if (pvpGameRoomData.reward_num == 2000)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 1;
 
-                    if ((vipLevel >= 2) && (vipLevel <= 4))
-                    {
-                        getHuiZhangNum += 1;
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                int vipLevel = userInfo_Game.vipLevel;
+
+                                if ((vipLevel >= 2) && (vipLevel <= 4))
+                                {
+                                    getHuiZhangNum += 1;
+                                }
+                                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                                {
+                                    getHuiZhangNum += 2;
+                                }
+                                else if ((vipLevel >= 8) && (vipLevel <= 10))
+                                {
+                                    getHuiZhangNum += 3;
+                                }
+                            }
+                            else
+                            {
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:2000;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
+                        }
                     }
-                    else if ((vipLevel >= 5) && (vipLevel <= 7))
+                    // 10000金币场
+                    else if (pvpGameRoomData.reward_num == 10000)
                     {
-                        getHuiZhangNum += 2;
-                    }
-                    else if ((vipLevel >= 8) && (vipLevel <= 10))
-                    {
-                        getHuiZhangNum += 3;
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 1;
+
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                int vipLevel = userInfo_Game.vipLevel;
+
+                                if ((vipLevel >= 2) && (vipLevel <= 4))
+                                {
+                                    getHuiZhangNum += 1;
+                                }
+                                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                                {
+                                    getHuiZhangNum += 2;
+                                }
+                                else if ((vipLevel >= 8) && (vipLevel <= 10))
+                                {
+                                    getHuiZhangNum += 3;
+                                }
+                            }
+                            else
+                            {
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:10000;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
+                        }
                     }
                 }
-                else
+                // PVP-话费场
+                else if (list[1].CompareTo("HuaFei") == 0)
                 {
-                    TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
-                }
-
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:2000;110:" + getHuiZhangNum;
-            }
-
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
-            }
-        }
-        else if(curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_JinBi_16) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 1;
-
-                UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
-                if (userInfo_Game != null)
-                {
-                    int vipLevel = userInfo_Game.vipLevel;
-
-                    if ((vipLevel >= 2) && (vipLevel <= 4))
+                    // 1元话费场
+                    if (list[2].CompareTo("1") == 0)
                     {
-                        getHuiZhangNum += 1;
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 1;
+
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                int vipLevel = userInfo_Game.vipLevel;
+
+                                if ((vipLevel >= 2) && (vipLevel <= 4))
+                                {
+                                    getHuiZhangNum += 1;
+                                }
+                                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                                {
+                                    getHuiZhangNum += 2;
+                                }
+                                else if ((vipLevel >= 8) && (vipLevel <= 10))
+                                {
+                                    getHuiZhangNum += 3;
+                                }
+                            }
+                            else
+                            {
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "111:1;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:500";
+                        }
                     }
-                    else if ((vipLevel >= 5) && (vipLevel <= 7))
+                    // 5元话费场
+                    else if (list[2].CompareTo("5") == 0)
                     {
-                        getHuiZhangNum += 2;
-                    }
-                    else if ((vipLevel >= 8) && (vipLevel <= 10))
-                    {
-                        getHuiZhangNum += 3;
-                    }
-                }
-                else
-                {
-                    TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
-                }
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 2;
 
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:10000;110:" + getHuiZhangNum;
-            }
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                int vipLevel = userInfo_Game.vipLevel;
 
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
-            }
-        }
-        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_8) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 1;
+                                if ((vipLevel >= 2) && (vipLevel <= 4))
+                                {
+                                    getHuiZhangNum += 1;
+                                }
+                                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                                {
+                                    getHuiZhangNum += 2;
+                                }
+                                else if ((vipLevel >= 8) && (vipLevel <= 10))
+                                {
+                                    getHuiZhangNum += 3;
+                                }
+                            }
+                            else
+                            {
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
+                            }
 
-                UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
-                if (userInfo_Game != null)
-                {
-                    int vipLevel = userInfo_Game.vipLevel;
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "112:1;110:" + getHuiZhangNum;
+                        }
 
-                    if ((vipLevel >= 2) && (vipLevel <= 4))
-                    {
-                        getHuiZhangNum += 1;
-                    }
-                    else if ((vipLevel >= 5) && (vipLevel <= 7))
-                    {
-                        getHuiZhangNum += 2;
-                    }
-                    else if ((vipLevel >= 8) && (vipLevel <= 10))
-                    {
-                        getHuiZhangNum += 3;
-                    }
-                }
-                else
-                {
-                    TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
-                }
-
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "111:1;110:" + getHuiZhangNum;
-            }
-
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:500";
-            }
-        }
-        else if (curPVPRoomPlayerList.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_PVP_HuaFei_16) == 0)
-        {
-            // 第一名
-            {
-                int getHuiZhangNum = 1;
-
-                UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
-                if (userInfo_Game != null)
-                {
-                    int vipLevel = userInfo_Game.vipLevel;
-
-                    if ((vipLevel >= 2) && (vipLevel <= 4))
-                    {
-                        getHuiZhangNum += 1;
-                    }
-                    else if ((vipLevel >= 5) && (vipLevel <= 7))
-                    {
-                        getHuiZhangNum += 2;
-                    }
-                    else if ((vipLevel >= 8) && (vipLevel <= 10))
-                    {
-                        getHuiZhangNum += 3;
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:5000;110:1";
+                        }
                     }
                 }
-                else
-                {
-                    TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
-                }
-
-                curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "112:1;110:" + getHuiZhangNum;
-            }
-
-            // 第二名
-            {
-                curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:10000;110:1";
             }
         }
     }

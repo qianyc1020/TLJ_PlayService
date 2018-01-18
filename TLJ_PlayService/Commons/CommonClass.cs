@@ -12,7 +12,9 @@ public enum TimerType
     TimerType_chaodi,
     TimerType_breakRoom,
     TimerType_fapai,
-    TimerType_pvpjueshengjuStart,
+    TimerType_pvpNextStartGame,
+    TimerType_callPlayerOutPoker,
+    TimerType_gameOver,
 }
 
 public class PVPRoomPlayerList

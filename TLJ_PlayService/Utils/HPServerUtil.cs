@@ -364,9 +364,6 @@ public class HPServerUtil
     // 处理客户端的请求
     void doAskCilentReq(object obj)
     {
-        // 模拟耗时操作，比如数据库操作，IO操作
-        // Thread.Sleep(3000);
-
         ReceiveObj receiveObj = (ReceiveObj)obj;
         string text = receiveObj.m_data;
         

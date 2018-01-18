@@ -167,10 +167,23 @@ public class RoomData
                     }
                     break;
 
-                case TimerType.TimerType_pvpjueshengjuStart:
+                case TimerType.TimerType_pvpNextStartGame:
                     {
                         // 检测房间人数是否可以开赛
                         GameLogic.checkRoomStartGame(this, m_tag, true);
+                    }
+                    break;
+
+                case TimerType.TimerType_callPlayerOutPoker:
+                    {
+                        // 让下一个人出牌
+                        GameLogic.doTask_CallPlayerOutPoker(m_gameBase, this, m_curOutPokerPlayer);
+                    }
+                    break;
+
+                case TimerType.TimerType_gameOver:
+                    {
+                        m_gameBase.gameOver(this);
                     }
                     break;
             }
