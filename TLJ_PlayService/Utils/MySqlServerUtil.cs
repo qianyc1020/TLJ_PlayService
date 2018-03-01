@@ -48,7 +48,10 @@ public class MySqlServerUtil
 
         m_isConnecting = true;
         LogUtil.getInstance().addDebugLog("连接数据库服务器成功");
-        
+
+        // 游戏在线统计
+        Request_OnlineStatistics.doRequest("", 0, "", true, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_clear);
+
         // 数据清空
         {
             PVPGameRoomDataScript.clear();

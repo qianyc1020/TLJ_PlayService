@@ -148,7 +148,17 @@ public class RoomData
 
                             if (m_zhuangjiaPlayerData == null)
                             {
-                                m_zhuangjiaPlayerData = getPlayerDataList()[0];
+                                if (true)
+                                {
+                                    // 没人抢庄的话，指定第一个人作为庄家
+                                    m_zhuangjiaPlayerData = getPlayerDataList()[0];
+                                }
+                                else
+                                {
+                                    // 没人抢庄的话，随机指定庄家
+                                    int i = RandomUtil.getRandom(0, 3);
+                                    m_zhuangjiaPlayerData = getPlayerDataList()[i];
+                                }                                
                             }
 
                             GameLogic.doTask_QiangZhuEnd(this);

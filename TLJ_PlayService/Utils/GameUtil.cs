@@ -439,6 +439,44 @@ class GameUtil
                             curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
                         }
                     }
+                    // 5000金币场(用于ios审核)
+                    else if (pvpGameRoomData.reward_num == 5000)
+                    {
+                        // 第一名
+                        {
+                            int getHuiZhangNum = 1;
+
+                            UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(curPVPRoomPlayerList.m_playerList[0].m_uid);
+                            if (userInfo_Game != null)
+                            {
+                                int vipLevel = userInfo_Game.vipLevel;
+
+                                if ((vipLevel >= 2) && (vipLevel <= 4))
+                                {
+                                    getHuiZhangNum += 1;
+                                }
+                                else if ((vipLevel >= 5) && (vipLevel <= 7))
+                                {
+                                    getHuiZhangNum += 2;
+                                }
+                                else if ((vipLevel >= 8) && (vipLevel <= 10))
+                                {
+                                    getHuiZhangNum += 3;
+                                }
+                            }
+                            else
+                            {
+                                TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":setPVPReward出错：UserInfo_Game_Manager.getDataByUid()为空");
+                            }
+
+                            curPVPRoomPlayerList.m_playerList[0].m_pvpReward = "1:5000;110:" + getHuiZhangNum;
+                        }
+
+                        // 第二名
+                        {
+                            curPVPRoomPlayerList.m_playerList[1].m_pvpReward = "1:1000";
+                        }
+                    }
                 }
                 // PVP-话费场
                 else if (list[1].CompareTo("HuaFei") == 0)
@@ -677,5 +715,57 @@ class GameUtil
         }
 
         return playerData;
+    }
+
+    public static string getRoomName(string gameRoomType)
+    {
+        string roonName = "";
+
+        if (gameRoomType.CompareTo("XiuXian_JingDian_ChuJi") == 0)
+        {
+            roonName = "经典玩法-新手场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_JingDian_ZhongJi") == 0)
+        {
+            roonName = "经典玩法-精英场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_JingDian_GaoJi") == 0)
+        {
+            roonName = "经典玩法-大师场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_ChaoDi_ChuJi") == 0)
+        {
+            roonName = "抄底玩法-新手场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_ChaoDi_ZhongJi") == 0)
+        {
+            roonName = "抄底玩法-精英场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_ChaoDi_GaoJi") == 0)
+        {
+            roonName = "抄底玩法-大师场";
+        }
+        else if (gameRoomType.CompareTo("PVP_JinBi_2000") == 0)
+        {
+            roonName = "2千金币场(抄底)";
+        }
+        else if (gameRoomType.CompareTo("PVP_JinBi_10000") == 0)
+        {
+            roonName = "1万金币场(抄底)";
+        }
+        else if (gameRoomType.CompareTo("PVP_HuaFei_1") == 0)
+        {
+            roonName = "1元话费场(抄底)";
+        }
+        else if (gameRoomType.CompareTo("PVP_HuaFei_5") == 0)
+        {
+            roonName = "5元话费场(抄底)";
+        }
+        else if (gameRoomType.CompareTo("PVP_JinBi_5000") == 0)
+        {
+            roonName = "5千金币场(抄底)";
+        }
+
+        return roonName;
     }
 }

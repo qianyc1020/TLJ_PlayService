@@ -329,6 +329,9 @@ public class HPServerUtil
                 RoomData room = GameUtil.getRoomByUid(playerData.m_uid);
                 if (room != null)
                 {
+                    // 游戏在线统计
+                    Request_OnlineStatistics.doRequest(playerData.m_uid, room.getRoomId(), room.m_gameRoomType, playerData.m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+
                     LogUtil.getInstance().writeRoomLog(room, "与客户端断开:" + connId);
                 }
                 else

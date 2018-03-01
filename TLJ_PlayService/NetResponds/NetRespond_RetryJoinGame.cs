@@ -24,6 +24,9 @@ class NetRespond_RetryJoinGame
 
                 if (room != null)
                 {
+                    // 游戏在线统计
+                    Request_OnlineStatistics.doRequest(playerData.m_uid, room.getRoomId(), room.m_gameRoomType, playerData.m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_Join);
+
                     respondJO.Add("tag", TLJCommon.Consts.Tag_ResumeGame);
                     respondJO.Add("gameroomtype", room.m_gameRoomType);
                     respondJO.Add("roomState", (int)room.getRoomState());

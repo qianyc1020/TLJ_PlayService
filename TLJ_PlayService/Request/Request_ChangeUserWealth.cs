@@ -7,7 +7,7 @@ using TLJ_PlayService;
 
 class Request_ChangeUserWealth
 {
-    public static void doRequest(string uid,int reward_id,int reward_num)
+    public static void doRequest(string uid,int reward_id,int reward_num,string reason)
     {
         try
         {
@@ -21,8 +21,9 @@ class Request_ChangeUserWealth
             respondJO.Add("uid", uid);
             respondJO.Add("reward_id", reward_id);
             respondJO.Add("reward_num", reward_num);
+            respondJO.Add("reason", reason);
 
-            LogUtil.getInstance().addDebugLog("Request_ChangeUserWealth----改变玩家财富：" + uid +  "  "+ reward_id+"  "+ reward_num);
+            LogUtil.getInstance().addDebugLog("Request_ChangeUserWealth----改变玩家财富：" + uid +  "  "+ reward_id+"  "+ reward_num + "  " + reason);
 
             // 传给数据库服务器
             {

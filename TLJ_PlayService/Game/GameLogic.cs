@@ -234,6 +234,9 @@ class GameLogic
 
                             // 获取游戏数据
                             Request_UserInfo_Game.doRequest(room.getPlayerDataList()[i].m_uid);
+
+                            // 游戏在线统计
+                            Request_OnlineStatistics.doRequest(room.getPlayerDataList()[i].m_uid,room.getRoomId(),room.m_gameRoomType, room.getPlayerDataList()[i].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_Join);
                         }
                     }
                 }
@@ -690,12 +693,42 @@ class GameLogic
                             // 如果是PVP的话，从第二轮开始，机器人的分数不能太假，要在合理的范围
                             if (room.m_rounds_pvp > 1)
                             {
-                                for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                // 话费场让玩家跟机器人打的时候得第一名的概率小一点
+                                if ((room.m_gameRoomType.CompareTo("PVP_HuaFei_1") == 0) || (room.m_gameRoomType.CompareTo("PVP_HuaFei_5") == 0))
                                 {
-                                    if (!room.getPlayerDataList()[j].m_isAI)
+                                    int r = RandomUtil.getRandom(1,100);
+                                    if (r <= 70)
                                     {
-                                        playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
-                                        break;
+                                        for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                        {
+                                            if (!room.getPlayerDataList()[j].m_isAI)
+                                            {
+                                                playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                        {
+                                            if (!room.getPlayerDataList()[j].m_isAI)
+                                            {
+                                                playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                    {
+                                        if (!room.getPlayerDataList()[j].m_isAI)
+                                        {
+                                            playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
+                                            break;
+                                        }
                                     }
                                 }
                             }

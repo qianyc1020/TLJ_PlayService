@@ -496,6 +496,12 @@ class PlayLogic_Relax: GameBase
             
             LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
 
+            // 游戏在线统计
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                Request_OnlineStatistics.doRequest(room.getPlayerDataList()[i].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[i].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+            }
+
             // 计算每个玩家的金币（积分）
             GameUtil.setPlayerScore(room,false);
 
@@ -534,12 +540,14 @@ class PlayLogic_Relax: GameBase
                     }
 
                     // 加、减玩家金币值
-                    Request_ChangeUserWealth.doRequest(room.getPlayerDataList()[i].m_uid, 1, room.getPlayerDataList()[i].m_score);
+                    Request_ChangeUserWealth.doRequest(room.getPlayerDataList()[i].m_uid, 1, room.getPlayerDataList()[i].m_score,"休闲场结算");
                 }
             }
 
             // 逻辑处理
             {
+                List<string> winnerList = new List<string>();
+
                 // 闲家赢
                 if (room.m_getAllScore >= 80)
                 {
@@ -547,6 +555,8 @@ class PlayLogic_Relax: GameBase
                     {
                         if (room.getPlayerDataList()[i].m_isBanker == 0)
                         {
+                            winnerList.Add(room.getPlayerDataList()[i].m_uid);
+
                             ++room.getPlayerDataList()[i].m_myLevelPoker;
                             if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
                             {
@@ -576,6 +586,8 @@ class PlayLogic_Relax: GameBase
                     {
                         if (room.getPlayerDataList()[i].m_isBanker == 1)
                         {
+                            winnerList.Add(room.getPlayerDataList()[i].m_uid);
+
                             ++room.getPlayerDataList()[i].m_myLevelPoker;
                             if (room.getPlayerDataList()[i].m_myLevelPoker == 15)
                             {
@@ -598,6 +610,9 @@ class PlayLogic_Relax: GameBase
                         }
                     }
                 }
+
+                // 游戏数据统计
+                Request_GameStatistics.doRequest(room,winnerList);
             }
 
             // 通知

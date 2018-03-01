@@ -68,6 +68,8 @@
     <Compile Include="Game\TrusteeshipLogic.cs" />
     <Compile Include="NetResponds\NetRespond_DebugSetPoker.cs" />
     <Compile Include="NetResponds\NetRespond_HeartBeat_Play.cs" />
+    <Compile Include="Request\Request_GameStatistics.cs" />
+    <Compile Include="Request\Request_OnlineStatistics.cs" />
     <Compile Include="Request\Request_GameOver.cs" />
     <Compile Include="Request\Request_UseBuff.cs" />
     <Compile Include="Request\Request_UserInfo_Game.cs" />

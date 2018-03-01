@@ -215,7 +215,7 @@ class PlayLogic_PVP: GameBase
                 {
                     List<string> tempList = new List<string>();
                     CommonUtil.splitStr(baomingfei, tempList,':');
-                    Request_ChangeUserWealth.doRequest(uid, int.Parse(tempList[0]), -int.Parse(tempList[1]));
+                    Request_ChangeUserWealth.doRequest(uid, int.Parse(tempList[0]), -int.Parse(tempList[1]),"比赛场报名费");
                 }
             }
 
@@ -618,9 +618,15 @@ class PlayLogic_PVP: GameBase
     {
         try
         {
-            LogUtil.getInstance().writeRoomLog(now_room, m_logFlag + "----" + ":比赛结束,roomid = :" + now_room.getRoomId());
-
             now_room.setRoomState(RoomState.RoomState_end);
+
+            LogUtil.getInstance().writeRoomLog(now_room, m_logFlag + "----" + ":比赛结束,roomid = :" + now_room.getRoomId());
+            
+            // 游戏在线统计
+            for (int i = 0; i < now_room.getPlayerDataList().Count; i++)
+            {
+                Request_OnlineStatistics.doRequest(now_room.getPlayerDataList()[i].m_uid, now_room.getRoomId(), now_room.m_gameRoomType, now_room.getPlayerDataList()[i].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+            }
 
             // 计算每个玩家的金币（积分）
             GameUtil.setPlayerScore(now_room,true);
@@ -689,6 +695,8 @@ class PlayLogic_PVP: GameBase
                 }
             }
 
+            List<string> winnerList = new List<string>();
+
             // 逻辑处理
             {
                 // 闲家赢
@@ -698,6 +706,8 @@ class PlayLogic_PVP: GameBase
                     {
                         if (now_room.getPlayerDataList()[i].m_isBanker == 0)
                         {
+                            winnerList.Add(now_room.getPlayerDataList()[i].m_uid);
+
                             ++now_room.getPlayerDataList()[i].m_myLevelPoker;
                             if (now_room.getPlayerDataList()[i].m_myLevelPoker == 15)
                             {
@@ -745,6 +755,8 @@ class PlayLogic_PVP: GameBase
                     {
                         if (now_room.getPlayerDataList()[i].m_isBanker == 1)
                         {
+                            winnerList.Add(now_room.getPlayerDataList()[i].m_uid);
+
                             ++now_room.getPlayerDataList()[i].m_myLevelPoker;
                             if (now_room.getPlayerDataList()[i].m_myLevelPoker == 15)
                             {
@@ -840,6 +852,9 @@ class PlayLogic_PVP: GameBase
 
             if (isJueShengJu)
             {
+                // 游戏数据统计
+                Request_GameStatistics.doRequest(now_room, winnerList);
+
                 jueshengju(now_room);
 
                 return;
@@ -848,6 +863,9 @@ class PlayLogic_PVP: GameBase
             // 进入新房间，准备开始下一局
             if (isContiune)
             {
+                // 游戏数据统计
+                Request_GameStatistics.doRequest(now_room, winnerList);
+
                 // 删除该房间
                 {
                     LogUtil.getInstance().writeRoomLog(now_room, m_logFlag + ":本局打完，强制解散该房间：" + now_room.getRoomId());
@@ -937,6 +955,9 @@ class PlayLogic_PVP: GameBase
                     PVPChangCiUtil.getInstance().deletePVPRoomPlayerList(curPVPRoomPlayerList);
 
                     GameUtil.setPVPReward(curPVPRoomPlayerList);
+
+                    // 游戏数据统计
+                    Request_GameStatistics.doRequest(now_room, winnerList);
 
                     string gameroomname = PVPGameRoomDataScript.getInstance().getDataByRoomType(curPVPRoomPlayerList.m_gameRoomType).gameroomname;
 
@@ -1049,7 +1070,25 @@ class PlayLogic_PVP: GameBase
                 playData.m_score = (room.getPlayerDataList()[i].m_score);
                 new_room.joinPlayer(playData);
             }
-            
+
+            // 随机交换队友
+            if(false)
+            {
+                int r = RandomUtil.getRandom(1,2);
+                if (r == 1)
+                {
+                    PlayerData temp = new_room.getPlayerDataList()[2];
+                    new_room.getPlayerDataList()[2] = new_room.getPlayerDataList()[1];
+                    new_room.getPlayerDataList()[1] = temp;
+                }
+                else
+                {
+                    PlayerData temp = new_room.getPlayerDataList()[2];
+                    new_room.getPlayerDataList()[2] = new_room.getPlayerDataList()[3];
+                    new_room.getPlayerDataList()[3] = temp;
+                }
+            }
+
             {
                 LogUtil.getInstance().writeRoomLog(room,m_logFlag + "----" + "删除旧房间：" + room.getRoomId());
                 GameLogic.removeRoom(this, room,false);
