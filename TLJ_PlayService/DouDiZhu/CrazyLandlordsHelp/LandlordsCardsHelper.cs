@@ -66,6 +66,35 @@ namespace CrazyLandlords.Helper
         }
 
         /// <summary>
+        /// 权重复制
+        /// </summary>
+        /// <param name="cards"></param>
+        public static void SetWeight(PokerInfo[] cards)
+        {
+            foreach (var card in cards)
+            {
+                if (card.m_num == 2)
+                {
+                    card.m_weight_DDZ = Weight_DDZ.Two;
+                }else if (card.m_num == 14)
+                {
+                    card.m_weight_DDZ = Weight_DDZ.One;
+                }else if (card.m_num == 15)
+                {
+                    card.m_weight_DDZ = Weight_DDZ.SJoker;
+                }
+                else if (card.m_num == 15)
+                {
+                    card.m_weight_DDZ = Weight_DDZ.LJoker;
+                }
+                else
+                {
+                    card.m_weight_DDZ = (Weight_DDZ)card.m_num;
+                }
+            }
+        }
+
+        /// <summary>
         /// 根据Weight_DDZ在卡组中找到所有重复的卡牌(两个及两个以上)
         /// </summary>
         /// <param name="cards"></param>
