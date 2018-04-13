@@ -962,7 +962,8 @@ class DDZ_GameLogic
                     respondJO.Add("tag", room.m_tag);
                     respondJO.Add("uid", playerData.m_uid);
                     respondJO.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_PlayerOutPoker);
-
+                    respondJO.Add("restPokerCount", playerData.getPokerList().Count);
+                    
                     {
                         JArray temp_ja = new JArray();
                         for (int m = 0; m < pokerList.Count; m++)
