@@ -139,7 +139,7 @@ namespace CrazyLandlords.Helper
                 (PokerInfo a, PokerInfo b) =>
                 {
                     //先按照权重降序，再按花色升序
-                    return -a.m_weight_DDZ.CompareTo(b.m_weight_DDZ) * 2 + a.m_weight_DDZ.CompareTo(b.m_weight_DDZ);
+                    return -a.m_weight_DDZ.CompareTo(b.m_weight_DDZ) * 2 + a.m_pokerType.CompareTo(b.m_pokerType);
                 }
             );
         }
