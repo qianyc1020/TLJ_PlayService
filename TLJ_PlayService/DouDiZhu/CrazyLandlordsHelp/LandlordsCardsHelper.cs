@@ -74,7 +74,7 @@ namespace CrazyLandlords.Helper
         {
             foreach (var PlayerData in room.getPlayerDataList())
             {
-                SetWeight(PlayerData.getPokerList().ToArray());
+                SetWeight(PlayerData.getPokerList());
                 SortCards(PlayerData.getPokerList());
             }
         }
@@ -83,7 +83,7 @@ namespace CrazyLandlords.Helper
         /// 权重复制
         /// </summary>
         /// <param name="cards"></param>
-        public static void SetWeight(PokerInfo[] cards)
+        public static void SetWeight(List<PokerInfo> cards)
         {
             foreach (var card in cards)
             {
@@ -106,7 +106,7 @@ namespace CrazyLandlords.Helper
                     card.m_weight_DDZ = (Weight_DDZ)card.m_num;
                 }
             }
-            SortCards(cards.ToList());
+            SortCards(cards);
         }
 
         /// <summary>
@@ -1333,8 +1333,8 @@ namespace CrazyLandlords.Helper
                     DDZ_PlayerData beforePlayerData = room.getBeforePlayerData(playerData.m_uid);
 
                     //给上一乱手牌设权重
-                    LandlordsCardsHelper.SetWeight(beforePlayerData.getPokerList().ToArray());
-                    LandlordsCardsHelper.SetWeight(beforePlayerData.m_curOutPokerList.ToArray());
+                    LandlordsCardsHelper.SetWeight(beforePlayerData.getPokerList());
+                    LandlordsCardsHelper.SetWeight(beforePlayerData.m_curOutPokerList);
 
                     if (beforePlayerData.m_curOutPokerList.Count != 0)
                     {
