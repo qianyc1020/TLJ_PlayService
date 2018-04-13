@@ -328,7 +328,7 @@ class DDZ_GameLogic
                         JObject respondJO = new JObject();
                         respondJO.Add("tag", tag);
                         respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_OK);
-                        respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_SetTuoGuanState);
+                        respondJO.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_SetTuoGuanState);
                         respondJO.Add("uid", uid);
                         respondJO.Add("isTuoGuan", isTuoGuan);
 
@@ -343,7 +343,7 @@ class DDZ_GameLogic
                 JObject respondJO = new JObject();
                 respondJO.Add("tag", tag);
                 respondJO.Add("code", (int)TLJCommon.Consts.Code.Code_CommonFail);
-                respondJO.Add("playAction", (int)TLJCommon.Consts.PlayAction.PlayAction_SetTuoGuanState);
+                respondJO.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_SetTuoGuanState);
                 respondJO.Add("uid", uid);
                 respondJO.Add("isTuoGuan", isTuoGuan);
 
