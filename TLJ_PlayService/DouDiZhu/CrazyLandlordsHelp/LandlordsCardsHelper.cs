@@ -1305,7 +1305,7 @@ namespace CrazyLandlords.Helper
             LandlordsCardsHelper.SetWeight(room);
             List<PokerInfo> handPoker = playerData.getPokerList();
 
-            if (!playerData.m_isAI)
+//            if (!playerData.m_isAI)
             {
                 //主动出牌
                 if (room.biggestPlayerData == null || room.biggestPlayerData == playerData)
