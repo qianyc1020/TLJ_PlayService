@@ -1334,6 +1334,7 @@ namespace CrazyLandlords.Helper
 
                     //给上一乱手牌设权重
                     LandlordsCardsHelper.SetWeight(beforePlayerData.getPokerList().ToArray());
+                    LandlordsCardsHelper.SetWeight(beforePlayerData.m_curOutPokerList.ToArray());
 
                     if (beforePlayerData.m_curOutPokerList.Count != 0)
                     {
