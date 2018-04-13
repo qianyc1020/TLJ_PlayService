@@ -41,17 +41,38 @@ class Request_UserInfo_Game
             UserInfo_Game_Manager.addOneData(userInfo_Game);
 
             // 获取到玩家信息之后找到该玩家所在的房间，给同桌的玩家推送此人的信息
-            RoomData room = GameUtil.getRoomByUid(userInfo_Game.uid);
-            if (room != null)
             {
-                string data = Newtonsoft.Json.JsonConvert.SerializeObject(userInfo_Game);
-
-                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                // 去升级找
+                RoomData room = GameUtil.getRoomByUid(userInfo_Game.uid);
+                if (room != null)
                 {
-                    if ((!room.getPlayerDataList()[i].isOffLine()) && (room.getPlayerDataList()[i].m_uid.CompareTo(userInfo_Game.uid) != 0))
+                    string data = Newtonsoft.Json.JsonConvert.SerializeObject(userInfo_Game);
+
+                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
                     {
-                        // 发送给客户端
-                        PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, data);
+                        if ((!room.getPlayerDataList()[i].isOffLine()) && (room.getPlayerDataList()[i].m_uid.CompareTo(userInfo_Game.uid) != 0))
+                        {
+                            // 发送给客户端
+                            PlayService.m_serverUtil.sendMessage(room.getPlayerDataList()[i].m_connId, data);
+                        }
+                    }
+                }
+                else
+                {
+                    // 去斗地主找
+                    DDZ_RoomData room_ddz = DDZ_GameUtil.getRoomByUid(userInfo_Game.uid);
+                    if (room_ddz != null)
+                    {
+                        string data = Newtonsoft.Json.JsonConvert.SerializeObject(userInfo_Game);
+
+                        for (int i = 0; i < room_ddz.getPlayerDataList().Count; i++)
+                        {
+                            if ((!room_ddz.getPlayerDataList()[i].isOffLine()) && (room_ddz.getPlayerDataList()[i].m_uid.CompareTo(userInfo_Game.uid) != 0))
+                            {
+                                // 发送给客户端
+                                PlayService.m_serverUtil.sendMessage(room_ddz.getPlayerDataList()[i].m_connId, data);
+                            }
+                        }
                     }
                 }
             }

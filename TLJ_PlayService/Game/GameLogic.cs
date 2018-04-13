@@ -237,6 +237,15 @@ class GameLogic
 
                             // 游戏在线统计
                             Request_OnlineStatistics.doRequest(room.getPlayerDataList()[i].m_uid,room.getRoomId(),room.m_gameRoomType, room.getPlayerDataList()[i].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_Join);
+
+                            // 休闲场扣除服务费:金币*500
+                            {
+                                if ((room.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_XiuXian_JingDian_Common) == 0) ||
+                                    (room.m_gameRoomType.CompareTo(TLJCommon.Consts.GameRoomType_XiuXian_ChaoDi_Common) == 0))
+                                {
+                                    Request_ChangeUserWealth.doRequest(room.getPlayerDataList()[i].m_uid, 1, -500, "休闲场报名费");
+                                }
+                            }
                         }
                     }
                 }
@@ -264,6 +273,7 @@ class GameLogic
 
             room.m_timerUtil.stopTimer();
             room.m_timerUtil_breakRom.stopTimer();
+            room.m_timerUtil_FaPai.stopTimer();
 
             LogUtil.getInstance().writeRoomLog(room, "GameUtils.removeRoom：删除房间：" + room.getRoomId());
 
@@ -697,24 +707,27 @@ class GameLogic
                                 if ((room.m_gameRoomType.CompareTo("PVP_HuaFei_1") == 0) || (room.m_gameRoomType.CompareTo("PVP_HuaFei_5") == 0))
                                 {
                                     int r = RandomUtil.getRandom(1,100);
-                                    if (r <= 70)
-                                    {
-                                        for (int j = 0; j < room.getPlayerDataList().Count; j++)
-                                        {
-                                            if (!room.getPlayerDataList()[j].m_isAI)
-                                            {
-                                                playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score));
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
+
+                                    // 机器人分数比玩家高
+                                    if (r <= 60)
                                     {
                                         for (int j = 0; j < room.getPlayerDataList().Count; j++)
                                         {
                                             if (!room.getPlayerDataList()[j].m_isAI)
                                             {
                                                 playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score), (int)(room.getPlayerDataList()[j].m_score * 1.3f));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    // 机器人分数比玩家低
+                                    else
+                                    {
+                                        for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                                        {
+                                            if (!room.getPlayerDataList()[j].m_isAI)
+                                            {
+                                                playerData.m_score = RandomUtil.getRandom((int)(room.getPlayerDataList()[j].m_score * 0.7f), (int)(room.getPlayerDataList()[j].m_score));
                                                 break;
                                             }
                                         }
@@ -1877,5 +1890,54 @@ class GameLogic
         {
             TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":callPlayerChaoDi异常：" + ex);
         }
+    }
+
+    public static bool breakRoomByRoomID(int roomID)
+    {
+        // 休闲场
+        {
+            List<RoomData> roomList = PlayLogic_Relax.getInstance().getRoomList();
+
+            for (int i = 0; i < roomList.Count; i++)
+            {
+                RoomData room = roomList[i];
+                if (room.getRoomId() == roomID)
+                {
+                    // 游戏在线统计
+                    for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                    {
+                        Request_OnlineStatistics.doRequest(room.getPlayerDataList()[j].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[j].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+                    }
+
+                    removeRoom(PlayLogic_Relax.getInstance(), room, true);
+
+                    return true;
+                }
+            }
+        }
+
+        // 比赛场
+        {
+            List<RoomData> roomList = PlayLogic_PVP.getInstance().getRoomList();
+
+            for (int i = 0; i < roomList.Count; i++)
+            {
+                RoomData room = roomList[i];
+                if (room.getRoomId() == roomID)
+                {
+                    // 游戏在线统计
+                    for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                    {
+                        Request_OnlineStatistics.doRequest(room.getPlayerDataList()[j].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[j].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+                    }
+
+                    removeRoom(PlayLogic_PVP.getInstance(), room, true);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

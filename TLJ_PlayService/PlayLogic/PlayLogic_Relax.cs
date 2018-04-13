@@ -676,4 +676,78 @@ class PlayLogic_Relax: GameBase
             TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":gameOver异常：" + ex);
         }
     }
+
+    public void sendBaoXiang()
+    {
+        for (int i = 0; i < m_roomList.Count; i++)
+        {
+            if (m_roomList[i].m_isStartGame)
+            {
+                for (int j = 0; j < m_roomList[i].getPlayerDataList().Count; j++)
+                {
+                    PlayerData player = m_roomList[i].getPlayerDataList()[j];
+                    if ((!player.m_isAI) && (!player.isOffLine()))
+                    {
+                        JObject respondJO;
+                        {
+                            respondJO = new JObject();
+
+                            respondJO.Add("tag", TLJCommon.Consts.Tag_BaoXiangDrop);
+
+                            // 奖励
+                            {
+                                int prop_id = 1;
+                                int prop_num = 88;
+                                int r = RandomUtil.getRandom(1, 100);
+
+                                // 5元碎片*1
+                                if (r <= 25)
+                                {
+                                    prop_id = 121;
+                                    prop_num = 1;
+                                }
+                                // 5元碎片*2
+                                else if (r <= 30)
+                                {
+                                    prop_id = 121;
+                                    prop_num = 2;
+                                }
+                                // 10元碎片*1
+                                else if (r <= 55)
+                                {
+                                    prop_id = 122;
+                                    prop_num = 1;
+                                }
+                                // 10元碎片*1
+                                else if (r <= 60)
+                                {
+                                    prop_id = 122;
+                                    prop_num = 2;
+                                }
+                                // 金币*1
+                                else if (r <= 80)
+                                {
+                                    prop_id = 1;
+                                    prop_num = 88;
+                                }
+                                // 金币*1
+                                else if (r <= 100)
+                                {
+                                    prop_id = 1;
+                                    prop_num = 188;
+                                }
+
+                                string reward = (prop_id + ":" + prop_num);
+                                respondJO.Add("reward", reward);
+
+                                Request_ChangeUserWealth.doRequest(player.m_uid, prop_id, prop_num, "宝箱掉落");
+                            }
+                        }
+
+                        PlayService.m_serverUtil.sendMessage(player.m_connId, respondJO.ToString());
+                    }
+                }
+            }
+        }
+    }
 }

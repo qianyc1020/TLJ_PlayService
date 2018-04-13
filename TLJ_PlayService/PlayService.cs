@@ -22,7 +22,11 @@ namespace TLJ_PlayService
                 return;
             }
 
+            // 日志
             LogUtil.getInstance().start(OtherConfig.s_logPath + "TLJ_PlayServiceLog");
+
+            // 全局定时器
+            GlobalTimer.getInstance().start();
 
             if (!NetConfig.init())
             {

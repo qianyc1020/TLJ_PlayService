@@ -229,6 +229,69 @@ class LogUtil
         }
     }
 
+    // 记录房间日志
+    public void writeRoomLog(DDZ_RoomData room, string data)
+    {
+        if (!m_canWriteDebugLog)
+        {
+            return;
+        }
+
+        if (room == null)
+        {
+            return;
+        }
+
+        // 把字符串中的换行符去掉
+        data = data.Replace("\r\n", "");
+
+        data = getCurTime() + "----" + data;
+
+        m_canWriteDebugLog = false;
+
+        StreamWriter sw = null;
+        try
+        {
+            string path = m_rootFolderPath + "/" + getCurYearMonthDay() + "/";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            path += room.getRoomId() + "  ";
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                path += (room.getPlayerDataList()[i].m_uid + "、");
+            }
+            path += ".txt";
+
+            if (!File.Exists(path))
+            {
+                File.Create(path).Close();
+            }
+
+            sw = new StreamWriter(path, true);
+
+            sw.WriteLine(data);
+
+            //清空缓冲区
+            sw.Flush();
+
+            //关闭流
+            sw.Close();
+
+            m_canWriteDebugLog = true;
+        }
+        catch (IOException e)
+        {
+            Console.Write(e);
+        }
+        finally
+        {
+            sw.Close();
+        }
+    }
+
     void checkLogList()
     {
         m_timer = new Timer(onTimer, "", 100, 10);
