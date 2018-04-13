@@ -915,6 +915,8 @@ class DDZ_GameLogic
         {
             // 其他处理
             {
+                playerData.m_curOutPokerList.Clear();
+
                 for (int i = 0; i < pokerList.Count; i++)
                 {
                     int num = pokerList[i].m_num;
@@ -1033,7 +1035,6 @@ class DDZ_GameLogic
                 }
 
                 room.m_curOutPokerPlayer = nextPlayerData;
-
                 // 让下一个人出牌
                 DDZ_GameLogic.doTask_CallPlayerOutPoker(room.m_gameBase, room, room.m_curOutPokerPlayer);
             }
