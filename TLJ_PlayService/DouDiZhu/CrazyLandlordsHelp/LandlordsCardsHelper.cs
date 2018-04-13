@@ -1304,9 +1304,14 @@ namespace CrazyLandlords.Helper
         {
             List<TLJCommon.PokerInfo> listPoker = new List<TLJCommon.PokerInfo>();
             LandlordsCardsHelper.SetWeight(room);
+
             List<PokerInfo> handPoker = playerData.getPokerList();
 
-//            if (!playerData.m_isAI)
+            PlayService.log.Warn($"之前:{handPoker[0].m_weight_DDZ}");
+            LandlordsCardsHelper.SetWeight(handPoker.ToArray());
+            PlayService.log.Warn($"之后:{handPoker[0].m_weight_DDZ}");
+
+            //            if (!playerData.m_isAI)
             {
                 PlayService.log.Warn($"当前最大的玩家:{room?.biggestPlayerData.m_uid}");
                 //主动出牌
