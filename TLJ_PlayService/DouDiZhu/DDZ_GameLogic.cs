@@ -483,6 +483,7 @@ class DDZ_GameLogic
                     playerData.m_isDiZhu = 1;
                     playerData.m_isJiaBang = 0;
                     room.m_diZhuPlayer = playerData;
+                    room.biggestPlayerData = room.m_diZhuPlayer;
 
                     // 通知玩家谁是地主
                     {
@@ -556,6 +557,7 @@ class DDZ_GameLogic
                             maxPlayer.m_isDiZhu = 1;
                             maxPlayer.m_isJiaBang = 0;
                             room.m_diZhuPlayer = maxPlayer;
+                            room.biggestPlayerData = room.m_diZhuPlayer;
 
                             // 通知玩家谁是地主
                             {
@@ -799,6 +801,15 @@ class DDZ_GameLogic
     {
         try
         {
+            if (room.biggestPlayerData.m_uid.CompareTo(playerData.m_uid) == 0)
+            {
+                playerData.m_isFreeOutPoker = true;
+            }
+            else
+            {
+                playerData.m_isFreeOutPoker = false;
+            }
+
             // 通知
             {
                 JObject respondJO;
@@ -808,6 +819,7 @@ class DDZ_GameLogic
                     respondJO.Add("tag", room.m_tag);
                     respondJO.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_CallPlayerOutPoker);
                     respondJO.Add("uid", room.m_curOutPokerPlayer.m_uid);
+                    
                     respondJO.Add("isFreeOutPoker", playerData.m_isFreeOutPoker);
                 }
 
