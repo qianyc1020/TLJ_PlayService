@@ -14,7 +14,6 @@ public class DDZ_TrusteeshipLogic
     // 托管:出牌
     public static void trusteeshipLogic_OutPoker(DDZ_GameBase gameBase, DDZ_RoomData room, DDZ_PlayerData playerData)
     {
-        TLJ_PlayService.PlayService.log.Warn("1111111111");
         try
         {
             // 轮到自己出牌
@@ -22,14 +21,12 @@ public class DDZ_TrusteeshipLogic
                 if (playerData.getPokerList().Count > 0)
                 {
                     JObject backData = new JObject();
-                    TLJ_PlayService.PlayService.log.Warn("2222222222222222222");
                     backData.Add("tag", room.m_tag);
                     backData.Add("uid", playerData.m_uid);
                     backData.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_PlayerOutPoker);
                     {
-                        TLJ_PlayService.PlayService.log.Warn("3333333333333333333333");
                         List<TLJCommon.PokerInfo> listPoker = LandlordsCardsHelper.GetTrusteeshipPoker(room, playerData);
-                        TLJ_PlayService.PlayService.log.Warn("444444444444444444444444444");
+
                         JArray jarray = new JArray();
                         for (int i = 0; i < listPoker.Count; i++)
                         {
@@ -57,10 +54,6 @@ public class DDZ_TrusteeshipLogic
 
                     //LogUtil.getInstance().addDebugLog(m_logFlag + "----" + "托管出牌：" + playerData.m_uid + "  " + backData.ToString());
                     DDZ_GameLogic.doTask_ReceivePlayerOutPoker(gameBase, playerData.m_connId, backData.ToString());
-                }
-                else
-                {
-                    TLJ_PlayService.PlayService.log.Warn("55555555555555555555555");
                 }
             }
         }
