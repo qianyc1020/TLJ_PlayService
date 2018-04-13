@@ -5,7 +5,7 @@ using TLJCommon;
 
 namespace CrazyLandlords.Helper
 {
-    public static class PokerInfosHelper
+    public static class LandlordsCardsHelper
     {
         /// <summary>
         /// 获取牌组权重
