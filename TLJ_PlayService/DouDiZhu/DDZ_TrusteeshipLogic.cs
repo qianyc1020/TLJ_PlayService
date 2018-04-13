@@ -26,6 +26,7 @@ public class DDZ_TrusteeshipLogic
                     backData.Add("uid", playerData.m_uid);
                     backData.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_PlayerOutPoker);
                     {
+
                         List<TLJCommon.PokerInfo> listPoker = LandlordsCardsHelper.GetTrusteeshipPoker(room, playerData);
 
                         JArray jarray = new JArray();

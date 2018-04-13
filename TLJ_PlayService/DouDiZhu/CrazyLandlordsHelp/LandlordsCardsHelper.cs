@@ -1308,7 +1308,9 @@ namespace CrazyLandlords.Helper
 
 //            if (!playerData.m_isAI)
             {
+                PlayService.log.Warn($"当前最大的玩家:{room?.biggestPlayerData.m_uid}");
                 //主动出牌
+
                 if (room.biggestPlayerData == null || room.biggestPlayerData == playerData)
                 {
                     listPoker = handPoker.Where(card => card.m_weight_DDZ == handPoker[handPoker.Count - 1].m_weight_DDZ).ToList();
@@ -1321,7 +1323,7 @@ namespace CrazyLandlords.Helper
                     {
                         if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
                         {
-                            PlayService.log.Info($"当前玩家{beforePlayerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(beforePlayerData.m_curOutPokerList.ToArray())}");
+                            PlayService.log.Warn($"当前玩家{beforePlayerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(beforePlayerData.m_curOutPokerList.ToArray())}");
 
                             List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(handPoker, beforePlayerData.m_curOutPokerList, type);
 
@@ -1330,7 +1332,7 @@ namespace CrazyLandlords.Helper
                                 listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
                                 room.biggestPlayerData = playerData;
 
-                                PlayService.log.Info($"当前玩家{playerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
+                                PlayService.log.Warn($"当前玩家{playerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
                             }
                         }
                         else
