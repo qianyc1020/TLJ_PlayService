@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TLJCommon;
 
 namespace CrazyLandlords.Helper
 {
-    public static class LandlordsCardsHelper
+    public static class PokerInfosHelper
     {
         /// <summary>
         /// 获取牌组权重
@@ -12,27 +13,27 @@ namespace CrazyLandlords.Helper
         /// <param name="cards"></param>
         /// <param name="rule"></param>
         /// <returns></returns>
-        public static int GetWeight(LandlordsCard[] cards, CardsType rule)
+        public static int GetWeight(PokerInfo[] cards, CardsType rule)
         {
-            int totalWeight = 0;
+            int totalWeight_DDZ = 0;
             if (rule == CardsType.JokerBoom)
             {
-                totalWeight = int.MaxValue;
+                totalWeight_DDZ = int.MaxValue;
             }
             else if (rule == CardsType.Boom)
             {
-                totalWeight = (int)cards[0].CardWeight * (int)cards[1].CardWeight * (int)cards[2].CardWeight * (int)cards[3].CardWeight + (int.MaxValue / 2);
+                totalWeight_DDZ = (int)cards[0].m_weight_DDZ * (int)cards[1].m_weight_DDZ * (int)cards[2].m_weight_DDZ * (int)cards[3].m_weight_DDZ + (int.MaxValue / 2);
             }
             else if (rule == CardsType.BoomAndTwo || rule == CardsType.BoomAndOne)
             {
                 for (int i = 0; i < cards.Length - 3; i++)
                 {
-                    if (cards[i].CardWeight == cards[i + 1].CardWeight &&
-                        cards[i].CardWeight == cards[i + 2].CardWeight &&
-                        cards[i].CardWeight == cards[i + 3].CardWeight)
+                    if (cards[i].m_weight_DDZ == cards[i + 1].m_weight_DDZ &&
+                        cards[i].m_weight_DDZ == cards[i + 2].m_weight_DDZ &&
+                        cards[i].m_weight_DDZ == cards[i + 3].m_weight_DDZ)
                     {
-                        totalWeight += (int)cards[i].CardWeight;
-                        totalWeight *= 4;
+                        totalWeight_DDZ += (int)cards[i].m_weight_DDZ;
+                        totalWeight_DDZ *= 4;
                         break;
                     }
                 }
@@ -43,11 +44,11 @@ namespace CrazyLandlords.Helper
                 {
                     if (i < cards.Length - 2)
                     {
-                        if (cards[i].CardWeight == cards[i + 1].CardWeight &&
-                            cards[i].CardWeight == cards[i + 2].CardWeight)
+                        if (cards[i].m_weight_DDZ == cards[i + 1].m_weight_DDZ &&
+                            cards[i].m_weight_DDZ == cards[i + 2].m_weight_DDZ)
                         {
-                            totalWeight += (int)cards[i].CardWeight;
-                            totalWeight *= 3;
+                            totalWeight_DDZ += (int)cards[i].m_weight_DDZ;
+                            totalWeight_DDZ *= 3;
                             break;
                         }
                     }
@@ -57,44 +58,44 @@ namespace CrazyLandlords.Helper
             {
                 for (int i = 0; i < cards.Length; i++)
                 {
-                    totalWeight += (int)cards[i].CardWeight;
+                    totalWeight_DDZ += (int)cards[i].m_weight_DDZ;
                 }
             }
 
-            return totalWeight;
+            return totalWeight_DDZ;
         }
 
         /// <summary>
-        /// 根据Weight在卡组中找到所有重复的卡牌(两个及两个以上)
+        /// 根据Weight_DDZ在卡组中找到所有重复的卡牌(两个及两个以上)
         /// </summary>
         /// <param name="cards"></param>
-        /// <returns>Weight:类型，int:重复的个数</returns>
-        public static Dictionary<Weight, int> FindSameCards(LandlordsCard[] cards)
+        /// <returns>Weight_DDZ:类型，int:重复的个数</returns>
+        public static Dictionary<Weight_DDZ, int> FindSameCards(PokerInfo[] cards)
         {
-            return cards.GroupBy(x => x.CardWeight).Where(x => x.Count() > 1).ToDictionary(x => x.Key, y => y.Count());
+            return cards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() > 1).ToDictionary(x => x.Key, y => y.Count());
         }
 
         /// <summary>
-        /// 根据Weight在卡组中找到所有重复的卡牌(两个以上)
+        /// 根据Weight_DDZ在卡组中找到所有重复的卡牌(两个以上)
         /// </summary>
         /// <param name="cards"></param>
-        /// <returns>Weight:类型，int:重复的个数</returns>
-        private static Dictionary<Weight, int> FindTripleCards(LandlordsCard[] cards)
+        /// <returns>Weight_DDZ:类型，int:重复的个数</returns>
+        private static Dictionary<Weight_DDZ, int> FindTripleCards(PokerInfo[] cards)
         {
-            return cards.GroupBy(x => x.CardWeight).Where(x => x.Count() > 2).ToDictionary(x => x.Key, y => y.Count());
+            return cards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() > 2).ToDictionary(x => x.Key, y => y.Count());
         }
 
         /// <summary>f
         /// 卡组排序
         /// </summary>
         /// <param name="cards"></param>
-        public static void SortCards(List<LandlordsCard> cards)
+        public static void SortCards(List<PokerInfo> cards)
         {
             cards.Sort(
-                (LandlordsCard a, LandlordsCard b) =>
+                (PokerInfo a, PokerInfo b) =>
                 {
                     //先按照权重降序，再按花色升序
-                    return -a.CardWeight.CompareTo(b.CardWeight) * 2 + a.CardWeight.CompareTo(b.CardWeight);
+                    return -a.m_weight_DDZ.CompareTo(b.m_weight_DDZ) * 2 + a.m_weight_DDZ.CompareTo(b.m_weight_DDZ);
                 }
             );
         }
@@ -104,7 +105,7 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsSingle(LandlordsCard[] cards)
+        public static bool IsSingle(PokerInfo[] cards)
         {
             if (cards.Length == 1)
                 return true;
@@ -117,11 +118,11 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsDouble(LandlordsCard[] cards)
+        public static bool IsDouble(PokerInfo[] cards)
         {
             if (cards.Length == 2)
             {
-                if (cards[0].CardWeight == cards[1].CardWeight)
+                if (cards[0].m_weight_DDZ == cards[1].m_weight_DDZ)
                     return true;
             }
 
@@ -133,12 +134,12 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsBoomAndTwo(LandlordsCard[] cards)
+        public static bool IsBoomAndTwo(PokerInfo[] cards)
         {
             //4444 + 55 + 77
             if (cards.Length == 8)
             {
-                Dictionary<Weight, int> findSameCards = FindSameCards(cards);
+                Dictionary<Weight_DDZ, int> findSameCards = FindSameCards(cards);
                 int totalNum = 0;
                 foreach (var item in findSameCards.Values)
                 {
@@ -158,12 +159,12 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsBoomAndOne(LandlordsCard[] cards)
+        public static bool IsBoomAndOne(PokerInfo[] cards)
         {
             //5555 + 3 + 8
             if (cards.Length == 6)
             {
-                Dictionary<Weight, int> findSameCards = FindSameCards(cards);
+                Dictionary<Weight_DDZ, int> findSameCards = FindSameCards(cards);
                 foreach (var item in findSameCards.Values)
                 {
                     //有4个重复的元素
@@ -181,18 +182,18 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsStraight(LandlordsCard[] cards)
+        public static bool IsStraight(PokerInfo[] cards)
         {
             if (cards.Length < 5 || cards.Length > 12)
                 return false;
             for (int i = 0; i < cards.Length - 1; i++)
             {
-                Weight w = cards[i].CardWeight;
-                if (w - cards[i + 1].CardWeight != 1)
+                Weight_DDZ w = cards[i].m_weight_DDZ;
+                if (w - cards[i + 1].m_weight_DDZ != 1)
                     return false;
 
                 //不能超过A
-                if (w > Weight.One || cards[i + 1].CardWeight > Weight.One)
+                if (w > Weight_DDZ.One || cards[i + 1].m_weight_DDZ > Weight_DDZ.One)
                     return false;
             }
             return true;
@@ -203,23 +204,23 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsDoubleStraight(LandlordsCard[] cards)
+        public static bool IsDoubleStraight(PokerInfo[] cards)
         {
             if (cards.Length < 6 || cards.Length % 2 != 0)
                 return false;
 
             for (int i = 0; i < cards.Length; i += 2)
             {
-                if (cards[i + 1].CardWeight != cards[i].CardWeight)
+                if (cards[i + 1].m_weight_DDZ != cards[i].m_weight_DDZ)
                     return false;
 
                 if (i < cards.Length - 2)
                 {
-                    if (cards[i].CardWeight - cards[i + 2].CardWeight != 1)
+                    if (cards[i].m_weight_DDZ - cards[i + 2].m_weight_DDZ != 1)
                         return false;
 
                     //不能超过A
-                    if (cards[i].CardWeight > Weight.One || cards[i + 2].CardWeight > Weight.One)
+                    if (cards[i].m_weight_DDZ > Weight_DDZ.One || cards[i + 2].m_weight_DDZ > Weight_DDZ.One)
                         return false;
                 }
             }
@@ -231,27 +232,27 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsTripleStraight(LandlordsCard[] cards)
+        public static bool IsTripleStraight(PokerInfo[] cards)
         {
             if (cards.Length < 6 || cards.Length % 3 != 0)
                 return false;
 
             for (int i = 0; i < cards.Length; i += 3)
             {
-                if (cards[i + 1].CardWeight != cards[i].CardWeight)
+                if (cards[i + 1].m_weight_DDZ != cards[i].m_weight_DDZ)
                     return false;
-                if (cards[i + 2].CardWeight != cards[i].CardWeight)
+                if (cards[i + 2].m_weight_DDZ != cards[i].m_weight_DDZ)
                     return false;
-                if (cards[i + 1].CardWeight != cards[i + 2].CardWeight)
+                if (cards[i + 1].m_weight_DDZ != cards[i + 2].m_weight_DDZ)
                     return false;
 
                 if (i < cards.Length - 3)
                 {
-                    if (cards[i].CardWeight - cards[i + 3].CardWeight != 1)
+                    if (cards[i].m_weight_DDZ - cards[i + 3].m_weight_DDZ != 1)
                         return false;
 
                     //不能超过A
-                    if (cards[i].CardWeight > Weight.One || cards[i + 3].CardWeight > Weight.One)
+                    if (cards[i].m_weight_DDZ > Weight_DDZ.One || cards[i + 3].m_weight_DDZ > Weight_DDZ.One)
                         return false;
                 }
             }
@@ -263,13 +264,13 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsTripleStraightAndOne(LandlordsCard[] cards)
+        public static bool IsTripleStraightAndOne(PokerInfo[] cards)
         {
             if (cards.Length % 4 != 0 || cards.Length < 8)
                 return false;
             //找出3张以上的牌
-            Dictionary<Weight, int> findSameCards = FindTripleCards(cards);
-            List<Weight> weights = new List<Weight>(findSameCards.Keys);
+            Dictionary<Weight_DDZ, int> findSameCards = FindTripleCards(cards);
+            List<Weight_DDZ> weights = new List<Weight_DDZ>(findSameCards.Keys);
             //两个3张以上
             if (weights.Count < 2)
                 return false;
@@ -289,14 +290,14 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsTripleStraightAndTwo(LandlordsCard[] cards)
+        public static bool IsTripleStraightAndTwo(PokerInfo[] cards)
         {
             if (cards.Length % 5 != 0 || cards.Length < 10)
                 return false;
-            Dictionary<Weight, int> doubleCards = cards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 2).ToDictionary(x => x.Key, y => y.Count());
-            Dictionary<Weight, int> tripleCards = cards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 3).ToDictionary(x => x.Key, y => y.Count());
-            List<Weight> doubleweights = new List<Weight>(doubleCards.Keys);
-            List<Weight> tripleweights = new List<Weight>(tripleCards.Keys);
+            Dictionary<Weight_DDZ, int> doubleCards = cards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 2).ToDictionary(x => x.Key, y => y.Count());
+            Dictionary<Weight_DDZ, int> tripleCards = cards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 3).ToDictionary(x => x.Key, y => y.Count());
+            List<Weight_DDZ> doubleweights = new List<Weight_DDZ>(doubleCards.Keys);
+            List<Weight_DDZ> tripleweights = new List<Weight_DDZ>(tripleCards.Keys);
 
             if (tripleweights.Count < 2 || tripleweights.Count != doubleweights.Count)
                 return false;
@@ -316,15 +317,15 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsOnlyThree(LandlordsCard[] cards)
+        public static bool IsOnlyThree(PokerInfo[] cards)
         {
             if (cards.Length != 3)
                 return false;
-            if (cards[0].CardWeight != cards[1].CardWeight)
+            if (cards[0].m_weight_DDZ != cards[1].m_weight_DDZ)
                 return false;
-            if (cards[1].CardWeight != cards[2].CardWeight)
+            if (cards[1].m_weight_DDZ != cards[2].m_weight_DDZ)
                 return false;
-            if (cards[0].CardWeight != cards[2].CardWeight)
+            if (cards[0].m_weight_DDZ != cards[2].m_weight_DDZ)
                 return false;
             return true;
         }
@@ -334,15 +335,15 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsThreeAndOne(LandlordsCard[] cards)
+        public static bool IsThreeAndOne(PokerInfo[] cards)
         {
             if (cards.Length != 4)
                 return false;
-            if (cards[0].CardWeight == cards[1].CardWeight &&
-                cards[1].CardWeight == cards[2].CardWeight)
+            if (cards[0].m_weight_DDZ == cards[1].m_weight_DDZ &&
+                cards[1].m_weight_DDZ == cards[2].m_weight_DDZ)
                 return true;
-            else if (cards[1].CardWeight == cards[2].CardWeight &&
-                cards[2].CardWeight == cards[3].CardWeight)
+            else if (cards[1].m_weight_DDZ == cards[2].m_weight_DDZ &&
+                cards[2].m_weight_DDZ == cards[3].m_weight_DDZ)
                 return true;
             return false;
         }
@@ -352,22 +353,22 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsThreeAndTwo(LandlordsCard[] cards)
+        public static bool IsThreeAndTwo(PokerInfo[] cards)
         {
             if (cards.Length != 5)
                 return false;
 
-            if (cards[0].CardWeight == cards[1].CardWeight &&
-                cards[1].CardWeight == cards[2].CardWeight)
+            if (cards[0].m_weight_DDZ == cards[1].m_weight_DDZ &&
+                cards[1].m_weight_DDZ == cards[2].m_weight_DDZ)
             {
-                if (cards[3].CardWeight == cards[4].CardWeight)
+                if (cards[3].m_weight_DDZ == cards[4].m_weight_DDZ)
                     return true;
             }
 
-            else if (cards[2].CardWeight == cards[3].CardWeight && 
-                     cards[3].CardWeight == cards[4].CardWeight)
+            else if (cards[2].m_weight_DDZ == cards[3].m_weight_DDZ && 
+                     cards[3].m_weight_DDZ == cards[4].m_weight_DDZ)
             {
-                if (cards[0].CardWeight == cards[1].CardWeight)
+                if (cards[0].m_weight_DDZ == cards[1].m_weight_DDZ)
                     return true;
             }
             return false;
@@ -378,15 +379,15 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsBoom(LandlordsCard[] cards)
+        public static bool IsBoom(PokerInfo[] cards)
         {
             if (cards.Length != 4)
                 return false;
-            if (cards[0].CardWeight != cards[1].CardWeight)
+            if (cards[0].m_weight_DDZ != cards[1].m_weight_DDZ)
                 return false;
-            if (cards[1].CardWeight != cards[2].CardWeight)
+            if (cards[1].m_weight_DDZ != cards[2].m_weight_DDZ)
                 return false;
-            if (cards[2].CardWeight != cards[3].CardWeight)
+            if (cards[2].m_weight_DDZ != cards[3].m_weight_DDZ)
                 return false;
             return true;
         }
@@ -396,19 +397,19 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static bool IsJokerBoom(LandlordsCard[] cards)
+        public static bool IsJokerBoom(PokerInfo[] cards)
         {
             if (cards.Length != 2)
                 return false;
-            if (cards[0].CardWeight == Weight.SJoker)
+            if (cards[0].m_weight_DDZ == Weight_DDZ.SJoker)
             {
-                if (cards[1].CardWeight == Weight.LJoker)
+                if (cards[1].m_weight_DDZ == Weight_DDZ.LJoker)
                     return true;
                 return false;
             }
-            else if (cards[0].CardWeight == Weight.LJoker)
+            else if (cards[0].m_weight_DDZ == Weight_DDZ.LJoker)
             {
-                if (cards[1].CardWeight == Weight.SJoker)
+                if (cards[1].m_weight_DDZ == Weight_DDZ.SJoker)
                     return true;
                 return false;
             }
@@ -422,7 +423,7 @@ namespace CrazyLandlords.Helper
         /// <param name="cards"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool GetCardsType(LandlordsCard[] cards, out CardsType type)
+        public static bool GetCardsType(PokerInfo[] cards, out CardsType type)
         {
             type = CardsType.None;
             bool isRule = false;
@@ -658,25 +659,25 @@ namespace CrazyLandlords.Helper
             return isRule;
         }
 
-        public static List<LandlordsCard> GetActiveCard(List<LandlordsCard> cards)
+        public static List<PokerInfo> GetActiveCard(List<PokerInfo> cards)
         {
-            List<LandlordsCard> temp = new List<LandlordsCard>();
+            List<PokerInfo> temp = new List<PokerInfo>();
 
-            List<LandlordsCard> jokerBoomCards = new List<LandlordsCard>();
-            List<LandlordsCard> boomCards = new List<LandlordsCard>();
+            List<PokerInfo> jokerBoomCards = new List<PokerInfo>();
+            List<PokerInfo> boomCards = new List<PokerInfo>();
 
-            List<LandlordsCard> tripleCards = new List<LandlordsCard>();
-            List<List<LandlordsCard>> tripleStraghtCards;
+            List<PokerInfo> tripleCards = new List<PokerInfo>();
+            List<List<PokerInfo>> tripleStraghtCards;
 
-//            List<LandlordsCard> tripleStraghtCards = new List<LandlordsCard>();
+//            List<PokerInfo> tripleStraghtCards = new List<PokerInfo>();
 
             //拷贝一份
-            List<LandlordsCard> copyCards = new List<LandlordsCard>(cards);
+            List<PokerInfo> copyCards = new List<PokerInfo>(cards);
 
             //检索王炸
             if (copyCards.Count >= 2)
             {
-                LandlordsCard[] groupCards = new LandlordsCard[2];
+                PokerInfo[] groupCards = new PokerInfo[2];
                 groupCards[0] = copyCards[0];
                 groupCards[1] = copyCards[1];
 
@@ -689,7 +690,7 @@ namespace CrazyLandlords.Helper
             //检索炸弹
             for (int i = copyCards.Count - 1; i >= 3; i--)
             {
-                LandlordsCard[] groupCards = new LandlordsCard[4];
+                PokerInfo[] groupCards = new PokerInfo[4];
                 groupCards[0] = copyCards[i - 3];
                 groupCards[1] = copyCards[i - 2];
                 groupCards[2] = copyCards[i - 1];
@@ -702,7 +703,7 @@ namespace CrazyLandlords.Helper
             }
 
             //检索3张
-            IGrouping<Weight, LandlordsCard>[] tempTripleCards = copyCards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 3).ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] tempTripleCards = copyCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 3).ToArray();
             foreach (var item in tempTripleCards)
             {
                 tripleCards.AddRange(item);
@@ -723,7 +724,7 @@ namespace CrazyLandlords.Helper
             copyCards.RemoveList(boomCards);
             copyCards.RemoveList(tripleStraghtCards);
 
-            List<List<LandlordsCard>> allFiveStraght = FindAllFiveStraght(copyCards);
+            List<List<PokerInfo>> allFiveStraght = FindAllFiveStraght(copyCards);
             copyCards.RemoveList(allFiveStraght);
 
             return null;
@@ -734,16 +735,16 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="tripleCards"></param>
         /// <returns></returns>
-        private static List<LandlordsCard> GetTripleStraght(List<LandlordsCard> tripleCards)
+        private static List<PokerInfo> GetTripleStraght(List<PokerInfo> tripleCards)
         {
-            List<LandlordsCard> tempCards = new List<LandlordsCard>();
+            List<PokerInfo> tempCards = new List<PokerInfo>();
 
             for (int i = 0; i < tripleCards.Count - 3; i += 3)
             {
                 int k = 1;
                 for (int j = i; j < tripleCards.Count - 3; j += 3)
                 {
-                    if (tripleCards[i].CardWeight - tripleCards[j + 3].CardWeight == k)
+                    if (tripleCards[i].m_weight_DDZ - tripleCards[j + 3].m_weight_DDZ == k)
                     {
                         tempCards.Add(tripleCards[j + 3]);
                         tempCards.Add(tripleCards[j + 4]);
@@ -765,13 +766,13 @@ namespace CrazyLandlords.Helper
             return tempCards;
         }
 
-        public static List<List<LandlordsCard>> GetAllTripleStraght(List<LandlordsCard> tripleCards)
+        public static List<List<PokerInfo>> GetAllTripleStraght(List<PokerInfo> tripleCards)
         {
-            List<List<LandlordsCard>> result = new List<List<LandlordsCard>>();
-            List<LandlordsCard> copyCards = new List<LandlordsCard>(tripleCards);
+            List<List<PokerInfo>> result = new List<List<PokerInfo>>();
+            List<PokerInfo> copyCards = new List<PokerInfo>(tripleCards);
             while (copyCards.Count >= 6)
             {
-                List<LandlordsCard> landlordsCards = GetTripleStraght(copyCards);
+                List<PokerInfo> landlordsCards = GetTripleStraght(copyCards);
                 if (landlordsCards.Count == 0) break;
                 foreach (var VARIABLEs in landlordsCards)
                 {
@@ -789,19 +790,19 @@ namespace CrazyLandlords.Helper
         /// <param name="lastCards"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static List<LandlordsCard[]> GetPrompt(List<LandlordsCard> cards, List<LandlordsCard> lastCards, CardsType type)
+        public static List<PokerInfo[]> GetPrompt(List<PokerInfo> cards, List<PokerInfo> lastCards, CardsType type)
         {
-            List<LandlordsCard[]> result = new List<LandlordsCard[]>();
-            List<LandlordsCard> copyCards = new List<LandlordsCard>(cards);
+            List<PokerInfo[]> result = new List<PokerInfo[]>();
+            List<PokerInfo> copyCards = new List<PokerInfo>(cards);
 
-            IGrouping<Weight, LandlordsCard>[] boomCards = copyCards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 4).ToArray();
-            IGrouping<Weight, LandlordsCard>[] tripleCards = copyCards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 3).ToArray();
-            IGrouping<Weight, LandlordsCard>[] doubleCards = copyCards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 2).ToArray();
-            IGrouping<Weight, LandlordsCard>[] singleCards = copyCards.GroupBy(x => x.CardWeight).Where(x => x.Count() == 1).ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] boomCards = copyCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 4).ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] tripleCards = copyCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 3).ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] doubleCards = copyCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 2).ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] singleCards = copyCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() == 1).ToArray();
 
             //TODO 缺少牌桌上的牌
-            LandlordsCard[] deskCards = lastCards.ToArray();
-            IGrouping<Weight, LandlordsCard>[] lastTripleCards = deskCards.GroupBy(x => x.CardWeight).Where(x => x.Count() >= 3).ToArray();
+            PokerInfo[] deskCards = lastCards.ToArray();
+            IGrouping<Weight_DDZ, PokerInfo>[] lastTripleCards = deskCards.GroupBy(x => x.m_weight_DDZ).Where(x => x.Count() >= 3).ToArray();
             int weight = GetWeight(deskCards, type);
 
             if (type == CardsType.JokerBoom)
@@ -812,7 +813,7 @@ namespace CrazyLandlords.Helper
             //检索王炸
             if (copyCards.Count >= 2)
             {
-                LandlordsCard[] groupCards = new LandlordsCard[2];
+                PokerInfo[] groupCards = new PokerInfo[2];
                 groupCards[0] = copyCards[0];
                 groupCards[1] = copyCards[1];
 
@@ -824,7 +825,7 @@ namespace CrazyLandlords.Helper
             //检索炸弹
             for (int i = copyCards.Count - 1; i >= 3; i--)
             {
-                LandlordsCard[] groupCards = new LandlordsCard[4];
+                PokerInfo[] groupCards = new PokerInfo[4];
                 groupCards[0] = copyCards[i - 3];
                 groupCards[1] = copyCards[i - 2];
                 groupCards[2] = copyCards[i - 1];
@@ -852,7 +853,7 @@ namespace CrazyLandlords.Helper
 
                     for (int i = copyCards.Count - 1; i >= 3; i--)
                     {
-                        LandlordsCard[] groupCards = new LandlordsCard[6];
+                        PokerInfo[] groupCards = new PokerInfo[6];
                         groupCards[0] = copyCards[i - 3];
                         groupCards[1] = copyCards[i - 2];
                         groupCards[2] = copyCards[i - 1];
@@ -883,7 +884,7 @@ namespace CrazyLandlords.Helper
                         if (((int) item.Key * 4) <= weight)
                             continue;
 
-                        List<LandlordsCard> temp = new List<LandlordsCard>(item);
+                        List<PokerInfo> temp = new List<PokerInfo>(item);
                         temp.AddRange(doubleCards[0]);
                         temp.AddRange(doubleCards[1]);
                         result.Add(temp.ToArray());
@@ -900,7 +901,7 @@ namespace CrazyLandlords.Helper
                     {
                         if (tripleCards[i].Key - tripleCards[i + 1].Key == 1)
                         {
-                            List<LandlordsCard> temp = new List<LandlordsCard>();
+                            List<PokerInfo> temp = new List<PokerInfo>();
 
                             temp.AddRange(tripleCards[i]);
                             temp.AddRange(tripleCards[i + 1]);
@@ -929,7 +930,7 @@ namespace CrazyLandlords.Helper
                     {
                         if (tripleCards[i].Key - tripleCards[i + 1].Key == 1)
                         {
-                            List<LandlordsCard> temp = new List<LandlordsCard>();
+                            List<PokerInfo> temp = new List<PokerInfo>();
 
                             temp.AddRange(tripleCards[i]);
                             temp.AddRange(tripleCards[i + 1]);
@@ -943,7 +944,7 @@ namespace CrazyLandlords.Helper
                                 if (tripleCards.Length > 0)
                                 {
                                     temp.AddRange(doubleCards[0]);
-                                    List<LandlordsCard> tempCards = new List<LandlordsCard>();
+                                    List<PokerInfo> tempCards = new List<PokerInfo>();
                                     foreach (var items in tripleCards)
                                     {
                                         if (items.Key == tripleCards[i].Key || items.Key == tripleCards[i + 1].Key)
@@ -969,12 +970,12 @@ namespace CrazyLandlords.Helper
                 case CardsType.OnlyThree:
                     for (int i = copyCards.Count - 1; i >= 2; i--)
                     {
-                        if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                        if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                         {
                             continue;
                         }
 
-                        LandlordsCard[] groupCards = new LandlordsCard[3];
+                        PokerInfo[] groupCards = new PokerInfo[3];
                         groupCards[0] = copyCards[i - 2];
                         groupCards[1] = copyCards[i - 1];
                         groupCards[2] = copyCards[i];
@@ -990,15 +991,15 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= 2; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
 
-                            List<LandlordsCard> other = new List<LandlordsCard>(copyCards);
+                            List<PokerInfo> other = new List<PokerInfo>(copyCards);
                             other.RemoveRange(i - 2, 3);
 
-                            LandlordsCard[] groupCards = new LandlordsCard[4];
+                            PokerInfo[] groupCards = new PokerInfo[4];
                             groupCards[0] = copyCards[i - 2];
                             groupCards[1] = copyCards[i - 1];
                             groupCards[2] = copyCards[i];
@@ -1016,19 +1017,19 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= 2; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
 
-                            List<LandlordsCard> other = new List<LandlordsCard>(copyCards);
+                            List<PokerInfo> other = new List<PokerInfo>(copyCards);
                             other.RemoveRange(i - 2, 3);
 
-                            List<LandlordsCard[]> otherDouble = GetPrompt(other, lastCards, CardsType.Double);
+                            List<PokerInfo[]> otherDouble = GetPrompt(other, lastCards, CardsType.Double);
                             if (otherDouble.Count > 0)
                             {
-                                LandlordsCard[] randomDouble = otherDouble[RandomHelper.RandomNumber(0, otherDouble.Count)];
-                                LandlordsCard[] groupCards = new LandlordsCard[5];
+                                PokerInfo[] randomDouble = otherDouble[RandomHelper.RandomNumber(0, otherDouble.Count)];
+                                PokerInfo[] groupCards = new PokerInfo[5];
                                 groupCards[0] = copyCards[i - 2];
                                 groupCards[1] = copyCards[i - 1];
                                 groupCards[2] = copyCards[i];
@@ -1053,18 +1054,18 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= deskCards.Length - 1; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
 
                             //是否全部搜索完成
                             bool isTrue = true;
-                            LandlordsCard[] groupCards = new LandlordsCard[deskCards.Length];
+                            PokerInfo[] groupCards = new PokerInfo[deskCards.Length];
                             for (int j = 0; j < deskCards.Length; j++)
                             {
                                 //搜索连续权重牌
-                                LandlordsCard findCard = copyCards.FirstOrDefault(card => (int)card.CardWeight == (int)copyCards[i].CardWeight + j);
+                                PokerInfo findCard = copyCards.FirstOrDefault(card => (int)card.m_weight_DDZ == (int)copyCards[i].m_weight_DDZ + j);
                                 if (findCard == null)
                                 {
                                     isTrue = false;
@@ -1090,18 +1091,18 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= deskCards.Length - 1; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
 
                             //是否全部搜索完成
                             bool isTrue = true;
-                            LandlordsCard[] groupCards = new LandlordsCard[deskCards.Length];
+                            PokerInfo[] groupCards = new PokerInfo[deskCards.Length];
                             for (int j = 0; j < deskCards.Length; j += 2)
                             {
                                 //搜索连续权重牌
-                                LandlordsCard[] findCards = copyCards.Where(card => (int)card.CardWeight == (int)copyCards[i].CardWeight + (j / 2)).ToArray();
+                                PokerInfo[] findCards = copyCards.Where(card => (int)card.m_weight_DDZ == (int)copyCards[i].m_weight_DDZ + (j / 2)).ToArray();
                                 if (findCards.Length < 2)
                                 {
                                     isTrue = false;
@@ -1123,18 +1124,18 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= deskCards.Length - 1; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
 
                             //是否全部搜索完成
                             bool isTrue = true;
-                            LandlordsCard[] groupCards = new LandlordsCard[deskCards.Length];
+                            PokerInfo[] groupCards = new PokerInfo[deskCards.Length];
                             for (int j = 0; j < deskCards.Length; j += 3)
                             {
                                 //搜索连续权重牌
-                                LandlordsCard[] findCards = copyCards.Where(card => (int)card.CardWeight == (int)copyCards[i].CardWeight + (j / 3)).ToArray();
+                                PokerInfo[] findCards = copyCards.Where(card => (int)card.m_weight_DDZ == (int)copyCards[i].m_weight_DDZ + (j / 3)).ToArray();
                                 if (findCards.Length < 3)
                                 {
                                     isTrue = false;
@@ -1157,7 +1158,7 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= 1; i--)
                         {
-                            LandlordsCard[] groupCards = new LandlordsCard[2];
+                            PokerInfo[] groupCards = new PokerInfo[2];
                             groupCards[0] = copyCards[i - 1];
                             groupCards[1] = copyCards[i];
 
@@ -1173,11 +1174,11 @@ namespace CrazyLandlords.Helper
                     {
                         for (int i = copyCards.Count - 1; i >= 0; i--)
                         {
-                            if (copyCards[i].CardWeight <= deskCards[deskCards.Length - 1].CardWeight)
+                            if (copyCards[i].m_weight_DDZ <= deskCards[deskCards.Length - 1].m_weight_DDZ)
                             {
                                 continue;
                             }
-                            LandlordsCard[] groupCards = new LandlordsCard[1];
+                            PokerInfo[] groupCards = new PokerInfo[1];
                             groupCards[0] = copyCards[i];
 
                             if (IsSingle(groupCards) && GetWeight(groupCards, type) > weight)
@@ -1198,22 +1199,22 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="landlordsCards"></param>
         /// <returns></returns>
-        public static List<LandlordsCard> FindFiveStraght(List<LandlordsCard> landlordsCards)
+        public static List<PokerInfo> FindFiveStraght(List<PokerInfo> landlordsCards)
         {
-            HashSet<Weight> cardsWeight = new HashSet<Weight>();
-            List<LandlordsCard> landlordsCard = new List<LandlordsCard>();
+            HashSet<Weight_DDZ> cardsWeight_DDZ = new HashSet<Weight_DDZ>();
+            List<PokerInfo> landlordsCard = new List<PokerInfo>();
 
             for (int i = landlordsCards.Count - 1; i >= 1; i--)
             {
-                if (landlordsCards[i].CardWeight + 1 == landlordsCards[i - 1].CardWeight ||
-                    landlordsCards[i].CardWeight == landlordsCards[i - 1].CardWeight)
+                if (landlordsCards[i].m_weight_DDZ + 1 == landlordsCards[i - 1].m_weight_DDZ ||
+                    landlordsCards[i].m_weight_DDZ == landlordsCards[i - 1].m_weight_DDZ)
                 {
-                    if (cardsWeight.Add(landlordsCards[i].CardWeight))
+                    if (cardsWeight_DDZ.Add(landlordsCards[i].m_weight_DDZ))
                     {
                         landlordsCard.Add(landlordsCards[i]);
                     }
 
-                    if (cardsWeight.Add(landlordsCards[i - 1].CardWeight))
+                    if (cardsWeight_DDZ.Add(landlordsCards[i - 1].m_weight_DDZ))
                     {
                         landlordsCard.Add(landlordsCards[i - 1]);
                     }
@@ -1224,7 +1225,7 @@ namespace CrazyLandlords.Helper
 
             if (landlordsCard.Count != 5)
             {
-                return new List<LandlordsCard>();
+                return new List<PokerInfo>();
             }
             return landlordsCard;
         }
@@ -1234,13 +1235,13 @@ namespace CrazyLandlords.Helper
         /// </summary>
         /// <param name="landlordsCards"></param>
         /// <returns></returns>
-        public static List<List<LandlordsCard>> FindAllFiveStraght(List<LandlordsCard> landlordsCards)
+        public static List<List<PokerInfo>> FindAllFiveStraght(List<PokerInfo> landlordsCards)
         {
-            List<LandlordsCard> copyCards = new List<LandlordsCard>(landlordsCards);
-            List<List<LandlordsCard>> result = new List<List<LandlordsCard>>();
+            List<PokerInfo> copyCards = new List<PokerInfo>(landlordsCards);
+            List<List<PokerInfo>> result = new List<List<PokerInfo>>();
             while (copyCards.Count >= 5)
             {
-                List<LandlordsCard> findFiveStraght = FindFiveStraght(copyCards);
+                List<PokerInfo> findFiveStraght = FindFiveStraght(copyCards);
                 if (findFiveStraght.Count == 0)
                     break;
                 result.Add(findFiveStraght);
