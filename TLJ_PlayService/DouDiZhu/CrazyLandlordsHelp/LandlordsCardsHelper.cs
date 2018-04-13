@@ -1336,7 +1336,8 @@ namespace CrazyLandlords.Helper
                                 listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
                                 room.biggestPlayerData = playerData;
 
-                                PlayService.log.Warn($"当前玩家{playerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
+                                PlayService.log.Warn($"当前玩家{playerData.m_uid}可以出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
+                                PlayService.log.Warn($"当前玩家{playerData.m_uid}出牌:{Newtonsoft.Json.JsonConvert.SerializeObject(listPoker.ToArray())}");
                             }
                         }
                         else
