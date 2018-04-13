@@ -106,6 +106,7 @@ namespace CrazyLandlords.Helper
                     card.m_weight_DDZ = (Weight_DDZ)card.m_num;
                 }
             }
+            SortCards(cards.ToList());
         }
 
         /// <summary>
@@ -760,7 +761,6 @@ namespace CrazyLandlords.Helper
                     tripleCards.Remove(card);
                 }
             }
-
         
             //排除3顺，炸弹的情况下，用剩下来的牌组成单顺
             copyCards.RemoveList(jokerBoomCards);
@@ -769,6 +769,18 @@ namespace CrazyLandlords.Helper
 
             List<List<PokerInfo>> allFiveStraght = FindAllFiveStraght(copyCards);
             copyCards.RemoveList(allFiveStraght);
+
+            foreach (var fiveStraght in allFiveStraght)
+            {
+                foreach (var card in copyCards)
+                {
+                    if (card.m_weight_DDZ - fiveStraght[fiveStraght.Count - 1].m_weight_DDZ == 1)
+                    {
+
+                    }
+                }
+            }
+
 
             return null;
         }
