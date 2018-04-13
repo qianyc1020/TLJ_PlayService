@@ -63,6 +63,7 @@
     <Compile Include="DouDiZhu\CrazyLandlordsHelp\LandlordsCard.cs" />
     <Compile Include="DouDiZhu\CrazyLandlordsHelp\LandlordsCardsHelper.cs" />
     <Compile Include="DouDiZhu\CrazyLandlordsHelp\LandlordsType.cs" />
+    <Compile Include="DouDiZhu\CrazyLandlordsHelp\ListExHelper.cs" />
     <Compile Include="DouDiZhu\CrazyLandlordsHelp\RandomHelper.cs" />
     <Compile Include="DouDiZhu\DDZ_AllotPoker.cs" />
     <Compile Include="DouDiZhu\DDZ_PlayerData.cs" />
