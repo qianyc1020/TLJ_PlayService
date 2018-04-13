@@ -1299,9 +1299,12 @@ namespace CrazyLandlords.Helper
         /// <param name="playerData"></param>
         /// <param name="listPoker"></param>
         /// <returns></returns>
-        public static List<PokerInfo> GetTrusteeshipPoker(DDZ_RoomData room, DDZ_PlayerData playerData, List<PokerInfo> listPoker)
+        public static List<PokerInfo> GetTrusteeshipPoker(DDZ_RoomData room, DDZ_PlayerData playerData)
         {
             LandlordsCardsHelper.SetWeight(room);
+            List<TLJCommon.PokerInfo> listPoker = new List<TLJCommon.PokerInfo>();
+            List<PokerInfo> handPoker = playerData.getPokerList();
+
             if (!playerData.m_isAI)
             {
                 //跟牌
@@ -1331,7 +1334,7 @@ namespace CrazyLandlords.Helper
                 //主动出牌
                 else
                 {
-                    listPoker = playerData.getPokerList().Where(card => card.m_weight_DDZ == playerData.getPokerList()[playerData.getPokerList().Count - 1].m_weight_DDZ).ToList();
+                    listPoker = handPoker.Where(card => card.m_weight_DDZ == handPoker[handPoker.Count - 1].m_weight_DDZ).ToList();
                 }
             }
 
