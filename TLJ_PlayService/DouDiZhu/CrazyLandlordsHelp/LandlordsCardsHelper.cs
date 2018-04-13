@@ -1325,6 +1325,7 @@ namespace CrazyLandlords.Helper
                             if (result.Count > 0)
                             {
                                 listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
+                                room.biggestPlayerData = playerData;
                             }
                         }
                         else
@@ -1337,7 +1338,6 @@ namespace CrazyLandlords.Helper
                     }
                 }
 
-                room.biggestPlayerData = playerData;
             }
             return listPoker;
         }
