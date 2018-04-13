@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TLJCommon;
+using TLJ_PlayService;
 
 namespace CrazyLandlords.Helper
 {
@@ -1320,17 +1321,21 @@ namespace CrazyLandlords.Helper
                     {
                         if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
                         {
+                            PlayService.log.Info($"当前玩家{beforePlayerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(beforePlayerData.m_curOutPokerList.ToArray())}");
+
                             List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(handPoker, beforePlayerData.m_curOutPokerList, type);
 
                             if (result.Count > 0)
                             {
                                 listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
                                 room.biggestPlayerData = playerData;
+
+                                PlayService.log.Info($"当前玩家{playerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
                             }
                         }
                         else
                         {
-                            LogUtil.getInstance().addErrorLog($"未知的类型：{type}");
+                            PlayService.log.Error($"未知的类型：{type}");
                         }
                     }
                     else
