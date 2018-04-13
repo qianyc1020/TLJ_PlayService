@@ -305,6 +305,29 @@ public class DDZ_RoomData
         return null;
     }
 
+    // 根据uid查找此人上一个出牌的人
+    public DDZ_PlayerData getBeforePlayerData(string uid)
+    {
+        int index = 0;
+        for (int i = 0; i < m_playerDataList.Count; i++)
+        {
+            if (m_playerDataList[i].m_uid.CompareTo(uid) == 0)
+            {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == 0)
+        {
+            return m_playerDataList[m_playerDataList.Count - 1];
+        }
+        else
+        {
+            return m_playerDataList[index - 1];
+        }
+    }
+
     public bool joinPlayer(DDZ_PlayerData playerData)
     {
         if (m_playerDataList.Count < 4)

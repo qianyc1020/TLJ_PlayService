@@ -66,6 +66,19 @@ namespace CrazyLandlords.Helper
         }
 
         /// <summary>
+        /// 给所有玩家设权重并排序
+        /// </summary>
+        /// <param name="room"></param>
+        public static void SetWeight(DDZ_RoomData room)
+        {
+            foreach (var PlayerData in room.getPlayerDataList())
+            {
+                SetWeight(PlayerData.getPokerList().ToArray());
+                SortCards(PlayerData.getPokerList());
+            }
+        }
+
+        /// <summary>
         /// 权重复制
         /// </summary>
         /// <param name="cards"></param>
@@ -1277,6 +1290,52 @@ namespace CrazyLandlords.Helper
                 copyCards.RemoveList(findFiveStraght);
             }
             return result;
+        }
+
+        /// <summary>
+        /// 游戏调用托管出牌
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="playerData"></param>
+        /// <param name="listPoker"></param>
+        /// <returns></returns>
+        public static List<PokerInfo> GetTrusteeshipPoker(DDZ_RoomData room, DDZ_PlayerData playerData, List<PokerInfo> listPoker)
+        {
+            LandlordsCardsHelper.SetWeight(room);
+            if (!playerData.m_isAI)
+            {
+                //跟牌
+                if (!playerData.m_isFreeOutPoker)
+                {
+                    DDZ_PlayerData beforePlayerData = room.getBeforePlayerData(playerData.m_uid);
+                    if (beforePlayerData.m_curOutPokerList.Count != 0)
+                    {
+                        if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
+                        {
+                            List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(playerData.getPokerList(),beforePlayerData.m_curOutPokerList, type);
+
+                            if (result.Count > 0)
+                            {
+                                listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
+                            }
+                        }
+                        else
+                        {
+                            LogUtil.getInstance().addErrorLog($"未知的类型：{type}");
+                        }
+                    }
+                    else
+                    {
+                    }
+                }
+                //主动出牌
+                else
+                {
+                    listPoker = playerData.getPokerList().Where(card => card.m_weight_DDZ == playerData.getPokerList()[playerData.getPokerList().Count - 1].m_weight_DDZ).ToList();
+                }
+            }
+
+            return listPoker;
         }
     }
 }

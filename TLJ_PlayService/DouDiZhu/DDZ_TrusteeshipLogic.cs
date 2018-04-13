@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using CrazyLandlords.Helper;
+using TLJCommon;
 
 public class DDZ_TrusteeshipLogic
 {
@@ -23,9 +25,11 @@ public class DDZ_TrusteeshipLogic
                     backData.Add("tag", room.m_tag);
                     backData.Add("uid", playerData.m_uid);
                     backData.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_PlayerOutPoker);
-                    
                     {
                         List<TLJCommon.PokerInfo> listPoker = new List<TLJCommon.PokerInfo>();
+
+                        listPoker = LandlordsCardsHelper.GetTrusteeshipPoker(room, playerData, listPoker);
+
                         listPoker.Add(playerData.getPokerList()[0]);
 
                         JArray jarray = new JArray();
@@ -63,6 +67,8 @@ public class DDZ_TrusteeshipLogic
             TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":trusteeshipLogic_OutPoker：" + ex);
         }
     }
+
+   
 
     // 托管:抢地主
     public static void trusteeshipLogic_QiangDiZhu(DDZ_GameBase gameBase, DDZ_RoomData room, DDZ_PlayerData playerData)
