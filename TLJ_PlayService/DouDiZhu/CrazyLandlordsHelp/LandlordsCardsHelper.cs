@@ -670,7 +670,6 @@ namespace CrazyLandlords.Helper
 
 //            List<LandlordsCard> tripleStraghtCards = new List<LandlordsCard>();
 
-
             //拷贝一份
             List<LandlordsCard> copyCards = new List<LandlordsCard>(cards);
 
@@ -720,11 +719,12 @@ namespace CrazyLandlords.Helper
 
         
             //排除3顺，炸弹的情况下，用剩下来的牌组成单顺
-            for (int i = 0; i < copyCards.Count; i++)
-            {
-                
-            }
-            
+            copyCards.RemoveList(jokerBoomCards);
+            copyCards.RemoveList(boomCards);
+            copyCards.RemoveList(tripleStraghtCards);
+
+            List<List<LandlordsCard>> allFiveStraght = FindAllFiveStraght(copyCards);
+            copyCards.RemoveList(allFiveStraght);
 
             return null;
         }
@@ -1189,6 +1189,62 @@ namespace CrazyLandlords.Helper
                     break;
                 default:
                     break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 找到5张单顺
+        /// </summary>
+        /// <param name="landlordsCards"></param>
+        /// <returns></returns>
+        public static List<LandlordsCard> FindFiveStraght(List<LandlordsCard> landlordsCards)
+        {
+            HashSet<Weight> cardsWeight = new HashSet<Weight>();
+            List<LandlordsCard> landlordsCard = new List<LandlordsCard>();
+
+            for (int i = landlordsCards.Count - 1; i >= 1; i--)
+            {
+                if (landlordsCards[i].CardWeight + 1 == landlordsCards[i - 1].CardWeight ||
+                    landlordsCards[i].CardWeight == landlordsCards[i - 1].CardWeight)
+                {
+                    if (cardsWeight.Add(landlordsCards[i].CardWeight))
+                    {
+                        landlordsCard.Add(landlordsCards[i]);
+                    }
+
+                    if (cardsWeight.Add(landlordsCards[i - 1].CardWeight))
+                    {
+                        landlordsCard.Add(landlordsCards[i - 1]);
+                    }
+                    if (landlordsCard.Count == 5)
+                        break;
+                }
+            }
+
+            if (landlordsCard.Count != 5)
+            {
+                return new List<LandlordsCard>();
+            }
+            return landlordsCard;
+        }
+
+        /// <summary>
+        /// 找到所有的5张单顺
+        /// </summary>
+        /// <param name="landlordsCards"></param>
+        /// <returns></returns>
+        public static List<List<LandlordsCard>> FindAllFiveStraght(List<LandlordsCard> landlordsCards)
+        {
+            List<LandlordsCard> copyCards = new List<LandlordsCard>(landlordsCards);
+            List<List<LandlordsCard>> result = new List<List<LandlordsCard>>();
+            while (copyCards.Count >= 5)
+            {
+                List<LandlordsCard> findFiveStraght = FindFiveStraght(copyCards);
+                if (findFiveStraght.Count == 0)
+                    break;
+                result.Add(findFiveStraght);
+                copyCards.RemoveList(findFiveStraght);
             }
             return result;
         }
