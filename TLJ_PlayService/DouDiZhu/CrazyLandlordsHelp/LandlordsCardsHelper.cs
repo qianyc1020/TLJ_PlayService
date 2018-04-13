@@ -1301,21 +1301,26 @@ namespace CrazyLandlords.Helper
         /// <returns></returns>
         public static List<PokerInfo> GetTrusteeshipPoker(DDZ_RoomData room, DDZ_PlayerData playerData)
         {
-            LandlordsCardsHelper.SetWeight(room);
             List<TLJCommon.PokerInfo> listPoker = new List<TLJCommon.PokerInfo>();
+            LandlordsCardsHelper.SetWeight(room);
             List<PokerInfo> handPoker = playerData.getPokerList();
 
             if (!playerData.m_isAI)
             {
-                //跟牌
-                if (!playerData.m_isFreeOutPoker)
+                //主动出牌
+                if (room.biggestPlayerData == null || room.biggestPlayerData == playerData)
+                {
+                    listPoker = handPoker.Where(card => card.m_weight_DDZ == handPoker[handPoker.Count - 1].m_weight_DDZ).ToList();
+                }
+                else
                 {
                     DDZ_PlayerData beforePlayerData = room.getBeforePlayerData(playerData.m_uid);
+
                     if (beforePlayerData.m_curOutPokerList.Count != 0)
                     {
                         if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
                         {
-                            List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(playerData.getPokerList(),beforePlayerData.m_curOutPokerList, type);
+                            List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(handPoker, beforePlayerData.m_curOutPokerList, type);
 
                             if (result.Count > 0)
                             {
@@ -1331,13 +1336,9 @@ namespace CrazyLandlords.Helper
                     {
                     }
                 }
-                //主动出牌
-                else
-                {
-                    listPoker = handPoker.Where(card => card.m_weight_DDZ == handPoker[handPoker.Count - 1].m_weight_DDZ).ToList();
-                }
-            }
 
+                room.biggestPlayerData = playerData;
+            }
             return listPoker;
         }
     }

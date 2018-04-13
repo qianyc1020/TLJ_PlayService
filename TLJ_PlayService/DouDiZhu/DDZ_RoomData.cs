@@ -19,7 +19,7 @@ public class DDZ_RoomData
     public int m_roomAliveTime = 900000;    // 房间生命周期：毫秒：15分钟
     public int m_fapaiDurTime = 400;        // 发牌间隔：毫秒
 
-    public string m_tag;            // "DouDiZhu_Game"
+    public string m_tag;                    // "DouDiZhu_Game"
 
     public bool m_isStartGame = false;
     DDZ_RoomState m_roomState = DDZ_RoomState.RoomState_waiting;
@@ -33,6 +33,8 @@ public class DDZ_RoomData
 
     // 本房间玩家信息
     List<DDZ_PlayerData> m_playerDataList = new List<DDZ_PlayerData>();
+
+    public DDZ_PlayerData biggestPlayerData;
 
     // 底牌
     List<TLJCommon.PokerInfo> m_DiPokerList = new List<TLJCommon.PokerInfo>();
