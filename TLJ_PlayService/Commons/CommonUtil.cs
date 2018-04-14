@@ -32,6 +32,21 @@ class CommonUtil
         return DateTime.Now.Day;
     }
 
+    static public int getCurHour()
+    {
+        return DateTime.Now.Hour;
+    }
+
+    static public int getCurMinute()
+    {
+        return DateTime.Now.Minute;
+    }
+
+    static public int getCurSecond()
+    {
+        return DateTime.Now.Second;
+    }
+
     static public bool splitStrIsPerfect(string str, List<string> list, char c)
     {
         bool b = false;

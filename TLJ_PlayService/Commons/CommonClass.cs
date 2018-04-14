@@ -15,6 +15,9 @@ public enum TimerType
     TimerType_pvpNextStartGame,
     TimerType_callPlayerOutPoker,
     TimerType_gameOver,
+
+    TimerType_qiangDizhu,
+    TimerType_jiaBang,
 }
 
 public class PVPRoomPlayerList

@@ -190,7 +190,11 @@ class GameUtil
                 {
                     case "XiuXian":
                         {
-                            if (tempList[2].CompareTo("ChuJi") == 0)
+                            if (tempList[2].CompareTo("Common") == 0)
+                            {
+                                changcixishu = 2;
+                            }
+                            else if (tempList[2].CompareTo("ChuJi") == 0)
                             {
                                 changcixishu = 1;
                             }
@@ -721,7 +725,11 @@ class GameUtil
     {
         string roonName = "";
 
-        if (gameRoomType.CompareTo("XiuXian_JingDian_ChuJi") == 0)
+        if (gameRoomType.CompareTo("XiuXian_JingDian_Common") == 0)
+        {
+            roonName = "经典玩法";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_JingDian_ChuJi") == 0)
         {
             roonName = "经典玩法-新手场";
         }
@@ -732,6 +740,10 @@ class GameUtil
         else if (gameRoomType.CompareTo("XiuXian_JingDian_GaoJi") == 0)
         {
             roonName = "经典玩法-大师场";
+        }
+        else if (gameRoomType.CompareTo("XiuXian_ChaoDi_Common") == 0)
+        {
+            roonName = "抄底玩法";
         }
         else if (gameRoomType.CompareTo("XiuXian_ChaoDi_ChuJi") == 0)
         {

@@ -432,7 +432,7 @@ public class HPServerUtil
             // 休闲场相关
             if (tag.CompareTo(TLJCommon.Consts.Tag_XiuXianChang) == 0)
             {
-                PlayLogic_Relax.getInstance().OnReceive(receiveObj.m_connId,text);
+                PlayLogic_Relax.getInstance().OnReceive(receiveObj.m_connId, text);
             }
             // 比赛场相关
             else if (tag.CompareTo(TLJCommon.Consts.Tag_JingJiChang) == 0)
@@ -473,6 +473,21 @@ public class HPServerUtil
             else if (tag.CompareTo(TLJCommon.Consts.Tag_HeartBeat_Play) == 0)
             {
                 NetRespond_HeartBeat_Play.doAskCilentReq_HeartBeat_Play(receiveObj.m_connId, text);
+            }
+            // 解散房间
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_BreakRoom) == 0)
+            {
+                NetRespond_BreakRoom.doAskCilentReq_BreakRoom(receiveObj.m_connId, text);
+            }
+            // 斗地主相关
+            else if (tag.CompareTo(TLJCommon.Consts.Tag_DouDiZhu_Game) == 0)
+            {
+                PlayLogic_DDZ.getInstance().OnReceive(receiveObj.m_connId, text);
+            }
+            // 未知Tag
+            else
+            {
+                LogUtil.getInstance().addDebugLog("未知Tag：" + tag);
             }
         }
         else
