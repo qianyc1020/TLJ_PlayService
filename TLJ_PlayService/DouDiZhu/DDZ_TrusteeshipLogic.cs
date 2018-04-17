@@ -32,7 +32,6 @@ public class DDZ_TrusteeshipLogic
                         {
                             int num = listPoker[i].m_num;
                             int pokerType = (int)listPoker[i].m_pokerType;
-
                             {
                                 JObject temp = new JObject();
                                 temp.Add("num", num);
