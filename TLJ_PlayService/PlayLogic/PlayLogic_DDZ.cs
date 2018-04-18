@@ -95,12 +95,6 @@ class PlayLogic_DDZ: DDZ_GameBase
                 }
                 break;
 
-                case (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_ChangeRoom:
-                {
-                    DDZ_GameLogic.doTask_ChangeRoom(this,connId, data);
-                }
-                break;
-
                 case (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_Chat:
                 {
                     DDZ_GameLogic.doTask_Chat(this, connId, data);
@@ -269,33 +263,6 @@ class PlayLogic_DDZ: DDZ_GameBase
                         {
                             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在本桌满人之前退出：" + playerData.m_uid);
 
-                            // 还回报名费
-                            {
-                                PVPGameRoomData pvpGameRoomData = PVPGameRoomDataScript.getInstance().getDataByRoomType(room.m_gameRoomType);
-                                string baomingfei = pvpGameRoomData.baomingfei;
-
-                                if (baomingfei.CompareTo("0") != 0)
-                                {
-                                    List<string> tempList = new List<string>();
-                                    CommonUtil.splitStr(baomingfei, tempList, ':');
-
-                                    int id = int.Parse(tempList[0]);
-                                    int num = int.Parse(tempList[1]);
-
-                                    string content = pvpGameRoomData.gameroomname + "报名费返还：";
-                                    if (id == 1)
-                                    {
-                                        content += ("金币x" + num);
-                                    }
-                                    else
-                                    {
-                                        content += ("蓝钻石x" + num);
-                                    }
-
-                                    Request_SendMailToUser.doRequest(playerData.m_uid, "报名费返还", content, baomingfei);
-                                }
-                            }
-
                             room.getPlayerDataList().Remove(playerData);
 
                             if (DDZ_GameUtil.checkRoomNonePlayer(room))
@@ -311,19 +278,16 @@ class PlayLogic_DDZ: DDZ_GameBase
                         }
                     }
                     break;
-                    
+
+                case DDZ_RoomState.RoomState_fapai:
+                case DDZ_RoomState.RoomState_qiangdizhu:
+                case DDZ_RoomState.RoomState_jiabang:
                 case DDZ_RoomState.RoomState_gaming:
                     {
                         if (!playerData.isOffLine())
                         {
                             LogUtil.getInstance().addDebugLog(m_logFlag + "----" + ":玩家在游戏中退出：" + playerData.m_uid);
                             playerData.setIsOffLine(true);
-
-                            // 如果当前房间正好轮到此人出牌
-                            if (room.m_curOutPokerPlayer.m_uid.CompareTo(playerData.m_uid) == 0)
-                            {
-                                //TrusteeshipLogic.trusteeshipLogic_OutPoker(this, m_roomList[i], playerDataList[j]);
-                            }
                         }
                         else
                         {
@@ -401,11 +365,126 @@ class PlayLogic_DDZ: DDZ_GameBase
     // 游戏结束
     public override void gameOver(DDZ_RoomData room)
     {
+        room.setRoomState(DDZ_RoomState.RoomState_end);
+
+        LogUtil.getInstance().writeRoomLog(room, m_logFlag + "----" + ":比赛结束,roomid = :" + room.getRoomId());
+
+        // 游戏在线统计
+        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+        {
+            Request_OnlineStatistics.doRequest(room.getPlayerDataList()[i].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[i].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+        }
+
+        // 是否春天
+        {
+            if (room.m_winPlayerData.m_isDiZhu == 1)
+            {
+                bool isChunTian = true;
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    if (room.getPlayerDataList()[i].m_isDiZhu == 0)
+                    {
+                        if (room.getPlayerDataList()[i].m_outPokerCiShu > 0)
+                        {
+                            isChunTian = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isChunTian)
+                {
+                    room.m_beishu_chuntian = 2;
+                }
+            }
+            else
+            {
+                bool isChunTian = true;
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    if (room.getPlayerDataList()[i].m_isDiZhu == 1)
+                    {
+                        if (room.getPlayerDataList()[i].m_outPokerCiShu > 1)
+                        {
+                            isChunTian = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isChunTian)
+                {
+                    room.m_beishu_chuntian = 2;
+                }
+            }
+        }
+
+        // 计算每个玩家的金币（积分）
+        DDZ_GameUtil.setPlayerScore(room, false);
+
+        // 加减金币
+        {
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                // 加、减玩家金币值
+                Request_ChangeUserWealth.doRequest(room.getPlayerDataList()[i].m_uid, 1, room.getPlayerDataList()[i].m_score, "斗地主结算");
+            }
+        }
+
+        //// 逻辑处理
+        //{
+        //    List<string> winnerList = new List<string>();
+
+        //    // 游戏数据统计
+        //    Request_GameStatistics.doRequest(room, winnerList);
+        //}
+
         {
             JObject respondJO = new JObject();
             {
                 respondJO.Add("tag", room.m_tag);
                 respondJO.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_GameOver);
+                respondJO.Add("isDiZhuWin", room.m_winPlayerData.m_isDiZhu);
+
+                for (int i = 0; i <room.getPlayerDataList().Count; i++)
+                {
+                    JObject jo = new JObject();
+                    jo.Add("score", room.getPlayerDataList()[i].m_score);
+
+                    float beishu = room.m_maxJiaoFenPlayerData.m_jiaofen * room.m_beishu_chuntian * room.m_beishu_bomb;
+                    jo.Add("beishu", (int)beishu * (room.getPlayerDataList()[i].m_isJiaBang + 1));
+
+                    respondJO.Add(room.getPlayerDataList()[i].m_uid, jo);
+                }
+
+                // 倍数
+                for(int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    DDZ_PlayerData playerData =  room.getPlayerDataList()[i];
+
+                    JArray ja = new JArray();
+
+                    {
+                        ja.Add("初始倍数X" + room.m_maxJiaoFenPlayerData.m_jiaofen);
+
+                        if (playerData.m_isJiaBang == 1)
+                        {
+                            ja.Add("加棒X2");
+                        }
+
+                        if (room.m_beishu_bomb > 1)
+                        {
+                            ja.Add("炸弹X" + room.m_beishu_bomb);
+                        }
+
+                        if (room.m_beishu_chuntian > 1)
+                        {
+                            ja.Add("春天X" + room.m_beishu_chuntian);
+                        }
+                    }
+
+                    respondJO.Add("beishu_" + playerData.m_uid, ja);
+                }
             }
 
             for (int i = 0; i < room.getPlayerDataList().Count; i++)

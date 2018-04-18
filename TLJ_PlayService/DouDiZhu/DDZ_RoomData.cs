@@ -34,7 +34,9 @@ public class DDZ_RoomData
     // 本房间玩家信息
     List<DDZ_PlayerData> m_playerDataList = new List<DDZ_PlayerData>();
 
-    public DDZ_PlayerData biggestPlayerData;
+    public DDZ_PlayerData m_maxJiaoFenPlayerData = null;    // 当前叫分最大的人
+    public DDZ_PlayerData biggestPlayerData = null;         // 当前出牌最大的人
+    public DDZ_PlayerData m_winPlayerData = null;
 
     // 底牌
     List<TLJCommon.PokerInfo> m_DiPokerList = new List<TLJCommon.PokerInfo>();
@@ -46,6 +48,9 @@ public class DDZ_RoomData
     public TimerUtil m_timerUtil_FaPai = new TimerUtil();
 
     public DDZ_GameBase m_gameBase;
+
+    public float m_beishu_bomb = 1;
+    public float m_beishu_chuntian = 1;
 
     public void clearData()
     {
@@ -198,7 +203,7 @@ public class DDZ_RoomData
                             int num = getPlayerDataList()[i].getPokerList()[m_fapaiIndex].m_num;
                             int pokerType = (int)getPlayerDataList()[i].getPokerList()[m_fapaiIndex].m_pokerType;
                             
-                            if (!getPlayerDataList()[i].isOffLine())
+                            //if (!getPlayerDataList()[i].isOffLine())
                             {
                                 JObject jo2 = new JObject();
                                 jo2.Add("tag", m_tag);
@@ -220,6 +225,8 @@ public class DDZ_RoomData
                             }
 
                             getPlayerDataList()[i].m_allotPokerList.Add(new PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+
+                            LogUtil.getInstance().writeRoomLog(this, "发牌给：" + getPlayerDataList()[i].m_uid + "----num = " + num + "  pokerType = " + pokerType);
                         }
 
                         // 牌未发完
@@ -232,11 +239,18 @@ public class DDZ_RoomData
                         // 牌已发完
                         else
                         {
+                            for (int i = 0; i < getDiPokerList().Count; i++)
+                            {
+                                LogUtil.getInstance().writeRoomLog(this, "底牌：----num = " + getDiPokerList()[i].m_num + "  pokerType = " + (int)getDiPokerList()[i].m_pokerType);
+                            }
+
                             // 随机一个玩家开始抢地主
                             {
+                                m_roomState = DDZ_RoomState.RoomState_qiangdizhu;
+
                                 DDZ_PlayerData playerData = null;
                                 int r = RandomUtil.getRandom(0, getPlayerDataList().Count - 1);
-                                r = 0;
+                                //r = 0;
                                 playerData = getPlayerDataList()[r];
 
                                 m_firstQiangDiZhuPlayer = playerData;
@@ -367,5 +381,16 @@ public class DDZ_RoomData
     public void addOutPoker(int num,int pokerType)
     {
         m_allOutPokerList.Add(new TLJCommon.PokerInfo(num, (TLJCommon.Consts.PokerType)pokerType));
+    }
+
+    public int getBeiShuByUid(string uid)
+    {
+        float beishu = m_maxJiaoFenPlayerData.m_jiaofen * m_beishu_chuntian * m_beishu_bomb;
+
+        if (getPlayerDataByUid(uid).m_isJiaBang == 1)
+        {
+            beishu *= 2;
+        }
+        return (int)beishu;
     }
 }

@@ -16,6 +16,8 @@ public class DDZ_PlayerData
     public bool m_isAI = false;
     public string m_gameRoomType;
     public bool m_isFreeOutPoker = false;
+    public int m_score = 0;
+    public int m_outPokerCiShu = 0;
 
     List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();                    // 玩家手牌（发完牌之后）
     public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();        // 当前已经发的牌
@@ -187,24 +189,24 @@ public class DDZ_PlayerData
         m_isTuoGuan = isTuoGuan;
     }
 
-    //public GameBase getGameBase()
-    //{
-    //    DDZ_RoomData room = GameUtil.getRoomByUid(m_uid);
+    public DDZ_GameBase getGameBase()
+    {
+        DDZ_RoomData room = DDZ_GameUtil.getRoomByUid(m_uid);
 
-    //    if (room != null)
-    //    {
-    //        return room.m_gameBase;
-    //    }
+        if (room != null)
+        {
+            return room.m_gameBase;
+        }
 
-    //    return null;
-    //}
+        return null;
+    }
 
     public void changeTuoGuanState()
     {
-        //GameBase gameBase = getGameBase();
-        //if (gameBase != null)
-        //{
-        //    GameLogic.tellPlayerTuoGuanState(gameBase, this, m_isTuoGuan);
-        //}
+        DDZ_GameBase gameBase = getGameBase();
+        if (gameBase != null)
+        {
+            DDZ_GameLogic.tellPlayerTuoGuanState(gameBase, this, m_isTuoGuan);
+        }
     }
 }

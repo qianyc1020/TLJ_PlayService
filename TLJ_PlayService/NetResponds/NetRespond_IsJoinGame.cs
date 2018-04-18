@@ -20,11 +20,22 @@ class NetRespond_IsJoinGame
             // 逻辑处理
             {
                 respondJO.Add("tag", tag);
-                respondJO.Add("isJoinGame", GameUtil.checkPlayerIsInRoom(uid) ? 1 : 0);
 
+                // 先去升级里面找
                 if (GameUtil.checkPlayerIsInRoom(uid))
                 {
+                    respondJO.Add("isJoinGame", 1);
                     respondJO.Add("gameRoomType", GameUtil.getRoomByUid(uid).m_gameRoomType);
+                }
+                // 再去斗地主里面找
+                else if (DDZ_GameUtil.checkPlayerIsInRoom(uid))
+                {
+                    respondJO.Add("isJoinGame", 1);
+                    respondJO.Add("gameRoomType", DDZ_GameUtil.getRoomByUid(uid).m_gameRoomType);
+                }
+                else
+                {
+                    respondJO.Add("isJoinGame", 0);
                 }
 
                 // 发送给客户端
