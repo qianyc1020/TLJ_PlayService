@@ -74,12 +74,22 @@ public class DDZ_TrusteeshipLogic
             data["tag"] = room.m_tag;
             data["uid"] = playerData.m_uid;
             data["playAction"] = (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_QiangDiZhu;
-
-            if (room.m_maxJiaoFenPlayerData != null)
+            
+            // 机器人叫分
+            if (playerData.m_isAI)
             {
-                int r = RandomUtil.getRandom(1, 3);
-                data["fen"] = r;
+                if (room.m_maxJiaoFenPlayerData == null)
+                {
+                    int r = RandomUtil.getRandom(1, 3);
+                    data["fen"] = r;
+                }
+                else
+                {
+                    int r = RandomUtil.getRandom(room.m_maxJiaoFenPlayerData.m_jiaofen + 1, 3);
+                    data["fen"] = r;
+                }
             }
+            // 真人托管不叫分
             else
             {
                 data["fen"] = 0;
