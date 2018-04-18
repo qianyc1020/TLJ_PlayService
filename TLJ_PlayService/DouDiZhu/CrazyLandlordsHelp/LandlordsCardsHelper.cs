@@ -1364,7 +1364,7 @@ namespace CrazyLandlords.Helper
                             }
                             else
                             {
-                                PlayService.log.Warn($"当前玩家不出牌");
+                                PlayService.log.Warn($"当前玩家{playerData.m_uid}不出牌");
                             }
                         }
                         else
