@@ -915,30 +915,20 @@ namespace CrazyLandlords.Helper
             {
                 //TODO 
                 case CardsType.BoomAndOne:
-
-                    for (int i = copyCards.Count - 1; i >= 3; i--)
+                    if (boomCards.Length == 0) break;
+                    foreach (var item in boomCards)
                     {
-                        PokerInfo[] groupCards = new PokerInfo[6];
-                        groupCards[0] = copyCards[i - 3];
-                        groupCards[1] = copyCards[i - 2];
-                        groupCards[2] = copyCards[i - 1];
-                        groupCards[3] = copyCards[i];
-
-                        if (GetWeight(groupCards, CardsType.Boom) > weight)
-                        {
-                            copyCards.RemoveRange(i - 3, 3);
-                            int i1 = RandomHelper.RandomNumber(0, copyCards.Count);
-                            groupCards[4] = copyCards[i1];
-                            copyCards.RemoveAt(i1);
-
-                            int i2 = RandomHelper.RandomNumber(0, copyCards.Count);
-                            groupCards[5] = copyCards[i2];
-                            copyCards.RemoveAt(i2);
-                            result.Add(groupCards);
-                        }
+                        //4带2没有对方大
+                        if (((int) item.Key * 4) <= weight)
+                            continue;
+                        List<PokerInfo> temp = new List<PokerInfo>(item);
+                        copyCards.RemoveList(temp);
+                        temp.Add(copyCards[0]);
+                        temp.Add(copyCards[1]);
+                        result.Add(temp.ToArray());
+                        break;
                     }
-
-                    break;
+                        break;
                 //TODO 
                 case CardsType.BoomAndTwo:
                     //没有炸弹
