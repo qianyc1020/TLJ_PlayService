@@ -710,8 +710,14 @@ namespace CrazyLandlords.Helper
             List<PokerInfo> jokerBoomCards = new List<PokerInfo>();
             List<PokerInfo> boomCards = new List<PokerInfo>();
 
+            //3张
             List<PokerInfo> tripleCards = new List<PokerInfo>();
+            //3顺
             List<List<PokerInfo>> tripleStraghtCards;
+            //单顺
+            List<List<PokerInfo>> allFiveStraght;
+            //双顺
+            List<List<PokerInfo>> allDoubleStraght;
 
 //            List<PokerInfo> tripleStraghtCards = new List<PokerInfo>();
 
@@ -767,19 +773,23 @@ namespace CrazyLandlords.Helper
             copyCards.RemoveList(boomCards);
             copyCards.RemoveList(tripleStraghtCards);
 
-            List<List<PokerInfo>> allFiveStraght = FindAllFiveStraght(copyCards);
+            allFiveStraght = FindAllFiveStraght(copyCards);
             copyCards.RemoveList(allFiveStraght);
 
             foreach (var fiveStraght in allFiveStraght)
             {
-                foreach (var card in copyCards)
+                for (int i = copyCards.Count - 1; i >= 0 ; i--)
                 {
-                    if (card.m_weight_DDZ - fiveStraght[fiveStraght.Count - 1].m_weight_DDZ == 1)
+                    if (copyCards[i].m_weight_DDZ - fiveStraght[fiveStraght.Count - 1].m_weight_DDZ == 1)
                     {
-
+                        fiveStraght.Add(copyCards[i]);
+                        copyCards.RemoveAt(i);
                     }
                 }
             }
+
+
+
 
 
             return null;
@@ -1351,6 +1361,10 @@ namespace CrazyLandlords.Helper
 
                                 PlayService.log.Warn($"当前玩家{playerData.m_uid}可以出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
                                 PlayService.log.Warn($"当前玩家{playerData.m_uid}出牌:{Newtonsoft.Json.JsonConvert.SerializeObject(listPoker.ToArray())}");
+                            }
+                            else
+                            {
+                                PlayService.log.Warn($"当前玩家不出牌");
                             }
                         }
                         else
