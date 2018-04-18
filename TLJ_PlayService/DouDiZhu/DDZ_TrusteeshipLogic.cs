@@ -62,7 +62,6 @@ public class DDZ_TrusteeshipLogic
         }
     }
 
-   
 
     // 托管:抢地主
     public static void trusteeshipLogic_QiangDiZhu(DDZ_GameBase gameBase, DDZ_RoomData room, DDZ_PlayerData playerData)
