@@ -62,9 +62,7 @@ public class DDZ_TrusteeshipLogic
             TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":trusteeshipLogic_OutPoker：" + ex);
         }
     }
-
-   
-
+    
     // 托管:抢地主
     public static void trusteeshipLogic_QiangDiZhu(DDZ_GameBase gameBase, DDZ_RoomData room, DDZ_PlayerData playerData)
     {
@@ -77,7 +75,16 @@ public class DDZ_TrusteeshipLogic
             data["tag"] = room.m_tag;
             data["uid"] = playerData.m_uid;
             data["playAction"] = (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_QiangDiZhu;
-            data["fen"] = 0;
+
+            if (room.m_maxJiaoFenPlayerData != null)
+            {
+                int r = RandomUtil.getRandom(1, 3);
+                data["fen"] = r;
+            }
+            else
+            {
+                data["fen"] = 0;
+            }
 
             DDZ_GameLogic.doTask_QiangDiZhu(gameBase, playerData.m_connId, data.ToString());
         }

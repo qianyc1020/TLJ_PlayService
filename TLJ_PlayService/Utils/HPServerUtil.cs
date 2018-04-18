@@ -137,7 +137,23 @@ public class HPServerUtil
                 }
                 else
                 {
-                    LogUtil.getInstance().addDebugLog("发送消息给客户端：" + data);
+                    DDZ_PlayerData ddz_playerData = DDZ_GameUtil.getPlayerDataByConnId(connId);
+                    if (ddz_playerData != null)
+                    {
+                        DDZ_RoomData room = DDZ_GameUtil.getRoomByUid(ddz_playerData.m_uid);
+                        if (room != null)
+                        {
+                            LogUtil.getInstance().writeRoomLog(room, "发送消息给客户端：" + data);
+                        }
+                        else
+                        {
+                            LogUtil.getInstance().addDebugLog("发送消息给客户端：" + data);
+                        }
+                    }
+                    else
+                    {
+                        LogUtil.getInstance().addDebugLog("发送消息给客户端：" + data);
+                    }
                 }
             }
         }

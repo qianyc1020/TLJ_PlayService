@@ -214,4 +214,85 @@ class DDZ_GameUtil
 
         return roonName;
     }
+
+    public static void setPlayerScore(DDZ_RoomData room, bool canFuShu)
+    {
+        try
+        {
+            float jichufenshu = 100;
+            float changcixishu = 1;
+            float beishu = 1;
+            
+            for (int i = 0; i < room.getPlayerDataList().Count; i++)
+            {
+                float score = 0;
+
+                // 叫分 * 春天倍数 * 炸弹倍数
+                beishu = room.m_maxJiaoFenPlayerData.m_jiaofen * room.m_beishu_chuntian * room.m_beishu_bomb;
+                if (room.getPlayerDataList()[i].m_isJiaBang == 1)
+                {
+                    beishu *= 2;
+                }
+
+                score = jichufenshu * changcixishu * beishu;
+                room.getPlayerDataList()[i].m_score = (int)score;
+            }
+
+            // 地主赢
+            if (room.m_winPlayerData.m_isDiZhu == 1)
+            {
+                int winerCanGetScote = 0;
+
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    DDZ_PlayerData playerData = room.getPlayerDataList()[i];
+
+                    if (playerData.m_isDiZhu != 1)
+                    {
+                        UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(playerData.m_uid);
+                        if (userInfo_Game != null)
+                        {
+                            if (userInfo_Game.gold < playerData.m_score)
+                            {
+                                winerCanGetScote += userInfo_Game.gold;
+                                playerData.m_score = -userInfo_Game.gold;
+                            }
+                            else
+                            {
+                                winerCanGetScote += playerData.m_score;
+                                playerData.m_score = -playerData.m_score;
+                            }
+                        }
+                    }
+                }
+                
+                room.m_diZhuPlayer.m_score = winerCanGetScote;
+            }
+            // 农民赢
+            else
+            {
+                int winerCanGetScote = 0;
+
+                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                {
+                    DDZ_PlayerData playerData = room.getPlayerDataList()[i];
+
+                    if (playerData.m_isDiZhu != 1)
+                    {
+                        UserInfo_Game userInfo_Game = UserInfo_Game_Manager.getDataByUid(playerData.m_uid);
+                        if (userInfo_Game != null)
+                        {
+                            winerCanGetScote += playerData.m_score;
+                        }
+                    }
+                }
+
+                room.m_diZhuPlayer.m_score = -winerCanGetScote;
+            }
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error("DDZ_GameUtil.setPlayerScore()----" + ex + "gameRoomType:" + room.m_gameRoomType);
+        }
+    }
 }
