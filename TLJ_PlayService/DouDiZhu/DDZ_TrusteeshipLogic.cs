@@ -27,6 +27,16 @@ public class DDZ_TrusteeshipLogic
                     {
                         List<TLJCommon.PokerInfo> listPoker = LandlordsCardsHelper.GetTrusteeshipPoker(room, playerData);
 
+                        //// 打印托管出的牌
+                        //{
+                        //    string str = "";
+                        //    for (int i = 0; i < listPoker.Count; i++)
+                        //    {
+                        //        str += (listPoker[i].m_num + "、");
+                        //    }
+                        //    TLJ_PlayService.PlayService.log.Warn(m_logFlag + "----托管出牌：" + playerData.m_uid + ":" + str);
+                        //}
+
                         JArray jarray = new JArray();
                         for (int i = 0; i < listPoker.Count; i++)
                         {

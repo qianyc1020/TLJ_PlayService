@@ -393,4 +393,12 @@ public class DDZ_RoomData
         }
         return (int)beishu;
     }
+
+    public void clearAllCurOutPoker()
+    {
+        for (int i = 0; i < getPlayerDataList().Count; i++)
+        {
+            getPlayerDataList()[i].m_curOutPokerList.Clear();
+        }
+    }
 }

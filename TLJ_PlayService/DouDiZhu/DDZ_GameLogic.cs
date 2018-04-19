@@ -846,6 +846,9 @@ class DDZ_GameLogic
             if (room.biggestPlayerData.m_uid.CompareTo(playerData.m_uid) == 0)
             {
                 playerData.m_isFreeOutPoker = true;
+
+                // 清空当前回合出的牌
+                room.clearAllCurOutPoker();
             }
             else
             {
