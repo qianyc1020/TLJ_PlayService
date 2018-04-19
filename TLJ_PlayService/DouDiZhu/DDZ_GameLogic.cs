@@ -534,13 +534,68 @@ class DDZ_GameLogic
                         // 没人抢地主,重新发牌
                         else
                         {
-                            JObject jo2 = new JObject();
-                            jo2.Add("tag", tag);
-                            jo2.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_NoOneQiangDiZhu);
-
-                            for (int i = 0; i < playerDataList.Count; i++)
+                            // 先通知
                             {
-                                PlayService.m_serverUtil.sendMessage(playerDataList[i].m_connId, jo2.ToString());
+                                JObject jo2 = new JObject();
+                                jo2.Add("tag", tag);
+                                jo2.Add("playAction", (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_NoOneQiangDiZhu);
+
+                                for (int i = 0; i < playerDataList.Count; i++)
+                                {
+                                    PlayService.m_serverUtil.sendMessage(playerDataList[i].m_connId, jo2.ToString());
+                                }
+                            }
+
+                            // 清空数据
+                            {
+                                room.m_fapaiIndex = 0;
+                                room.m_firstQiangDiZhuPlayer = null;
+                                room.m_curQiangDiZhuPlayer = null;
+
+                                room.getDiPokerList().Clear();
+
+                                for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                                {
+                                    room.getPlayerDataList()[i].m_pokerList.Clear();
+                                    room.getPlayerDataList()[i].m_allotPokerList.Clear();
+                                }
+                            }
+
+                            // 重新发牌
+                            {
+                                // 开始解散房间倒计时（设为15分钟，目的是房间异常后强制解散房间，否则玩家和机器人无法释放）
+                                room.startBreakRoomTimer();
+
+                                room.m_isStartGame = true;
+                                room.setRoomState(DDZ_RoomState.RoomState_fapai);
+
+                                // 生成每个人的牌
+                                {
+                                    // 随机分配牌
+                                    List<List<TLJCommon.PokerInfo>> pokerInfoList = DDZ_AllotPoker.AllotPokerToPlayer(room.m_gameRoomType);
+
+                                    for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                                    {
+                                        room.getPlayerDataList()[i].setPokerList(pokerInfoList[i]);
+                                    }
+
+                                    room.setDiPokerList(pokerInfoList[pokerInfoList.Count - 1]);
+
+                                    // 自定义牌型
+                                    if (DebugConfig.s_isDebug)
+                                    {
+                                        for (int i = 0; i < room.getPlayerDataList().Count; i++)
+                                        {
+                                            PlayerCustomPokerInfo playerCustomPokerInfo = CustomPoker.findPlayerByUid(room.getPlayerDataList()[i].m_uid);
+                                            if (playerCustomPokerInfo != null)
+                                            {
+                                                room.getPlayerDataList()[i].setPokerList(playerCustomPokerInfo.getPokerListForNew());
+                                            }
+                                        }
+                                    }
+                                }
+
+                                room.startFaPaiTimer();
                             }
                         }
                     }
@@ -1118,6 +1173,7 @@ class DDZ_GameLogic
                     respondJO.Add("tag", TLJCommon.Consts.Tag_ResumeGame);
                     respondJO.Add("gameroomtype", room.m_gameRoomType);
                     respondJO.Add("roomState", (int)room.getRoomState());
+                    respondJO.Add("beishu", room.getBeiShuByUid(uid));
 
                     // userList
                     {

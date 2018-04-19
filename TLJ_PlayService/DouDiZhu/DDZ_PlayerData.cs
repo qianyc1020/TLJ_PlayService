@@ -19,7 +19,7 @@ public class DDZ_PlayerData
     public int m_score = 0;
     public int m_outPokerCiShu = 0;
 
-    List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();                    // 玩家手牌（发完牌之后）
+    public List<TLJCommon.PokerInfo> m_pokerList = new List<TLJCommon.PokerInfo>();             // 玩家手牌（发完牌之后）
     public List<TLJCommon.PokerInfo> m_allotPokerList = new List<TLJCommon.PokerInfo>();        // 当前已经发的牌
     public List<TLJCommon.PokerInfo> m_curOutPokerList = new List<TLJCommon.PokerInfo>();
 
