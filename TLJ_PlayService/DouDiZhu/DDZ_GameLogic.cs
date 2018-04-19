@@ -379,7 +379,7 @@ class DDZ_GameLogic
                 // 抢地主失败
                 if (room.m_maxJiaoFenPlayerData != null)
                 {
-                    if ((fen > 0) && (fen < room.m_maxJiaoFenPlayerData.m_jiaofen))
+                    if ((fen > 0) && (fen <= room.m_maxJiaoFenPlayerData.m_jiaofen))
                     {
                         // 给客户端回复
                         JObject respondJO = new JObject();
@@ -388,7 +388,7 @@ class DDZ_GameLogic
                         respondJO.Add("playAction", playAction);
                         respondJO.Add("uid", uid);
                         respondJO.Add("fen", fen);
-                        respondJO.Add("msg", "抢地主失败，必须比上家叫的分大。");
+                        respondJO.Add("msg", "叫分失败，必须大于" + room.m_maxJiaoFenPlayerData.m_jiaofen + "分。");
 
                         // 发送给客户端
                         PlayService.m_serverUtil.sendMessage(playerData.m_connId, respondJO.ToString());
@@ -547,6 +547,8 @@ class DDZ_GameLogic
                     // 叫下一个人抢地主
                     else
                     {
+                        room.m_curQiangDiZhuPlayer = nextPlayer;
+
                         // 开始倒计时
                         nextPlayer.m_timerUtil.startTimer(room.m_qiangDiZhuTime, TimerType.TimerType_qiangDizhu);
 
