@@ -44,7 +44,7 @@ public class DDZ_RoomData
     public TimerUtil m_timerUtil = new TimerUtil();
     public TimerUtil m_timerUtil_breakRom = new TimerUtil();
 
-    int m_fapaiIndex = 0;
+    public int m_fapaiIndex = 0;
     public TimerUtil m_timerUtil_FaPai = new TimerUtil();
 
     public DDZ_GameBase m_gameBase;

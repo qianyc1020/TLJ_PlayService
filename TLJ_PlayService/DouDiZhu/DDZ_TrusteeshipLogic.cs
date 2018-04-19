@@ -74,7 +74,7 @@ public class DDZ_TrusteeshipLogic
             data["tag"] = room.m_tag;
             data["uid"] = playerData.m_uid;
             data["playAction"] = (int)TLJCommon.Consts.DDZ_PlayAction.PlayAction_QiangDiZhu;
-            
+
             // 机器人叫分
             if (playerData.m_isAI)
             {
