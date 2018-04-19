@@ -1398,8 +1398,9 @@ namespace CrazyLandlords.Helper
             }
             else
             {
-                DDZ_PlayerData beforePlayerData2 = room.getBeforePlayerData(beforePlayerData.m_uid);
-                FollowCards(room, playerData, beforePlayerData2, handPoker, listPoker);
+                PlayService.log.Warn($"上一家玩家{beforePlayerData.m_uid}没有出牌");
+                //  DDZ_PlayerData beforePlayerData2 = room.getBeforePlayerData(beforePlayerData.m_uid);
+                //  FollowCards(room, playerData, beforePlayerData2, handPoker, listPoker);
             }
 
             return listPoker;
