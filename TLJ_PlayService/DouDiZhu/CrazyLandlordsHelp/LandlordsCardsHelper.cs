@@ -471,7 +471,7 @@ namespace CrazyLandlords.Helper
         {
             type = CardsType.None;
             bool isRule = false;
-            switch (cards?.Length)
+            switch (cards.Length)
             {
                 case 1:
                     isRule = true;
@@ -582,6 +582,11 @@ namespace CrazyLandlords.Helper
                         isRule = true;
                         type = CardsType.OnlyThree;
                     }
+                    else if (IsTripleStraight(cards))
+                    {
+                        isRule = true;
+                        type = CardsType.TripleStraight;
+                    }
                     break;
                 case 10:
                     if (IsStraight(cards))
@@ -629,6 +634,11 @@ namespace CrazyLandlords.Helper
                         isRule = true;
                         type = CardsType.TripleStraightAndOne;
                     }
+                    else if (IsTripleStraight(cards))
+                    {
+                        isRule = true;
+                        type = CardsType.TripleStraight;
+                    }
                     break;
                 case 13:
                     break;
@@ -644,6 +654,11 @@ namespace CrazyLandlords.Helper
                     {
                         isRule = true;
                         type = CardsType.OnlyThree;
+                    }
+                    else if (IsTripleStraight(cards))
+                    {
+                        isRule = true;
+                        type = CardsType.TripleStraight;
                     }
                     else if (IsTripleStraightAndTwo(cards))
                     {
@@ -670,6 +685,11 @@ namespace CrazyLandlords.Helper
                     {
                         isRule = true;
                         type = CardsType.DoubleStraight;
+                    }
+                    else if (IsTripleStraight(cards))
+                    {
+                        isRule = true;
+                        type = CardsType.TripleStraight;
                     }
                     else if (IsOnlyThree(cards))
                     {
@@ -1332,42 +1352,56 @@ namespace CrazyLandlords.Helper
                 {
                     DDZ_PlayerData beforePlayerData = room.getBeforePlayerData(playerData.m_uid);
 
-                    //给上一乱手牌设权重
-                    LandlordsCardsHelper.SetWeight(beforePlayerData.getPokerList());
-                    LandlordsCardsHelper.SetWeight(beforePlayerData.m_curOutPokerList);
-
-                    if (beforePlayerData.m_curOutPokerList.Count != 0)
-                    {
-                        if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
-                        {
-                            PlayService.log.Warn($"上一轮玩家{beforePlayerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(beforePlayerData.m_curOutPokerList.ToArray())}");
-
-                            List<PokerInfo[]> result = LandlordsCardsHelper.GetPrompt(handPoker, beforePlayerData.m_curOutPokerList, type);
-
-                            if (result.Count > 0)
-                            {
-                                listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
-                                room.biggestPlayerData = playerData;
-
-                                PlayService.log.Warn($"当前玩家{playerData.m_uid}可以出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
-                                PlayService.log.Warn($"当前玩家{playerData.m_uid}出牌:{Newtonsoft.Json.JsonConvert.SerializeObject(listPoker.ToArray())}");
-                            }
-                            else
-                            {
-                                PlayService.log.Warn($"当前玩家{playerData.m_uid}不出牌");
-                            }
-                        }
-                        else
-                        {
-                            PlayService.log.Error($"未知的类型：{type}");
-                        }
-                    }
-                    else
-                    {
-                    }
+                    listPoker = FollowCards(room, playerData, beforePlayerData, handPoker, listPoker);
                 }
 
             }
+            return listPoker;
+        }
+
+        private static List<PokerInfo> FollowCards(DDZ_RoomData room, DDZ_PlayerData playerData, DDZ_PlayerData beforePlayerData,
+            List<PokerInfo> handPoker, List<PokerInfo> listPoker)
+        {
+            //给上一乱手牌设权重
+            LandlordsCardsHelper.SetWeight(beforePlayerData.getPokerList());
+            LandlordsCardsHelper.SetWeight(beforePlayerData.m_curOutPokerList);
+
+            if (beforePlayerData.m_curOutPokerList.Count != 0)
+            {
+                if (LandlordsCardsHelper.GetCardsType(beforePlayerData.m_curOutPokerList.ToArray(), out var type))
+                {
+                    PlayService.log.Warn(
+                        $"上一轮玩家{beforePlayerData.m_uid}出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(beforePlayerData.m_curOutPokerList.ToArray())}");
+
+                    List<PokerInfo[]> result =
+                        LandlordsCardsHelper.GetPrompt(handPoker, beforePlayerData.m_curOutPokerList, type);
+
+                    if (result.Count > 0)
+                    {
+                        listPoker = result[RandomHelper.RandomNumber(0, result.Count)].ToList();
+                        room.biggestPlayerData = playerData;
+
+                        PlayService.log.Warn(
+                            $"当前玩家{playerData.m_uid}可以出牌类型：{type}\n{Newtonsoft.Json.JsonConvert.SerializeObject(result.ToArray())}");
+                        PlayService.log.Warn(
+                            $"当前玩家{playerData.m_uid}出牌:{Newtonsoft.Json.JsonConvert.SerializeObject(listPoker.ToArray())}");
+                    }
+                    else
+                    {
+                        PlayService.log.Warn($"当前玩家{playerData.m_uid}不出牌");
+                    }
+                }
+                else
+                {
+                    PlayService.log.Error($"未知的类型：{type}");
+                }
+            }
+            else
+            {
+                DDZ_PlayerData beforePlayerData2 = room.getBeforePlayerData(beforePlayerData.m_uid);
+                FollowCards(room, playerData, beforePlayerData2, handPoker, listPoker);
+            }
+
             return listPoker;
         }
     }
