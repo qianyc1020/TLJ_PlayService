@@ -174,25 +174,34 @@ class DDZ_GameLogic
 
     public static DDZ_RoomData getRoomByPlayerUid(DDZ_GameBase gameBase, string uid)
     {
-        DDZ_RoomData room = null;
-
-        // 找到玩家所在的房间
-        for (int i = 0; i < gameBase.getRoomList().Count; i++)
+        try
         {
-            List<DDZ_PlayerData> playerDataList = gameBase.getRoomList()[i].getPlayerDataList();
+            DDZ_RoomData room = null;
 
-            for (int j = 0; j < playerDataList.Count; j++)
+            // 找到玩家所在的房间
+            for (int i = 0; i < gameBase.getRoomList().Count; i++)
             {
-                if (playerDataList[j].m_uid.CompareTo(uid) == 0)
-                {
-                    room = gameBase.getRoomList()[i];
+                List<DDZ_PlayerData> playerDataList = gameBase.getRoomList()[i].getPlayerDataList();
 
-                    return room;
+                for (int j = 0; j < playerDataList.Count; j++)
+                {
+                    if (playerDataList[j].m_uid.CompareTo(uid) == 0)
+                    {
+                        room = gameBase.getRoomList()[i];
+
+                        return room;
+                    }
                 }
             }
+
+            return room;
+        }
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":getRoomByPlayerUid异常：" + ex);
         }
 
-        return room;
+        return null;
     }
 
     public static void doTask_Chat(DDZ_GameBase gameBase, IntPtr connId, string data)
@@ -1125,28 +1134,35 @@ class DDZ_GameLogic
     
     public static bool breakRoomByRoomID(int roomID)
     {
-        // 休闲场
+        try
         {
-            List<DDZ_RoomData> roomList = PlayLogic_DDZ.getInstance().getRoomList();
-
-            for (int i = 0; i < roomList.Count; i++)
+            // 休闲场
             {
-                DDZ_RoomData room = roomList[i];
-                if (room.getRoomId() == roomID)
+                List<DDZ_RoomData> roomList = PlayLogic_DDZ.getInstance().getRoomList();
+
+                for (int i = 0; i < roomList.Count; i++)
                 {
-                    // 游戏在线统计
-                    for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                    DDZ_RoomData room = roomList[i];
+                    if (room.getRoomId() == roomID)
                     {
-                        Request_OnlineStatistics.doRequest(room.getPlayerDataList()[j].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[j].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+                        // 游戏在线统计
+                        for (int j = 0; j < room.getPlayerDataList().Count; j++)
+                        {
+                            Request_OnlineStatistics.doRequest(room.getPlayerDataList()[j].m_uid, room.getRoomId(), room.m_gameRoomType, room.getPlayerDataList()[j].m_isAI, (int)Request_OnlineStatistics.OnlineStatisticsType.OnlineStatisticsType_exit);
+                        }
+
+                        removeRoom(PlayLogic_DDZ.getInstance(), room, true);
+
+                        return true;
                     }
-
-                    removeRoom(PlayLogic_DDZ.getInstance(), room, true);
-
-                    return true;
                 }
             }
         }
-        
+        catch (Exception ex)
+        {
+            TLJ_PlayService.PlayService.log.Error(m_logFlag + "----" + ":breakRoomByRoomID异常：" + ex);
+        }
+
         return false;
     }
 
